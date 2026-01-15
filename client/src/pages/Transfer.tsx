@@ -438,33 +438,27 @@ export default function Transfer() {
             <div className="relative">
               <Button
                 variant="outline"
-                className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
+                className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[56px] py-3 px-4 hover-elevate transition-all"
                 onClick={() => setShowSourceModal(true)}
                 data-testid="button-wallet-selector"
               >
                 <div className="flex items-center gap-4 overflow-hidden text-left">
-                  <Wallet className="w-6 h-6 text-muted-foreground shrink-0" />
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <div className="flex items-center gap-2 overflow-hidden w-full">
-                      <span className="shrink-0 font-medium text-[18px] text-[#000000]">From</span>
-                      <div className="flex gap-1.5 overflow-hidden flex-wrap">
-                        {selectedWallets.length > 0 ? (
-                          selectedWallets.map(id => {
-                            const wallet = availableWallets.find(w => w.id === id);
-                            return wallet ? (
-                              <Badge key={id} variant="secondary" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-primary/10 text-primary border-0">
-                                {wallet.name}
-                              </Badge>
-                            ) : null;
-                          })
-                        ) : null}
-                      </div>
+                  <div className="flex items-center gap-2 overflow-hidden w-full">
+                    <span className="shrink-0 font-medium text-[18px] text-[#000000]">From</span>
+                    <div className="flex gap-1.5 overflow-hidden flex-wrap">
+                      {selectedWallets.length > 0 ? (
+                        selectedWallets.map(id => {
+                          const wallet = availableWallets.find(w => w.id === id);
+                          return wallet ? (
+                            <Badge key={id} variant="secondary" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-primary/10 text-primary border-0">
+                              {wallet.name}
+                            </Badge>
+                          ) : null;
+                        })
+                      ) : (
+                        <span className="text-muted-foreground text-[14px] font-normal">Choose origin wallets</span>
+                      )}
                     </div>
-                    <span className="text-muted-foreground text-[14px] font-normal">
-                      {selectedWallets.length > 0 
-                        ? `Total: $${getTotalWalletAmount().toLocaleString()}` 
-                        : "Choose origin wallets"}
-                    </span>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
