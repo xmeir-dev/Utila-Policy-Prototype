@@ -53,7 +53,7 @@ export function Navbar({ walletState }: NavbarProps) {
                 <img 
                   src={waystarRoycoLogo} 
                   alt={connectedUser.name} 
-                  className="w-6 h-6 rounded-full object-cover" 
+                  className="h-6 w-auto object-contain" 
                 />
                 <span className="text-sm font-medium">{connectedUser.name}</span>
               </div>
@@ -68,7 +68,7 @@ export function Navbar({ walletState }: NavbarProps) {
                 <img 
                   src={waystarRoycoLogo} 
                   alt={connectedUser.name} 
-                  className="w-6 h-6 rounded-full mr-2 object-cover" 
+                  className="h-6 w-auto mr-2 object-contain" 
                 />
                 {connectedUser.name}
               </Button>
@@ -112,7 +112,7 @@ export function Navbar({ walletState }: NavbarProps) {
                 <img 
                   src={waystarRoycoLogo} 
                   alt={user.name} 
-                  className="w-8 h-8 rounded-full mr-3 object-cover" 
+                  className="h-8 w-auto mr-3 object-contain" 
                 />
                 <div className="flex flex-col items-start">
                   <span className="font-medium">{user.name}</span>
