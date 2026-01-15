@@ -24,11 +24,39 @@ export default function Transfer() {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
 
-  const handleContinue = () => {
-    console.log("Transfer:", { amount, asset: selectedAsset.symbol, recipient });
+  const formatUSD = (val: string) => {
+    const num = parseFloat(val.replace(/,/g, ''));
+    if (isNaN(num)) return val;
+    return new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 2,
+    }).format(num);
   };
 
-  const AssetIcon = selectedAsset.icon;
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/,/g, '');
+    
+    // Only allow numbers and decimal point
+    if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
+
+    if (!isTokenPrimary) {
+      // USD formatting: add commas
+      if (val === '') {
+        setAmount('');
+      } else {
+        // Keep raw value if it ends with a dot to allow typing decimals
+        if (val.endsWith('.')) {
+          setAmount(val);
+        } else {
+          const parts = val.split('.');
+          const formatted = new Intl.NumberFormat('en-US').format(parseInt(parts[0]));
+          setAmount(parts.length > 1 ? `${formatted}.${parts[1]}` : formatted);
+        }
+      }
+    } else {
+      // Token formatting: just raw input to allow decimals
+      setAmount(val);
+    }
+  };
 
   const togglePrimary = () => {
     if (!amount) {
@@ -44,12 +72,20 @@ export default function Transfer() {
 
     if (isTokenPrimary) {
       // Switching from Token to USD
-      setAmount((currentVal * selectedAsset.price).toFixed(2));
+      const usdVal = currentVal * selectedAsset.price;
+      setAmount(new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(usdVal));
     } else {
       // Switching from USD to Token
-      setAmount((currentVal / selectedAsset.price).toFixed(6));
+      const tokenVal = currentVal / selectedAsset.price;
+      setAmount(tokenVal.toFixed(2));
     }
     setIsTokenPrimary(!isTokenPrimary);
+  };
+
+  const AssetIcon = selectedAsset.icon;
+
+  const handleContinue = () => {
+    console.log("Transfer:", { amount, asset: selectedAsset.symbol, recipient });
   };
 
   return (
@@ -147,7 +183,7 @@ export default function Transfer() {
                       type="text"
                       placeholder="0.00"
                       value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      onChange={handleAmountChange}
                       style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 14}px` : '50px' }}
                       className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[50px]"
                       data-testid="input-amount"
@@ -160,9 +196,9 @@ export default function Transfer() {
                 <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                   <span>
                     {isTokenPrimary ? (
-                      `$${amount ? (parseFloat(amount.replace(/,/g, '')) * selectedAsset.price).toFixed(2) : "0.00"}`
+                      `$${amount ? new Intl.NumberFormat('en-US').format(Math.round(parseFloat(amount.replace(/,/g, '')) * selectedAsset.price)) : "0"}`
                     ) : (
-                      `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(6) : "0.00"} ${selectedAsset.symbol}`
+                      `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(2) : "0.00"} ${selectedAsset.symbol}`
                     )}
                   </span>
                   <Button
