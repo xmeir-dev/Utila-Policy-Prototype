@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -332,7 +332,7 @@ export default function Transfer() {
                 data-testid="button-destination-selector"
               >
                 <div className="flex items-center gap-4 overflow-hidden text-left">
-                  <Wallet className="w-6 h-6 text-muted-foreground shrink-0" />
+                  <Send className="w-6 h-6 text-muted-foreground shrink-0" />
                   <div className="flex flex-col items-start gap-1 w-full">
                     <div className="flex items-center gap-2 overflow-hidden w-full">
                       <span className="shrink-0 font-medium text-[18px] text-[#000000]">To</span>
