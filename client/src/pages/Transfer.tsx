@@ -803,7 +803,10 @@ export default function Transfer() {
             )}
 
             <div className="space-y-3">
-              <h3 className="text-sm text-muted-foreground font-medium">Available wallets</h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm text-muted-foreground font-medium">Available wallets</h3>
+                <span className="text-sm font-medium"><span className="text-[#ababab]">Total balance</span> <span className="text-foreground">${availableWallets.reduce((sum, w) => sum + parseFloat(w.balance) * selectedAsset.price, 0).toLocaleString()}</span></span>
+              </div>
               <div className="space-y-2">
                 {availableWallets.map((wallet) => {
                   const isSelected = selectedWallets.includes(wallet.id);
