@@ -489,9 +489,7 @@ export default function Policies() {
                 <Card className="overflow-hidden">
                   <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium tracking-wide text-[14px] text-[#a8a8a8]">
-                        Priority Order
-                      </span>
+                      <span className="font-medium tracking-wide text-[14px] text-[#171717]">Priority order</span>
                     </div>
                     <span className="text-[14px] text-[#ababab]">
                       Drag to reorder. Higher policies take priority
