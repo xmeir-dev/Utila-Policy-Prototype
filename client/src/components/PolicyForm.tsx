@@ -720,7 +720,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label className="text-sm">Policy Change Approvers</Label>
+                <Label className="text-sm">Users who can approve policy changes</Label>
                 <MultiUserSelector
                   selected={formData.changeApproversList || []}
                   onChange={(values) => updateField('changeApproversList', values)}
