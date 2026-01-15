@@ -660,7 +660,7 @@ export default function Transfer() {
         </motion.div>
       </main>
         <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
-          <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
+          <DialogContent className="sm:max-w-[440px] rounded-[16px] p-0 gap-0 overflow-hidden">
             <DialogHeader className="p-6 pb-4 border-b border-border">
               <DialogTitle className="text-xl font-bold">Select recipients</DialogTitle>
             </DialogHeader>
@@ -831,7 +831,7 @@ export default function Transfer() {
           </DialogContent>
         </Dialog>
         <Dialog open={showSourceModal} onOpenChange={setShowSourceModal}>
-          <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
+          <DialogContent className="sm:max-w-[440px] rounded-[16px] p-0 gap-0 overflow-hidden">
             <DialogHeader className="p-6 pb-4 border-b border-border">
               <DialogTitle className="text-xl font-bold">Select source wallets</DialogTitle>
             </DialogHeader>
