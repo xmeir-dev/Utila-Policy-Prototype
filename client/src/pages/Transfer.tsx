@@ -529,26 +529,18 @@ export default function Transfer() {
                 onClick={() => setShowDestinationModal(true)} 
                 data-testid="button-destination-selector"
               >
-                <div className="flex items-center gap-4 overflow-hidden text-left">
-                  <Send className="w-6 h-6 text-muted-foreground shrink-0" />
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <div className="flex items-center gap-2 overflow-hidden w-full">
-                      <span className="shrink-0 font-medium text-[#000000] text-[14px]">To</span>
-                      <div className="flex gap-1.5 overflow-hidden flex-wrap">
-                        {recipients.length > 0 ? (
-                          recipients.map(r => (
-                            <Badge key={r.id} variant="outline" className="h-5 px-1.5 shrink-0 bg-transparent text-foreground border-muted-foreground/30 font-normal text-[14px]">
-                              {r.label || truncateAddress(r.address)}
-                            </Badge>
-                          ))
-                        ) : null}
-                      </div>
-                    </div>
-                    <span className="text-[14px] font-normal text-[#ababab]">
-                      {recipients.length > 0 
-                        ? `Total: $${getTotalRecipientAmount().toLocaleString()}` 
-                        : "Choose destination wallets"}
-                    </span>
+                <div className="flex items-center gap-2 overflow-hidden text-left">
+                  <span className="shrink-0 font-medium text-[14px] text-muted-foreground">To</span>
+                  <div className="flex gap-1.5 overflow-hidden flex-wrap">
+                    {recipients.length > 0 ? (
+                      recipients.map(r => (
+                        <Badge key={r.id} variant="outline" className="h-5 px-1.5 shrink-0 bg-transparent text-foreground border-muted-foreground/30 font-normal text-[14px]">
+                          {r.label || truncateAddress(r.address)}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-[14px] font-normal text-[#ababab]">Choose destination wallets</span>
+                    )}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
