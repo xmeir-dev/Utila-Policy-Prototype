@@ -423,15 +423,19 @@ export default function Transfer() {
                         e.stopPropagation();
                         const rawBalance = selectedAsset.balance.replace(/,/g, '');
                         const balanceNum = parseFloat(rawBalance);
-                        const maxAmount = (balanceNum * selectedAsset.price).toString();
                         
                         if (!isTokenPrimary) {
                           // Format with commas for USD
-                          const formatted = new Intl.NumberFormat('en-US').format(Math.floor(parseFloat(maxAmount)));
+                          const maxUSD = balanceNum * selectedAsset.price;
+                          const formatted = new Intl.NumberFormat('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                          }).format(Math.floor(maxUSD));
                           setAmount(formatted);
                         } else {
-                          // For token, use balance as is (already has commas from assets array or we can re-format)
-                          setAmount(selectedAsset.balance);
+                          // For token, format with commas
+                          const formatted = new Intl.NumberFormat('en-US').format(balanceNum);
+                          setAmount(formatted);
                         }
                       }}
                       data-testid="button-max"
