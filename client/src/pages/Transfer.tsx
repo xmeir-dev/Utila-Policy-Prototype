@@ -381,7 +381,7 @@ export default function Transfer() {
             </div>
 
             {!isLoadingPolicies && !hasPolicies && (
-              <div className="flex items-center justify-between p-4 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-[14px]">
+              <div className="flex items-center justify-between p-4 mb-4 border border-amber-500/20 rounded-[14px] bg-[#e0ceab1a]">
                 <div className="flex flex-col gap-0.5">
                   <h3 className="text-sm font-bold dark:text-amber-200 text-[#d67424]">
                     Secure your account
