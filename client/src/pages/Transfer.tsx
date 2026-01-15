@@ -544,7 +544,7 @@ export default function Transfer() {
                         ) : null}
                       </div>
                     </div>
-                    <span className="text-muted-foreground text-[14px] font-normal">
+                    <span className="text-[14px] font-normal text-[#ababab]">
                       {recipients.length > 0 
                         ? `Total: $${getTotalRecipientAmount().toLocaleString()}` 
                         : "Choose destination wallets"}
