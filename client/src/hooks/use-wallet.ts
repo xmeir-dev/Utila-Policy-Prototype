@@ -1,20 +1,26 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type ConnectWalletResponse } from "@shared/routes";
-import { useState } from "react";
-
-// In a real app, we might query "me" endpoint to check session status.
-// For this demo, we'll store local state to mimic the visual effect of connection
-// while still calling the API.
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@shared/routes";
+import { useState, useEffect } from "react";
 
 export function useWallet() {
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState<string | null>(() => {
+    return localStorage.getItem("utila_wallet_address");
+  });
+
+  useEffect(() => {
+    if (walletAddress) {
+      localStorage.setItem("utila_wallet_address", walletAddress);
+    } else {
+      localStorage.removeItem("utila_wallet_address");
+    }
+  }, [walletAddress]);
 
   const connectMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(api.wallet.connect.path, {
         method: api.wallet.connect.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // Optional wallet address body
+        body: JSON.stringify({}), 
         credentials: "include",
       });
 
