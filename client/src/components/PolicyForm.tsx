@@ -165,7 +165,7 @@ function MultiUserSelector({
             }
           }}
         >
-          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors">
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors [&>svg]:hidden">
             <div className="flex items-center gap-1">
               <Plus className="w-3 h-3" />
               <span>Add User</span>
@@ -227,7 +227,7 @@ function MultiWalletSelector({
             }
           }}
         >
-          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors">
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors [&>svg]:hidden">
             <div className="flex items-center gap-1">
               <Plus className="w-3 h-3" />
               <span>Add Wallet</span>
