@@ -225,7 +225,7 @@ export class DatabaseStorage implements IStorage {
     const policy = await this.getPolicy(id);
     if (!policy || policy.status !== 'pending_approval') return undefined;
 
-    const currentApprovals = policy.changeApprovers || [];
+    const currentApprovals = policy.changeApprovals || [];
     if (currentApprovals.includes(approver)) {
       return policy; // Already approved
     }
@@ -242,7 +242,7 @@ export class DatabaseStorage implements IStorage {
           ...pendingChanges,
           status: 'active',
           pendingChanges: null,
-          changeApprovers: null,
+          changeApprovals: null,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(policies.id, id))
@@ -252,7 +252,7 @@ export class DatabaseStorage implements IStorage {
       // Just add the approval
       const [updated] = await db
         .update(policies)
-        .set({ changeApprovers: newApprovals })
+        .set({ changeApprovals: newApprovals })
         .where(eq(policies.id, id))
         .returning();
       return updated;
