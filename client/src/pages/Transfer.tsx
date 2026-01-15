@@ -48,6 +48,10 @@ export default function Transfer() {
           </div>
 
           <div className="space-y-3">
+            <div className="flex justify-between items-center text-sm">
+              <span className="font-medium text-muted-foreground">Balance</span>
+              <span className="font-semibold text-foreground">{selectedAsset.balance} {selectedAsset.symbol}</span>
+            </div>
             <div className="relative">
               <Input
                 type="text"
@@ -87,9 +91,6 @@ export default function Transfer() {
                 )}
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Available: {selectedAsset.balance} {selectedAsset.symbol}
-            </p>
           </div>
 
           <div className="space-y-3">
