@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Wallet, Loader2 } from "lucide-react";
+import { Wallet, Loader2, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useWallet, WALLET_USERS } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
