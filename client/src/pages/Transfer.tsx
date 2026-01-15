@@ -181,7 +181,7 @@ export default function Transfer() {
                     )}
                     <Input
                       type="text"
-                      placeholder="0.00"
+                      placeholder={isTokenPrimary ? "0.00" : "0"}
                       value={amount}
                       onChange={handleAmountChange}
                       style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 16}px` : '60px' }}
