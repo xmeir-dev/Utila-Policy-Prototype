@@ -130,9 +130,9 @@ export default function Transfer() {
                 Max
               </Button>
             </div>
-            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-md overflow-hidden h-32">
+            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-md h-32 z-10">
               {/* Token Selector (Left) */}
-              <div className="flex items-center px-4 border-r border-border min-w-[140px]">
+              <div className="flex items-center px-4 border-r border-border min-w-[140px] z-20">
                 <div className="relative w-full">
                   <Button
                     variant="ghost"
@@ -147,7 +147,7 @@ export default function Transfer() {
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </Button>
                   {showAssetDropdown && (
-                    <div className="absolute left-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-20 min-w-[200px] overflow-hidden">
+                    <div className="absolute left-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-50 min-w-[200px] overflow-hidden">
                       {assets.map((asset) => {
                         const Icon = asset.icon;
                         return (
