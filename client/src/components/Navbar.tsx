@@ -95,11 +95,9 @@ export function Navbar({ walletState }: NavbarProps) {
                 onClick={() => handleUserSelect(user.address)}
                 className="justify-start h-14 px-4 rounded-[14px]"
               >
-                <img 
-                  src={waystarRoycoLogo} 
-                  alt={user.name} 
-                  className="h-8 w-auto mr-3 object-contain" 
-                />
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full mr-3 ${user.avatarBg} ${user.avatarColor}`}>
+                  <span className="text-sm font-semibold">{user.name.charAt(0)}</span>
+                </div>
                 <div className="flex flex-col items-start">
                   <span className="font-medium">{user.name}</span>
                   <span className="text-xs text-muted-foreground font-mono">
