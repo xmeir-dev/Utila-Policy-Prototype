@@ -48,7 +48,7 @@ export function Navbar({ walletState }: NavbarProps) {
               data-testid="button-connect-wallet"
               onClick={() => connect()}
               disabled={isConnecting}
-              className="rounded-md"
+              className="rounded-[16px]"
             >
               {isConnecting ? (
                 <>

@@ -80,18 +80,18 @@ export default function Home() {
             >
               <div className="grid grid-cols-3 gap-4 mb-12">
                 <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2"
+                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
                   data-testid="button-transfer"
                 >
                   <Send className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Transfer</span>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2">
+                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2">
                   <Gavel className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Policies</span>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2">
+                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2">
                   <LibraryBig className="w-8 h-8 text-primary" />
                   <span className="font-semibold">History</span>
                 </div>
