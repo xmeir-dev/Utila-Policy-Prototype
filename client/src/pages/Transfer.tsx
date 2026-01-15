@@ -173,7 +173,7 @@ export default function Transfer() {
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </Button>
                   {showAssetDropdown && (
-                    <div className="absolute left-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-50 min-w-[200px] overflow-hidden">
+                    <div className="absolute left-0 top-full mt-2 bg-card border border-border rounded-[16px] shadow-lg z-50 min-w-[200px] overflow-hidden">
                       {assets.map((asset) => {
                         const Icon = asset.icon;
                         return (
@@ -284,7 +284,7 @@ export default function Transfer() {
               </Button>
 
               {showWalletDropdown && (
-                <div className="absolute left-0 right-0 top-full mt-2 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden py-1">
+                <div className="absolute left-0 right-0 top-full mt-2 bg-card border border-border rounded-[16px] shadow-xl z-50 overflow-hidden py-1">
                   {availableWallets.map((wallet) => (
                     <div
                       key={wallet.id}
