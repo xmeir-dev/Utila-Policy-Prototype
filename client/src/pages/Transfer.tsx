@@ -630,11 +630,6 @@ export default function Transfer() {
                     </span>
                   </div>
                 </div>
-                {!isWithinBalance && (
-                  <div className="text-xs text-destructive bg-destructive/10 p-2 rounded-[8px]">
-                    Total exceeds available balance
-                  </div>
-                )}
               </div>
             )}
 
@@ -719,14 +714,33 @@ export default function Transfer() {
           </div>
 
           <div className="p-6 pt-4 border-t border-border">
-            <Button
-              className="w-full rounded-[12px]"
-              onClick={() => setShowDestinationModal(false)}
-              disabled={recipients.length === 0 || !recipients.every(r => r.amount && parseFloat(r.amount) > 0) || !isWithinBalance}
-              data-testid="button-confirm-recipients"
-            >
-              Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
-            </Button>
+            {!isWithinBalance && recipients.length > 0 ? (
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <span className="w-full cursor-not-allowed" tabIndex={0}>
+                    <Button
+                      className="w-full rounded-[12px] pointer-events-none"
+                      disabled
+                      data-testid="button-confirm-recipients"
+                    >
+                      Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Total exceeds available balance</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button
+                className="w-full rounded-[12px]"
+                onClick={() => setShowDestinationModal(false)}
+                disabled={recipients.length === 0 || !recipients.every(r => r.amount && parseFloat(r.amount) > 0)}
+                data-testid="button-confirm-recipients"
+              >
+                Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
