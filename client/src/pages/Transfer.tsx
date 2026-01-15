@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet, RefreshCw } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
@@ -15,6 +17,12 @@ const assets = [
   { symbol: "USDT", name: "Tether", balance: "500.00", price: 1, icon: SiTether, color: "text-[#26A17B]" },
 ];
 
+const availableWallets = [
+  { id: "w1", name: "Main Wallet", address: "0x1234...5678", balance: "1.5" },
+  { id: "w2", name: "Hardware Wallet", address: "0x8765...4321", balance: "0.8" },
+  { id: "w3", name: "Savings", address: "0xabcd...efgh", balance: "0.2" },
+];
+
 export default function Transfer() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -23,13 +31,19 @@ export default function Transfer() {
   const [recipient, setRecipient] = useState("");
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
+  const [selectedWallets, setSelectedWallets] = useState<string[]>(["w1"]);
+  const [showWalletDropdown, setShowWalletDropdown] = useState(false);
   const amountInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const walletDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowAssetDropdown(false);
+      }
+      if (walletDropdownRef.current && !walletDropdownRef.current.contains(event.target as Node)) {
+        setShowWalletDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -141,6 +155,82 @@ export default function Transfer() {
                 Max
               </Button>
             </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-medium text-muted-foreground uppercase tracking-wider">Source Wallets</span>
+                <span className="text-muted-foreground">
+                  {selectedWallets.length} selected
+                </span>
+              </div>
+              <div className="relative" ref={walletDropdownRef}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between bg-card/50 border-border rounded-[16px] h-12 px-4 hover-elevate transition-all"
+                  onClick={() => setShowWalletDropdown(!showWalletDropdown)}
+                  data-testid="button-wallet-selector"
+                >
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <Wallet className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div className="flex gap-1.5 overflow-hidden">
+                      {selectedWallets.length > 0 ? (
+                        selectedWallets.map(id => {
+                          const wallet = availableWallets.find(w => w.id === id);
+                          return wallet ? (
+                            <Badge key={id} variant="secondary" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-primary/10 text-primary border-0">
+                              {wallet.name}
+                            </Badge>
+                          ) : null;
+                        })
+                      ) : (
+                        <span className="text-muted-foreground text-sm font-normal">Select source wallets</span>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+                </Button>
+
+                {showWalletDropdown && (
+                  <div className="absolute left-0 right-0 top-full mt-2 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden py-1">
+                    {availableWallets.map((wallet) => (
+                      <div
+                        key={wallet.id}
+                        className="flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const isSelected = selectedWallets.includes(wallet.id);
+                          if (isSelected) {
+                            setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
+                          } else {
+                            setSelectedWallets([...selectedWallets, wallet.id]);
+                          }
+                        }}
+                        data-testid={`option-wallet-${wallet.id}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={selectedWallets.includes(wallet.id)}
+                            onCheckedChange={() => {}} // Handled by div click
+                            className="rounded-sm border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold">{wallet.name}</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-[24px] h-32 z-10">
               {/* Token Selector (Left) */}
               <div className="flex items-center px-4 border-r border-border min-w-[140px] z-20" ref={dropdownRef}>
@@ -231,6 +321,81 @@ export default function Transfer() {
                   </Button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-sm">
+              <span className="font-medium text-muted-foreground">Source Wallets</span>
+              <span className="text-xs text-muted-foreground">
+                {selectedWallets.length} selected
+              </span>
+            </div>
+            <div className="relative" ref={walletDropdownRef}>
+              <Button
+                variant="outline"
+                className="w-full justify-between bg-card border-border rounded-[24px] h-14 px-4 hover-elevate"
+                onClick={() => setShowWalletDropdown(!showWalletDropdown)}
+                data-testid="button-wallet-selector"
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <Wallet className="w-5 h-5 text-muted-foreground shrink-0" />
+                  <div className="flex gap-1.5 overflow-hidden">
+                    {selectedWallets.length > 0 ? (
+                      selectedWallets.map(id => {
+                        const wallet = availableWallets.find(w => w.id === id);
+                        return wallet ? (
+                          <Badge key={id} variant="secondary" className="h-6 px-2 text-[10px] font-bold shrink-0">
+                            {wallet.name}
+                          </Badge>
+                        ) : null;
+                      })
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Select source wallets</span>
+                    )}
+                  </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+              </Button>
+
+              {showWalletDropdown && (
+                <div className="absolute left-0 right-0 top-full mt-2 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden py-1">
+                  {availableWallets.map((wallet) => (
+                    <div
+                      key={wallet.id}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const isSelected = selectedWallets.includes(wallet.id);
+                        if (isSelected) {
+                          setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
+                        } else {
+                          setSelectedWallets([...selectedWallets, wallet.id]);
+                        }
+                      }}
+                      data-testid={`option-wallet-${wallet.id}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          checked={selectedWallets.includes(wallet.id)}
+                          onCheckedChange={() => {}} // Handled by div click
+                          className="rounded-sm border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold">{wallet.name}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
