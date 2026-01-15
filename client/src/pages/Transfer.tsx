@@ -1,3 +1,4 @@
+import etherscanLogo from "@assets/etherscan-logo-circle_1768521442428.png"
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send, Plus, X, User, Lock, CornerUpRight } from "lucide-react";
@@ -684,13 +685,18 @@ export default function Transfer() {
                           </div>
                           <div className="flex flex-col">
                             <span className="text-sm font-semibold">{recipient.label || "Custom Address"}</span>
-                            <a 
-                              href={`https://etherscan.io/address/${recipient.address}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
-                              onClick={(e) => e.stopPropagation()}
-                            >{truncateAddress(recipient.address)}</a>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground font-mono">{truncateAddress(recipient.address)}</span>
+                              <a 
+                                href={`https://etherscan.io/address/${recipient.address}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:opacity-80 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <img src={etherscanLogo} alt="Etherscan" className="w-3 h-3 grayscale opacity-70 hover:grayscale-0 hover:opacity-100" />
+                              </a>
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
@@ -780,13 +786,18 @@ export default function Transfer() {
                                 {entry.isInternal ? 'Internal' : 'External'}
                               </span>
                             </div>
-                            <a 
-                              href={`https://etherscan.io/address/${entry.address}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
-                              onClick={(e) => e.stopPropagation()}
-                            >{truncateAddress(entry.address)}</a>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground font-mono">{truncateAddress(entry.address)}</span>
+                              <a 
+                                href={`https://etherscan.io/address/${entry.address}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:opacity-80 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <img src={etherscanLogo} alt="Etherscan" className="w-3 h-3 grayscale opacity-70 hover:grayscale-0 hover:opacity-100" />
+                              </a>
+                            </div>
                           </div>
                         </div>
                         {isSelected && (
