@@ -303,6 +303,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
+        <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Policy details</Label>
         <div className="space-y-2">
           <Label htmlFor="policy-name">Policy Name</Label>
           <Input
