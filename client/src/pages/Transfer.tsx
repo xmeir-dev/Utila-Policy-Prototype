@@ -647,7 +647,7 @@ export default function Transfer() {
             )}
 
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">Add New Address</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground">New address</h3>
               <div className="flex gap-2">
                 <Input
                   placeholder="Enter wallet address or ENS name"
