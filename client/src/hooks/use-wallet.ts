@@ -16,11 +16,11 @@ export function useWallet() {
   }, [walletAddress]);
 
   const connectMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (walletAddress: string) => {
       const res = await fetch(api.wallet.connect.path, {
         method: api.wallet.connect.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), 
+        body: JSON.stringify({ walletAddress }), 
         credentials: "include",
       });
 
@@ -55,7 +55,7 @@ export function useWallet() {
   });
 
   return {
-    connect: connectMutation.mutate,
+    connect: (walletAddress: string) => connectMutation.mutate(walletAddress),
     disconnect: disconnectMutation.mutate,
     isConnecting: connectMutation.isPending,
     isConnected: !!walletAddress,
