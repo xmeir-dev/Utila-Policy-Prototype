@@ -440,10 +440,10 @@ export default function Transfer() {
 
                 {/* Amount Inputs (Right) */}
                 <div 
-                  className="flex-1 flex items-center justify-between px-6 cursor-text"
+                  className="flex-1 flex flex-col justify-center px-6 gap-1 items-end cursor-text"
                   onClick={() => amountInputRef.current?.focus()}
                 >
-                  <div className="flex flex-col gap-1 items-start">
+                  <div className="flex items-center justify-end w-full">
                     <div className="flex items-center">
                       {!isTokenPrimary && (
                         <span className="text-[24px] leading-none font-normal text-foreground">$</span>
@@ -465,27 +465,24 @@ export default function Transfer() {
                         <span className="text-[24px] leading-none font-normal text-foreground ml-1">{selectedAsset.symbol}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-                      <span>
-                        {isTokenPrimary ? (
-                          `$${amount ? new Intl.NumberFormat('en-US').format(Math.round(parseFloat(amount.replace(/,/g, '')) * selectedAsset.price)) : "0"}`
-                        ) : (
-                          `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(2) : "0.00"} ${selectedAsset.symbol}`
-                        )}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 p-0 hover:bg-transparent hover:text-foreground text-[#ababab]"
-                        onClick={togglePrimary}
-                        data-testid="button-switch-unit"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                      </Button>
-                    </div>
                   </div>
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted/50">
-                    <Wallet className="w-5 h-5 text-muted-foreground" />
+                  <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                    <span>
+                      {isTokenPrimary ? (
+                        `$${amount ? new Intl.NumberFormat('en-US').format(Math.round(parseFloat(amount.replace(/,/g, '')) * selectedAsset.price)) : "0"}`
+                      ) : (
+                        `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(2) : "0.00"} ${selectedAsset.symbol}`
+                      )}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 p-0 hover:bg-transparent hover:text-foreground text-[#ababab]"
+                      onClick={togglePrimary}
+                      data-testid="button-switch-unit"
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                    </Button>
                   </div>
                 </div>
               </div>
