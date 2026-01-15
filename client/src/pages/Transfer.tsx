@@ -370,7 +370,7 @@ export default function Transfer() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h2 className="text-3xl font-bold font-display text-foreground">Transfer</h2>
+            <h2 className="font-bold font-display text-foreground text-[24px]">Transfer</h2>
           </div>
 
           <div className="space-y-1">
