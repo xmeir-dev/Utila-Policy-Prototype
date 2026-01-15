@@ -87,7 +87,11 @@ export default function Home() {
                   <Send className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Transfer</span>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2">
+                <div 
+                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
+                  onClick={() => setLocation("/policies")}
+                  data-testid="button-policies"
+                >
                   <Gavel className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Policies</span>
                 </div>

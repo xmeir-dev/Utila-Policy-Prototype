@@ -60,5 +60,73 @@ export async function registerRoutes(
     res.status(200).json(pendingTxs);
   });
 
+  // Policies endpoints
+  app.get(api.policies.list.path, async (req, res) => {
+    try {
+      const policies = await storage.getPolicies();
+      res.status(200).json(policies);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch policies" });
+    }
+  });
+
+  app.post(api.policies.create.path, async (req, res) => {
+    try {
+      const input = api.policies.create.input.parse(req.body);
+      
+      // Validate action field
+      const validActions = ['approve', 'deny', 'require_approval'];
+      if (!validActions.includes(input.action)) {
+        return res.status(400).json({
+          message: `Invalid action. Must be one of: ${validActions.join(', ')}`,
+          field: 'action',
+        });
+      }
+      
+      const policy = await storage.createPolicy(input);
+      res.status(200).json(policy);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      res.status(500).json({ message: "Failed to create policy" });
+    }
+  });
+
+  app.delete('/api/policies/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      const deleted = await storage.deletePolicy(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.status(200).json({ success: true });
+    } catch (err) {
+      res.status(500).json({ message: "Failed to delete policy" });
+    }
+  });
+
+  app.patch('/api/policies/:id/toggle', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      const policy = await storage.togglePolicy(id);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.status(200).json(policy);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to toggle policy" });
+    }
+  });
+
   return httpServer;
 }

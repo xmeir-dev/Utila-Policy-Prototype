@@ -30,5 +30,20 @@ export const insertTransactionSchema = createInsertSchema(transactions).omit({ i
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 
+// Policies table
+export const policies = pgTable("policies", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  action: text("action").notNull(), // 'approve', 'deny', 'require_approval'
+  isActive: boolean("is_active").default(true),
+});
+
+export const insertPolicySchema = createInsertSchema(policies).omit({ id: true });
+
+export type Policy = typeof policies.$inferSelect;
+export type InsertPolicy = z.infer<typeof insertPolicySchema>;
+
 // Request/Response types
 export type TransactionsListResponse = Transaction[];
+export type PoliciesListResponse = Policy[];

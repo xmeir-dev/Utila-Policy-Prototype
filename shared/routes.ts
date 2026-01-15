@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertUserSchema, users } from './schema';
+import { insertUserSchema, users, insertPolicySchema, policies } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -48,6 +48,40 @@ export const api = {
           status: z.string(),
           txHash: z.string().optional()
         })),
+      },
+    },
+  },
+  policies: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/policies',
+      responses: {
+        200: z.array(z.custom<typeof policies.$inferSelect>()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/policies',
+      input: insertPolicySchema,
+      responses: {
+        200: z.custom<typeof policies.$inferSelect>(),
+        400: errorSchemas.validation,
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/policies/:id',
+      responses: {
+        200: z.object({ success: z.boolean() }),
+        404: errorSchemas.notFound,
+      },
+    },
+    toggle: {
+      method: 'PATCH' as const,
+      path: '/api/policies/:id/toggle',
+      responses: {
+        200: z.custom<typeof policies.$inferSelect>(),
+        404: errorSchemas.notFound,
       },
     },
   },

@@ -477,7 +477,7 @@ export default function Transfer() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 p-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                      className="h-6 w-6 p-0 hover:bg-transparent hover:text-foreground text-[#ababab]"
                       onClick={togglePrimary}
                       data-testid="button-switch-unit"
                     >
