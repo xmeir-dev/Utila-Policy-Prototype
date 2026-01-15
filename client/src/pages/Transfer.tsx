@@ -43,9 +43,9 @@ const truncateAddress = (address: string): string => {
 };
 
 const assets = [
-  { symbol: "ETH", name: "Ethereum", balance: "1,255", price: 2500, icon: SiEthereum, color: "text-[#627EEA]" },
-  { symbol: "USDC", name: "USD Coin", balance: "1,059,505", price: 1, icon: MdOutlinePaid, color: "text-[#2775CA]" },
-  { symbol: "USDT", name: "Tether", balance: "750,500", price: 1, icon: SiTether, color: "text-[#26A17B]" },
+  { symbol: "ETH", name: "Ethereum", balance: "1,255", price: 3292.39, icon: SiEthereum, color: "text-[#627EEA]" },
+  { symbol: "USDC", name: "USD Coin", balance: "1,059,505", price: 1.0001, icon: MdOutlinePaid, color: "text-[#2775CA]" },
+  { symbol: "USDT", name: "Tether", balance: "750,500", price: 0.9999, icon: SiTether, color: "text-[#26A17B]" },
 ];
 
 const availableWallets = [
