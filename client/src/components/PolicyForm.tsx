@@ -324,7 +324,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               <Label htmlFor="policy-name">Policy Name</Label>
               <Input
                 id="policy-name"
-                placeholder="e.g., Large Bitcoin Transfer Approval"
+                placeholder="ababab"
                 value={formData.name || ""}
                 onChange={(e) => updateField('name', e.target.value)}
                 className="rounded-lg"
@@ -336,7 +336,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               <Label htmlFor="policy-description">Description</Label>
               <Textarea
                 id="policy-description"
-                placeholder="Describe what this policy does..."
+                placeholder="ababab"
                 value={formData.description || ""}
                 onChange={(e) => updateField('description', e.target.value)}
                 className="rounded-lg min-h-[80px] resize-none"
