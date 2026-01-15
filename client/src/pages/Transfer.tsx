@@ -618,18 +618,6 @@ export default function Transfer() {
                     </div>
                   ))}
                 </div>
-                
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-sm text-muted-foreground">Total</span>
-                  <div className="flex flex-col items-end">
-                    <span className={`text-sm font-bold ${!isWithinBalance ? 'text-destructive' : ''}`}>
-                      ${getTotalRecipientAmount().toLocaleString()}
-                    </span>
-                    <span className="text-muted-foreground text-[14px]">
-                      Total available: ${getAvailableBalance().toLocaleString()}
-                    </span>
-                  </div>
-                </div>
               </div>
             )}
 
