@@ -733,7 +733,7 @@ export default function Transfer() {
       <Dialog open={showSourceModal} onOpenChange={setShowSourceModal}>
         <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
           <DialogHeader className="p-6 pb-4 border-b border-border">
-            <DialogTitle className="text-xl font-bold">Select Source Wallets</DialogTitle>
+            <DialogTitle className="text-xl font-bold">Select source wallets</DialogTitle>
           </DialogHeader>
           
           <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
