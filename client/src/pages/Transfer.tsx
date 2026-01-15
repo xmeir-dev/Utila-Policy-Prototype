@@ -468,7 +468,7 @@ export default function Transfer() {
                         {isTokenPrimary ? (
                           `$${amount ? new Intl.NumberFormat('en-US').format(Math.round(parseFloat(amount.replace(/,/g, '')) * selectedAsset.price)) : "0"}`
                         ) : (
-                          `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(2) : "0.00"} ${selectedAsset.symbol}`
+                          `${amount ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount.replace(/,/g, '')) / selectedAsset.price) : "0.00"} ${selectedAsset.symbol}`
                         )}
                       </span>
                       <Button
