@@ -66,9 +66,11 @@ export default function Transfer() {
   const amountInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const walletDropdownRef = useRef<HTMLDivElement>(null);
+  const userEnteredAmountRef = useRef<string>("");
 
   const getInitialRecipientAmount = () => {
-    const parsed = parseFloat(amount.replace(/,/g, ''));
+    const amountToUse = userEnteredAmountRef.current || amount;
+    const parsed = parseFloat(amountToUse.replace(/,/g, ''));
     if (isNaN(parsed) || parsed <= 0) return "";
     const usdAmount = isTokenPrimary ? parsed * selectedAsset.price : parsed;
     return usdAmount.toString();
@@ -187,6 +189,11 @@ export default function Transfer() {
     
     // Only allow numbers and decimal point
     if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
+
+    // Track user-entered amount before any recipients are added
+    if (recipients.length === 0) {
+      userEnteredAmountRef.current = val;
+    }
 
     if (!isTokenPrimary) {
       // USD formatting: add commas
