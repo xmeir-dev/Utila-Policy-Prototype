@@ -160,6 +160,55 @@ export default function Transfer() {
     setWalletAmounts(prev => ({ ...prev, [walletId]: formatted }));
   };
 
+  const distributeWalletAmounts = (walletIds: string[], totalBudget: number): Record<string, string> => {
+    if (walletIds.length === 0 || totalBudget <= 0) return {};
+    
+    const count = walletIds.length;
+    const totalCents = Math.round(totalBudget * 100);
+    const baseAmount = Math.floor(totalCents / count);
+    const remainder = totalCents % count;
+    
+    const newAmounts: Record<string, string> = {};
+    walletIds.forEach((id, index) => {
+      const amount = ((baseAmount + (index < remainder ? 1 : 0)) / 100).toFixed(2);
+      newAmounts[id] = formatAmountWithCommas(amount);
+    });
+    return newAmounts;
+  };
+
+  const handleWalletSelection = (walletId: string, isCurrentlySelected: boolean) => {
+    let newSelectedWallets: string[];
+    if (isCurrentlySelected) {
+      newSelectedWallets = selectedWallets.filter(id => id !== walletId);
+    } else {
+      newSelectedWallets = [...selectedWallets, walletId];
+    }
+    setSelectedWallets(newSelectedWallets);
+    
+    // Get total budget from the main amount input or from current wallet amounts
+    const currentTotal = getTotalWalletAmount();
+    const mainAmountTotal = getTopContainerAmountUSD();
+    const totalBudget = currentTotal > 0 ? currentTotal : mainAmountTotal;
+    
+    if (totalBudget > 0 && newSelectedWallets.length > 0) {
+      setWalletAmounts(distributeWalletAmounts(newSelectedWallets, totalBudget));
+    } else if (newSelectedWallets.length === 0) {
+      setWalletAmounts({});
+    }
+  };
+
+  const handleRemoveWallet = (walletId: string) => {
+    const newSelectedWallets = selectedWallets.filter(id => id !== walletId);
+    setSelectedWallets(newSelectedWallets);
+    
+    const currentTotal = getTotalWalletAmount();
+    if (currentTotal > 0 && newSelectedWallets.length > 0) {
+      setWalletAmounts(distributeWalletAmounts(newSelectedWallets, currentTotal));
+    } else {
+      setWalletAmounts({});
+    }
+  };
+
   const getTotalWalletAmount = () => {
     return selectedWallets.reduce((sum, id) => {
       const amt = parseFloat((walletAmounts[id] || "0").replace(/,/g, '')) || 0;
@@ -784,7 +833,7 @@ export default function Transfer() {
                           variant="ghost"
                           size="icon"
                           className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
-                          onClick={() => setSelectedWallets(selectedWallets.filter(id => id !== wallet.id))}
+                          onClick={() => handleRemoveWallet(wallet.id)}
                           data-testid={`button-remove-wallet-${wallet.id}`}
                         >
                           <X className="w-3 h-3" />
@@ -810,13 +859,7 @@ export default function Transfer() {
                       className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
                         isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
                       }`}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
-                        } else {
-                          setSelectedWallets([...selectedWallets, wallet.id]);
-                        }
-                      }}
+                      onClick={() => handleWalletSelection(wallet.id, isSelected)}
                       data-testid={`option-wallet-${wallet.id}`}
                     >
                       <div className="flex items-center gap-3">
