@@ -600,7 +600,7 @@ export default function Transfer() {
                   ))}
                 </div>
                 
-                <div className="flex justify-between items-center pt-2 border-t border-border">
+                <div className="flex justify-between items-center pt-2">
                   <span className="text-sm text-muted-foreground">Total</span>
                   <div className="flex flex-col items-end">
                     <span className={`text-sm font-bold ${!isWithinBalance ? 'text-destructive' : ''}`}>
