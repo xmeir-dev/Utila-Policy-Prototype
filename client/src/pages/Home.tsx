@@ -4,10 +4,11 @@ import { useWallet } from "@/hooks/use-wallet";
 import { Clock, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@shared/routes";
+import { type Transaction } from "@shared/schema";
 
 export default function Home() {
   const walletState = useWallet();
-  const { data: pendingTransactions } = useQuery({
+  const { data: pendingTransactions } = useQuery<Transaction[]>({
     queryKey: [api.transactions.listPending.path],
     enabled: walletState.isConnected,
   });

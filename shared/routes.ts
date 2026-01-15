@@ -41,7 +41,13 @@ export const api = {
       method: 'GET' as const,
       path: '/api/transactions/pending',
       responses: {
-        200: z.array(z.custom<typeof users.$inferSelect & { type: string, amount: string, status: string, txHash?: string }>()),
+        200: z.array(z.object({
+          id: z.number(),
+          type: z.string(),
+          amount: z.string(),
+          status: z.string(),
+          txHash: z.string().optional()
+        })),
       },
     },
   },
