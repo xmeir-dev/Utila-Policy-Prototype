@@ -15,7 +15,7 @@ export function Navbar({ walletState }: NavbarProps) {
     : "";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-background border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-background">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 cursor-pointer">
           <span className="text-2xl font-bold font-display tracking-tight text-foreground">Utila</span>

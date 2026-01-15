@@ -55,7 +55,7 @@ export default function Home() {
         </motion.div>
 
         </main>
-      <footer className="w-full border-t border-border py-8 text-center text-sm text-muted-foreground">
+      <footer className="w-full py-8 text-center text-sm text-muted-foreground">
         <p className="text-[#bdbdbd]">By Meir Rosenschein, January 15th 2026</p>
       </footer>
     </div>
