@@ -425,9 +425,7 @@ export default function Policies() {
             </Button>
             <div className="flex-1">
               <h2 className="font-bold font-display text-foreground text-[24px]">Policies</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Define rules for transfer approvals. First matching policy wins.
-              </p>
+              <p className="text-sm mt-1 text-[#8a8a8a]">Set transfer approvals rules for Waystar Royco</p>
             </div>
             {policies.length > 0 && (
               <Button
