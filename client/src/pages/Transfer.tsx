@@ -556,17 +556,6 @@ export default function Transfer() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center px-2 py-2">
-            <div className="flex items-baseline gap-1.5 leading-none">
-              <span className="text-sm text-foreground font-normal">4 sec</span>
-              <span className="text-[14px] font-normal text-[#ababab]">est. tx time</span>
-            </div>
-            <div className="flex items-baseline gap-1.5 leading-none">
-              <span className="text-sm text-foreground font-normal">$0.31</span>
-              <span className="text-[14px] font-normal text-[#ababab]">est. fee</span>
-            </div>
-          </div>
-
           <div className="flex flex-col items-center gap-2 pt-[0px] pb-[0px]">
             {!canSend && (hasValidRecipients || selectedWallets.length > 0 || amount) ? (
               <Tooltip delayDuration={0}>
