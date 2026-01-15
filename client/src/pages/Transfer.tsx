@@ -454,7 +454,7 @@ export default function Transfer() {
                         ) : null;
                       })
                     ) : (
-                      <span className="text-muted-foreground text-[14px] font-normal">Choose origin wallets</span>
+                      <span className="text-[14px] font-normal text-[#ababab]">Choose origin wallets</span>
                     )}
                   </div>
                 </div>
