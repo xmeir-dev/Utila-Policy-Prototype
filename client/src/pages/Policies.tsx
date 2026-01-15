@@ -402,28 +402,6 @@ export default function Policies() {
             )}
           </div>
 
-          {policies.length === 0 && !isLoading && !isError && (
-            <div className="flex items-center justify-between p-4 border border-blue-500/30 bg-blue-500/5 rounded-[14px]">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-blue-500" />
-                </div>
-                <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
-                  Create a policy to enable transactions.
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="rounded-[14px] border-blue-500/30 text-blue-600 hover:bg-blue-500/10"
-                onClick={() => setShowAddModal(true)}
-                data-testid="button-create-policy-banner"
-              >
-                Create Policy
-              </Button>
-            </div>
-          )}
-
           {pendingPolicies.length > 0 && (
             <Card className="p-4 border-amber-500/30 bg-amber-500/5">
               <div className="flex items-center gap-3">
