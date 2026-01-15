@@ -667,7 +667,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               <div className="space-y-4">
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    <Label className="text-sm">Select users who can approve transactions</Label>
+                    <Label className="text-sm">Users who can approve transactions</Label>
                     <MultiUserSelector
                       selected={formData.approvers || []}
                       onChange={(values) => updateField('approvers', values)}
