@@ -84,12 +84,12 @@ export default function Home() {
 
               <div className="space-y-4">
                 {pendingTransactions?.map((tx: any) => (
-                  <div key={tx.id} className="p-6 border border-border rounded-md bg-card flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">{tx.type}</p>
-                      <p className="text-sm text-muted-foreground">{tx.amount}</p>
+                  <div key={tx.id} className="p-6 border border-border rounded-md bg-card flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <p className="font-semibold text-foreground whitespace-nowrap">{tx.type}</p>
+                      <p className="text-sm text-muted-foreground truncate">{tx.amount}</p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 shrink-0">
                       <span className="text-xs font-mono text-muted-foreground">{tx.txHash}</span>
                       <ExternalLink className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
                     </div>
