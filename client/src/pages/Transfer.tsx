@@ -141,7 +141,7 @@ export default function Transfer() {
                 Max
               </Button>
             </div>
-            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-md h-32 z-10">
+            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-[24px] h-32 z-10">
               {/* Token Selector (Left) */}
               <div className="flex items-center px-4 border-r border-border min-w-[140px] z-20" ref={dropdownRef}>
                 <div className="relative w-full">
@@ -242,7 +242,7 @@ export default function Transfer() {
                 placeholder="Enter wallet address or ENS name"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
-                className="pl-12 bg-card border-border"
+                className="pl-12 bg-card border-border rounded-[24px]"
                 data-testid="input-recipient"
               />
             </div>
