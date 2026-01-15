@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, X, Shield, ShieldCheck, ShieldX, ShieldAlert, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, X, Shield, ShieldCheck, ShieldX, ShieldAlert, ToggleLeft, ToggleRight, Trash2, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -168,7 +168,7 @@ export default function Policies() {
             ) : policies.length === 0 ? (
               <div className="relative flex flex-col bg-card border border-border rounded-[24px] p-6">
                 <div className="flex flex-col items-center justify-center gap-2 py-4">
-                  <Shield className="w-10 h-10 text-muted-foreground/50" />
+                  <Scale className="w-10 h-10 text-muted-foreground/50" />
                   <span className="text-sm text-[171717]">It's time to add your first policy</span>
                 </div>
               </div>
