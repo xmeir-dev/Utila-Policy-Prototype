@@ -200,12 +200,6 @@ function SortablePolicyItem({
           <span className={`font-medium text-foreground text-[14px] ${!policy.isActive ? 'opacity-50' : ''}`}>
             {policy.name}
           </span>
-          <Badge 
-            variant="outline" 
-            className={`h-5 px-1.5 text-[11px] ${!policy.isActive ? 'opacity-50' : ''}`}
-          >
-            {getActionLabel(policy.action)}
-          </Badge>
           {!policy.isActive && (
             <Badge variant="secondary" className="h-5 px-1.5 text-[11px]">
               Disabled
