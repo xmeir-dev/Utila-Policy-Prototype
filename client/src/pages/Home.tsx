@@ -78,6 +78,10 @@ export default function Home() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="w-full max-w-2xl mx-auto"
             >
+              <h2 className="text-2xl font-bold font-display mb-8 text-center">
+                Hi {walletState.connectedUser?.name}, welcome to your Waystar Royco workspace
+              </h2>
+
               <div className="grid grid-cols-3 gap-4 mb-12">
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
