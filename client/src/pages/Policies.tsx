@@ -218,19 +218,6 @@ function SortablePolicyItem({
           {policy.description}
         </p>
         
-        {conditions.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-              {policy.conditionLogic || 'AND'}
-            </Badge>
-            {conditions.map((condition, i) => (
-              <Badge key={i} variant="outline" className="h-5 px-1.5 text-[10px]">
-                {condition}
-              </Badge>
-            ))}
-          </div>
-        )}
-        
         {policy.action === 'require_approval' && policy.approvers && policy.approvers.length > 0 && (
           <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
             <span>Quorum: {policy.quorumRequired} of {policy.approvers.length}</span>
