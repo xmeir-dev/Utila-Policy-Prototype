@@ -356,7 +356,17 @@ export default function Transfer() {
             </div>
           </div>
 
-          <div className="pt-[0px] pb-[0px]">
+          <div className="pt-4 space-y-3">
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full text-lg font-semibold rounded-[16px] h-[48px] border-2"
+              disabled={!amount || !recipient}
+              onClick={() => console.log("Simulate Transfer")}
+              data-testid="button-simulate"
+            >
+              Simulate Transfer
+            </Button>
             <Button
               size="lg"
               className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
