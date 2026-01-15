@@ -272,7 +272,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
     ...initialData,
   });
 
-  const [expandedSections, setExpandedSections] = useState<string[]>(['initiator']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['details', 'conditions', 'initiator']);
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => 
@@ -303,51 +303,81 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
-        <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Policy details</Label>
-        <div className="space-y-2">
-          <Label htmlFor="policy-name">Policy Name</Label>
-          <Input
-            id="policy-name"
-            placeholder="e.g., Large Bitcoin Transfer Approval"
-            value={formData.name || ""}
-            onChange={(e) => updateField('name', e.target.value)}
-            className="rounded-lg"
-            data-testid="input-policy-name"
+        <button
+          type="button"
+          onClick={() => toggleSection('details')}
+          className="flex items-center gap-2 w-full text-left"
+        >
+          <ChevronDown 
+            className={cn(
+              "w-5 h-5 text-[#8a8a8a] transition-transform duration-200",
+              !expandedSections.includes('details') && "-rotate-90"
+            )} 
           />
-        </div>
+          <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Policy details</Label>
+        </button>
+        
+        {expandedSections.includes('details') && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
+            <div className="space-y-2">
+              <Label htmlFor="policy-name">Policy Name</Label>
+              <Input
+                id="policy-name"
+                placeholder="e.g., Large Bitcoin Transfer Approval"
+                value={formData.name || ""}
+                onChange={(e) => updateField('name', e.target.value)}
+                className="rounded-lg"
+                data-testid="input-policy-name"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="policy-description">Description</Label>
-          <Textarea
-            id="policy-description"
-            placeholder="Describe what this policy does..."
-            value={formData.description || ""}
-            onChange={(e) => updateField('description', e.target.value)}
-            className="rounded-lg min-h-[80px] resize-none"
-            data-testid="input-policy-description"
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="policy-description">Description</Label>
+              <Textarea
+                id="policy-description"
+                placeholder="Describe what this policy does..."
+                value={formData.description || ""}
+                onChange={(e) => updateField('description', e.target.value)}
+                className="rounded-lg min-h-[80px] resize-none"
+                data-testid="input-policy-description"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <Label>Action</Label>
-          <Select
-            value={formData.action}
-            onValueChange={(value) => updateField('action', value)}
-          >
-            <SelectTrigger className="rounded-lg" data-testid="select-policy-action">
-              <SelectValue placeholder="Select action" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="allow">Allow Transaction</SelectItem>
-              <SelectItem value="deny">Deny Transaction</SelectItem>
-              <SelectItem value="require_approval">Require Approval</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            <div className="space-y-2">
+              <Label>Action</Label>
+              <Select
+                value={formData.action}
+                onValueChange={(value) => updateField('action', value)}
+              >
+                <SelectTrigger className="rounded-lg" data-testid="select-policy-action">
+                  <SelectValue placeholder="Select action" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="allow">Allow Transaction</SelectItem>
+                  <SelectItem value="deny">Deny Transaction</SelectItem>
+                  <SelectItem value="require_approval">Require Approval</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
       </div>
+
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Trigger conditions</Label>
+          <button
+            type="button"
+            onClick={() => toggleSection('conditions')}
+            className="flex items-center gap-2"
+          >
+            <ChevronDown 
+              className={cn(
+                "w-5 h-5 text-[#8a8a8a] transition-transform duration-200",
+                !expandedSections.includes('conditions') && "-rotate-90"
+              )} 
+            />
+            <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Trigger conditions</Label>
+          </button>
           <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -387,286 +417,312 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           </div>
         </div>
 
-        <ConditionSection
-          title="Initiator"
-          icon={<Users className="w-4 h-4 text-muted-foreground" />}
-          isExpanded={expandedSections.includes('initiator')}
-          onToggle={() => toggleSection('initiator')}
-          isConfigured={isInitiatorConfigured}
-        >
-          <div className="space-y-3 pt-3">
-            <Select
-              value={formData.initiatorType || "any"}
-              onValueChange={(value) => updateField('initiatorType', value)}
+        {expandedSections.includes('conditions') && (
+          <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
+            <ConditionSection
+              title="Initiator"
+              icon={<Users className="w-4 h-4 text-muted-foreground" />}
+              isExpanded={expandedSections.includes('initiator')}
+              onToggle={() => toggleSection('initiator')}
+              isConfigured={isInitiatorConfigured}
             >
-              <SelectTrigger className="rounded-lg" data-testid="select-initiator-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any User</SelectItem>
-                <SelectItem value="user">Specific Users</SelectItem>
-              </SelectContent>
-            </Select>
-            {formData.initiatorType === 'user' && (
-              <MultiUserSelector
-                selected={formData.initiatorValues || []}
-                onChange={(values) => updateField('initiatorValues', values)}
-                placeholder="Select users..."
-                testId="select-initiator-users"
-              />
-            )}
-          </div>
-        </ConditionSection>
-
-        <ConditionSection
-          title="Source Wallet"
-          icon={<Wallet className="w-4 h-4 text-muted-foreground" />}
-          isExpanded={expandedSections.includes('source')}
-          onToggle={() => toggleSection('source')}
-          isConfigured={isSourceConfigured}
-        >
-          <div className="space-y-3 pt-3">
-            <Select
-              value={formData.sourceWalletType || "any"}
-              onValueChange={(value) => updateField('sourceWalletType', value)}
-            >
-              <SelectTrigger className="rounded-lg" data-testid="select-source-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Wallet</SelectItem>
-                <SelectItem value="specific">Specific Wallets</SelectItem>
-              </SelectContent>
-            </Select>
-            {formData.sourceWalletType === 'specific' && (
-              <MultiWalletSelector
-                selected={formData.sourceWallets || []}
-                onChange={(values) => updateField('sourceWallets', values)}
-                testId="select-source-wallets"
-              />
-            )}
-          </div>
-        </ConditionSection>
-
-        <ConditionSection
-          title="Destination"
-          icon={<Target className="w-4 h-4 text-muted-foreground" />}
-          isExpanded={expandedSections.includes('destination')}
-          onToggle={() => toggleSection('destination')}
-          isConfigured={isDestinationConfigured}
-        >
-          <div className="space-y-3 pt-3">
-            <Select
-              value={formData.destinationType || "any"}
-              onValueChange={(value) => updateField('destinationType', value)}
-            >
-              <SelectTrigger className="rounded-lg" data-testid="select-destination-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Destination</SelectItem>
-                <SelectItem value="internal">Internal Only</SelectItem>
-                <SelectItem value="external">External Only</SelectItem>
-                <SelectItem value="whitelist">Whitelisted Addresses</SelectItem>
-              </SelectContent>
-            </Select>
-            {formData.destinationType === 'whitelist' && (
-              <TagInput
-                values={formData.destinationValues || []}
-                onChange={(values) => updateField('destinationValues', values)}
-                placeholder="Enter whitelisted address..."
-                testId="input-destination-values"
-              />
-            )}
-          </div>
-        </ConditionSection>
-
-        <ConditionSection
-          title="Amount Threshold (USD)"
-          icon={<DollarSign className="w-4 h-4 text-muted-foreground" />}
-          isExpanded={expandedSections.includes('amount')}
-          onToggle={() => toggleSection('amount')}
-          isConfigured={isAmountConfigured}
-        >
-          <div className="space-y-3 pt-3">
-            <Select
-              value={formData.amountCondition || "any"}
-              onValueChange={(value) => updateField('amountCondition', value)}
-            >
-              <SelectTrigger className="rounded-lg" data-testid="select-amount-condition">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Amount</SelectItem>
-                <SelectItem value="above">Above Threshold</SelectItem>
-                <SelectItem value="below">Below Threshold</SelectItem>
-                <SelectItem value="between">Between Range</SelectItem>
-              </SelectContent>
-            </Select>
-            {formData.amountCondition === 'above' && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Greater than $</span>
-                <Input
-                  type="number"
-                  value={formData.amountMin || ""}
-                  onChange={(e) => updateField('amountMin', e.target.value)}
-                  placeholder="0"
-                  className="w-32 rounded-lg"
-                  data-testid="input-amount-min"
-                />
+              <div className="space-y-3 pt-3">
+                <Select
+                  value={formData.initiatorType || "any"}
+                  onValueChange={(value) => updateField('initiatorType', value)}
+                >
+                  <SelectTrigger className="rounded-lg" data-testid="select-initiator-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any User</SelectItem>
+                    <SelectItem value="user">Specific Users</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formData.initiatorType === 'user' && (
+                  <MultiUserSelector
+                    selected={formData.initiatorValues || []}
+                    onChange={(values) => updateField('initiatorValues', values)}
+                    placeholder="Select users..."
+                    testId="select-initiator-users"
+                  />
+                )}
               </div>
-            )}
-            {formData.amountCondition === 'below' && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Less than $</span>
-                <Input
-                  type="number"
-                  value={formData.amountMin || ""}
-                  onChange={(e) => updateField('amountMin', e.target.value)}
-                  placeholder="0"
-                  className="w-32 rounded-lg"
-                  data-testid="input-amount-min"
-                />
-              </div>
-            )}
-            {formData.amountCondition === 'between' && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground">Between $</span>
-                <Input
-                  type="number"
-                  value={formData.amountMin || ""}
-                  onChange={(e) => updateField('amountMin', e.target.value)}
-                  placeholder="0"
-                  className="w-28 rounded-lg"
-                  data-testid="input-amount-min"
-                />
-                <span className="text-sm text-muted-foreground">and $</span>
-                <Input
-                  type="number"
-                  value={formData.amountMax || ""}
-                  onChange={(e) => updateField('amountMax', e.target.value)}
-                  placeholder="10000"
-                  className="w-28 rounded-lg"
-                  data-testid="input-amount-max"
-                />
-              </div>
-            )}
-          </div>
-        </ConditionSection>
+            </ConditionSection>
 
-        <ConditionSection
-          title="Asset Type"
-          icon={<Coins className="w-4 h-4 text-muted-foreground" />}
-          isExpanded={expandedSections.includes('asset')}
-          onToggle={() => toggleSection('asset')}
-          isConfigured={isAssetConfigured}
-        >
-          <div className="space-y-3 pt-3">
-            <Select
-              value={formData.assetType || "any"}
-              onValueChange={(value) => updateField('assetType', value)}
+            <ConditionSection
+              title="Source Wallet"
+              icon={<Wallet className="w-4 h-4 text-muted-foreground" />}
+              isExpanded={expandedSections.includes('source')}
+              onToggle={() => toggleSection('source')}
+              isConfigured={isSourceConfigured}
             >
-              <SelectTrigger className="rounded-lg" data-testid="select-asset-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Asset</SelectItem>
-                <SelectItem value="specific">Specific Assets</SelectItem>
-              </SelectContent>
-            </Select>
-            {formData.assetType === 'specific' && (
-              <>
-                <div className="flex flex-wrap gap-1">
-                  {COMMON_ASSETS.map((asset) => (
-                    <Button
-                      key={asset}
-                      type="button"
-                      variant={(formData.assetValues || []).includes(asset) ? "default" : "outline"}
-                      size="sm"
-                      className="h-7 text-xs rounded-lg"
-                      onClick={() => {
-                        const current = formData.assetValues || [];
-                        if (current.includes(asset)) {
-                          updateField('assetValues', current.filter(a => a !== asset));
-                        } else {
-                          updateField('assetValues', [...current, asset]);
-                        }
+              <div className="space-y-3 pt-3">
+                <Select
+                  value={formData.sourceWalletType || "any"}
+                  onValueChange={(value) => updateField('sourceWalletType', value)}
+                >
+                  <SelectTrigger className="rounded-lg" data-testid="select-source-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Wallet</SelectItem>
+                    <SelectItem value="specific">Specific Wallets</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formData.sourceWalletType === 'specific' && (
+                  <MultiWalletSelector
+                    selected={formData.sourceWallets || []}
+                    onChange={(values) => updateField('sourceWallets', values)}
+                    testId="select-source-wallets"
+                  />
+                )}
+              </div>
+            </ConditionSection>
+
+            <ConditionSection
+              title="Destination"
+              icon={<Target className="w-4 h-4 text-muted-foreground" />}
+              isExpanded={expandedSections.includes('destination')}
+              onToggle={() => toggleSection('destination')}
+              isConfigured={isDestinationConfigured}
+            >
+              <div className="space-y-3 pt-3">
+                <Select
+                  value={formData.destinationType || "any"}
+                  onValueChange={(value) => updateField('destinationType', value)}
+                >
+                  <SelectTrigger className="rounded-lg" data-testid="select-destination-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Destination</SelectItem>
+                    <SelectItem value="internal">Internal Only</SelectItem>
+                    <SelectItem value="external">External Only</SelectItem>
+                    <SelectItem value="whitelist">Whitelisted Addresses</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formData.destinationType === 'whitelist' && (
+                  <TagInput
+                    values={formData.destinationValues || []}
+                    onChange={(values) => updateField('destinationValues', values)}
+                    placeholder="Enter whitelisted address..."
+                    testId="input-destination-values"
+                  />
+                )}
+              </div>
+            </ConditionSection>
+
+            <ConditionSection
+              title="Amount Threshold (USD)"
+              icon={<DollarSign className="w-4 h-4 text-muted-foreground" />}
+              isExpanded={expandedSections.includes('amount')}
+              onToggle={() => toggleSection('amount')}
+              isConfigured={isAmountConfigured}
+            >
+              <div className="space-y-3 pt-3">
+                <Select
+                  value={formData.amountCondition || "any"}
+                  onValueChange={(value) => updateField('amountCondition', value)}
+                >
+                  <SelectTrigger className="rounded-lg" data-testid="select-amount-condition">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Amount</SelectItem>
+                    <SelectItem value="above">Above Threshold</SelectItem>
+                    <SelectItem value="below">Below Threshold</SelectItem>
+                    <SelectItem value="between">Between Range</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formData.amountCondition === 'above' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Greater than $</span>
+                    <Input
+                      type="number"
+                      value={formData.amountMin || ""}
+                      onChange={(e) => updateField('amountMin', e.target.value)}
+                      placeholder="0"
+                      className="w-32 rounded-lg"
+                      data-testid="input-amount-min"
+                    />
+                  </div>
+                )}
+                {formData.amountCondition === 'below' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Less than $</span>
+                    <Input
+                      type="number"
+                      value={formData.amountMin || ""}
+                      onChange={(e) => updateField('amountMin', e.target.value)}
+                      placeholder="0"
+                      className="w-32 rounded-lg"
+                      data-testid="input-amount-min"
+                    />
+                  </div>
+                )}
+                {formData.amountCondition === 'between' && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm text-muted-foreground">Between $</span>
+                    <Input
+                      type="number"
+                      value={formData.amountMin || ""}
+                      onChange={(e) => updateField('amountMin', e.target.value)}
+                      placeholder="0"
+                      className="w-28 rounded-lg"
+                      data-testid="input-amount-min"
+                    />
+                    <span className="text-sm text-muted-foreground">and $</span>
+                    <Input
+                      type="number"
+                      value={formData.amountMax || ""}
+                      onChange={(e) => updateField('amountMax', e.target.value)}
+                      placeholder="10000"
+                      className="w-28 rounded-lg"
+                      data-testid="input-amount-max"
+                    />
+                  </div>
+                )}
+              </div>
+            </ConditionSection>
+
+            <ConditionSection
+              title="Asset Type"
+              icon={<Coins className="w-4 h-4 text-muted-foreground" />}
+              isExpanded={expandedSections.includes('asset')}
+              onToggle={() => toggleSection('asset')}
+              isConfigured={isAssetConfigured}
+            >
+              <div className="space-y-3 pt-3">
+                <Select
+                  value={formData.assetType || "any"}
+                  onValueChange={(value) => updateField('assetType', value)}
+                >
+                  <SelectTrigger className="rounded-lg" data-testid="select-asset-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Asset</SelectItem>
+                    <SelectItem value="specific">Specific Assets</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formData.assetType === 'specific' && (
+                  <>
+                    <div className="flex flex-wrap gap-1">
+                      {COMMON_ASSETS.map((asset) => (
+                        <Button
+                          key={asset}
+                          type="button"
+                          variant={(formData.assetValues || []).includes(asset) ? "default" : "outline"}
+                          size="sm"
+                          className="h-7 text-xs rounded-lg"
+                          onClick={() => {
+                            const current = formData.assetValues || [];
+                            if (current.includes(asset)) {
+                              updateField('assetValues', current.filter(a => a !== asset));
+                            } else {
+                              updateField('assetValues', [...current, asset]);
+                            }
+                          }}
+                          data-testid={`button-asset-${asset.toLowerCase()}`}
+                        >
+                          {asset}
+                        </Button>
+                      ))}
+                    </div>
+                    <TagInput
+                      values={(formData.assetValues || []).filter(a => !COMMON_ASSETS.includes(a))}
+                      onChange={(values) => {
+                        const commonSelected = (formData.assetValues || []).filter(a => COMMON_ASSETS.includes(a));
+                        updateField('assetValues', [...commonSelected, ...values]);
                       }}
-                      data-testid={`button-asset-${asset.toLowerCase()}`}
-                    >
-                      {asset}
-                    </Button>
-                  ))}
-                </div>
-                <TagInput
-                  values={(formData.assetValues || []).filter(a => !COMMON_ASSETS.includes(a))}
-                  onChange={(values) => {
-                    const commonSelected = (formData.assetValues || []).filter(a => COMMON_ASSETS.includes(a));
-                    updateField('assetValues', [...commonSelected, ...values]);
-                  }}
-                  placeholder="Add custom asset symbol..."
-                  testId="input-asset-values"
-                />
-              </>
-            )}
-          </div>
-        </ConditionSection>
-      </div>
-      {formData.action === 'require_approval' && (
-        <Card className="p-4 space-y-4">
-          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Approval settings</Label>
-          
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-sm">Approvers</Label>
-              <TagInput
-                values={formData.approvers || []}
-                onChange={(values) => updateField('approvers', values)}
-                placeholder="Enter approver address or ID..."
-                testId="input-approvers"
-              />
-              <p className="text-xs text-muted-foreground">Add wallet addresses or user IDs who can approve transactions matching this policy.</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm">Quorum Required</Label>
-              <div className="flex items-center gap-3">
-                <Input
-                  type="number"
-                  min={1}
-                  max={(formData.approvers || []).length || 1}
-                  value={formData.quorumRequired || 1}
-                  onChange={(e) => updateField('quorumRequired', parseInt(e.target.value) || 1)}
-                  className="w-20 rounded-lg"
-                  data-testid="input-quorum-required"
-                />
-                <span className="text-sm text-muted-foreground">
-                  of {(formData.approvers || []).length || 0} approvers must approve
-                </span>
+                      placeholder="Add custom asset symbol..."
+                      testId="input-asset-values"
+                    />
+                  </>
+                )}
               </div>
-            </div>
+            </ConditionSection>
           </div>
-        </Card>
-      )}
-      <Card className="p-4 space-y-4">
-        <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Policy changes</Label>
-        <div className="space-y-2">
-          <Label className="text-sm">Approvals Required for Changes</Label>
-          <div className="flex items-center gap-3">
-            <Input
-              type="number"
-              min={1}
-              value={formData.changeApprovalsRequired || 1}
-              onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
-              className="w-20 rounded-lg"
-              data-testid="input-change-approvals"
-            />
-            <span className="text-sm text-muted-foreground">
-              approvals needed before edits go live
-            </span>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => toggleSection('approvals')}
+          className="flex items-center gap-2"
+        >
+          <ChevronDown 
+            className={cn(
+              "w-5 h-5 text-[#8a8a8a] transition-transform duration-200",
+              !expandedSections.includes('approvals') && "-rotate-90"
+            )} 
+          />
+          <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Approval & Change Settings</Label>
+        </button>
+
+        {expandedSections.includes('approvals') && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
+            {formData.action === 'require_approval' && (
+              <Card className="p-4 space-y-4">
+                <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Approval settings</Label>
+                
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Approvers</Label>
+                    <TagInput
+                      values={formData.approvers || []}
+                      onChange={(values) => updateField('approvers', values)}
+                      placeholder="Enter approver address or ID..."
+                      testId="input-approvers"
+                    />
+                    <p className="text-xs text-muted-foreground">Add wallet addresses or user IDs who can approve transactions matching this policy.</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm">Quorum Required</Label>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="number"
+                        min={1}
+                        max={(formData.approvers || []).length || 1}
+                        value={formData.quorumRequired || 1}
+                        onChange={(e) => updateField('quorumRequired', parseInt(e.target.value) || 1)}
+                        className="w-20 rounded-lg"
+                        data-testid="input-quorum-required"
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        of {(formData.approvers || []).length || 0} approvers must approve
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            <Card className="p-4 space-y-4">
+              <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Policy changes</Label>
+              <div className="space-y-2">
+                <Label className="text-sm">Approvals Required for Changes</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    min={1}
+                    value={formData.changeApprovalsRequired || 1}
+                    onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
+                    className="w-20 rounded-lg"
+                    data-testid="input-change-approvals"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    approvals needed before edits go live
+                  </span>
+                </div>
+              </div>
+            </Card>
           </div>
-        </div>
-      </Card>
+        )}
+      </div>
       <div className="flex gap-3 pt-2">
         <Button
           type="button"
