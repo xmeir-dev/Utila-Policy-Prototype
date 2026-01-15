@@ -136,7 +136,7 @@ export default function Transfer() {
             <h2 className="text-3xl font-bold font-display text-foreground">Transfer</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-1">
             <div className="flex justify-between items-center text-sm">
               <div className="flex items-center gap-1.5">
                 <span className="font-medium text-muted-foreground">Balance:</span>
@@ -249,7 +249,7 @@ export default function Transfer() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-1">
             <div className="relative" ref={walletDropdownRef}>
               <Button
                 variant="outline"
