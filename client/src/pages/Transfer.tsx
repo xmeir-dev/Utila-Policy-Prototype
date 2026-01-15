@@ -448,7 +448,7 @@ export default function Transfer() {
                       selectedWallets.map(id => {
                         const wallet = availableWallets.find(w => w.id === id);
                         return wallet ? (
-                          <Badge key={id} variant="secondary" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-primary/10 text-primary border-0">
+                          <Badge key={id} variant="outline" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-transparent text-foreground border-muted-foreground/30">
                             {wallet.name}
                           </Badge>
                         ) : null;
@@ -485,7 +485,7 @@ export default function Transfer() {
                       <div className="flex gap-1.5 overflow-hidden flex-wrap">
                         {recipients.length > 0 ? (
                           recipients.map(r => (
-                            <Badge key={r.id} variant="secondary" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-primary/10 text-primary border-0">
+                            <Badge key={r.id} variant="outline" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-transparent text-foreground border-muted-foreground/30">
                               {r.label || truncateAddress(r.address)}
                             </Badge>
                           ))
