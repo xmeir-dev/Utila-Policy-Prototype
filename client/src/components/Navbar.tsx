@@ -48,14 +48,15 @@ export function Navbar({ walletState }: NavbarProps) {
                 data-testid="button-disconnect-wallet"
                 variant="outline"
                 onClick={() => disconnect()}
-                className="rounded-[16px] font-mono text-sm h-[48px]"
+                className="rounded-[16px] font-mono text-sm h-[48px] gap-2"
               >
                 <img 
                   src={waystarRoycoLogo} 
                   alt={connectedUser.name} 
-                  className="h-6 w-auto mr-2 object-contain" 
+                  className="h-6 w-auto object-contain" 
                 />
                 {connectedUser.name}
+                <ChevronDown className="w-4 h-4 opacity-50" />
               </Button>
             ) : (
               <Button
