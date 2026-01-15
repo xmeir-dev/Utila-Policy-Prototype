@@ -732,9 +732,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                     className="w-20 rounded-lg"
                     data-testid="input-change-approvals"
                   />
-                  <span className="text-sm text-muted-foreground">
-                    approvals needed before edits go live
-                  </span>
+                  <span className="text-sm text-muted-foreground">approvals needed to approve changes</span>
                 </div>
               </div>
             </Card>
