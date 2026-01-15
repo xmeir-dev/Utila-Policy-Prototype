@@ -137,20 +137,22 @@ export default function Policies() {
           </div>
 
           <div className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
-              onClick={() => setShowAddModal(true)}
-              data-testid="button-add-policy"
-            >
-              <div className="flex items-center gap-4 text-left">
-                <Plus className="w-6 h-6 text-muted-foreground shrink-0" />
-                <div className="flex flex-col items-start gap-1">
-                  <span className="font-medium text-foreground text-[14px]">Add New Policy</span>
-                  <span className="text-[13px] text-muted-foreground">Define rules for transfer approvals</span>
+            {!isLoading && !isError && policies.length > 0 && (
+              <Button
+                variant="outline"
+                className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
+                onClick={() => setShowAddModal(true)}
+                data-testid="button-add-policy"
+              >
+                <div className="flex items-center gap-4 text-left">
+                  <Plus className="w-6 h-6 text-muted-foreground shrink-0" />
+                  <div className="flex flex-col items-start gap-1">
+                    <span className="font-medium text-foreground text-[14px]">Add New Policy</span>
+                    <span className="text-[13px] text-muted-foreground">Define rules for transfer approvals</span>
+                  </div>
                 </div>
-              </div>
-            </Button>
+              </Button>
+            )}
 
             {isLoading ? (
               <div className="relative flex flex-col bg-card border border-border rounded-[24px] p-6">
