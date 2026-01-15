@@ -359,7 +359,7 @@ export default function Transfer() {
           <div className="flex justify-between items-center px-2 py-2">
             <div className="flex items-baseline gap-1.5 leading-none">
               <span className="text-sm font-semibold text-foreground">4 sec</span>
-              <span className="text-[10px] font-medium text-muted-foreground">est. tx time</span>
+              <span className="text-[14px] font-normal text-[#ababab]">est. tx time</span>
             </div>
             <div className="flex items-baseline gap-1.5 leading-none">
               <span className="text-[10px] font-medium text-muted-foreground">est. fee</span>
