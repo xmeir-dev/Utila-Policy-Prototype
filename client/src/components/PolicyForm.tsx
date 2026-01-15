@@ -324,7 +324,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               <Label htmlFor="policy-name">Policy name</Label>
               <Input
                 id="policy-name"
-                placeholder="e.g., Large Bitcoin Transfer Approval"
+                placeholder="e.g., Large USDC transfer to external address"
                 value={formData.name || ""}
                 onChange={(e) => updateField('name', e.target.value)}
                 className="rounded-[14px]"
