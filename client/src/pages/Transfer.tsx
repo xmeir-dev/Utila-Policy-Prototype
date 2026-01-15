@@ -134,17 +134,25 @@ export default function Transfer() {
     setRecipients(totalBudget > 0 && newList.length > 0 ? distributeAmounts(newList, totalBudget) : newList);
   };
 
+  const formatAmountWithCommas = (val: string) => {
+    if (!val || val === '') return '';
+    const parts = val.split('.');
+    const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.length > 1 ? `${intPart}.${parts[1]}` : intPart;
+  };
+
   const updateRecipientAmount = (id: string, newAmount: string) => {
     let val = newAmount.replace(/,/g, '');
     if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
+    const formatted = formatAmountWithCommas(val);
     setRecipients(recipients.map(r => 
-      r.id === id ? { ...r, amount: val } : r
+      r.id === id ? { ...r, amount: formatted } : r
     ));
   };
 
   const getTotalRecipientAmount = () => {
     return recipients.reduce((sum, r) => {
-      const amt = parseFloat(r.amount) || 0;
+      const amt = parseFloat(r.amount.replace(/,/g, '')) || 0;
       return sum + amt;
     }, 0);
   };
@@ -159,7 +167,7 @@ export default function Transfer() {
 
   const isWithinBalance = getTotalRecipientAmount() <= getAvailableBalance();
   const hasValidRecipients = recipients.length > 0 && 
-    recipients.every(r => r.amount && parseFloat(r.amount) > 0) && 
+    recipients.every(r => r.amount && parseFloat(r.amount.replace(/,/g, '')) > 0) && 
     isWithinBalance;
 
   const getTopContainerAmountUSD = () => {
@@ -606,7 +614,7 @@ export default function Transfer() {
                           placeholder="0"
                           value={recipient.amount}
                           onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
-                          className="w-24 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
+                          className="w-32 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
                           data-testid={`input-amount-${recipient.id}`}
                         />
                       </div>
