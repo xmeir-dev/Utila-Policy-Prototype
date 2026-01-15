@@ -504,7 +504,7 @@ export default function Policies() {
                 <Card className="overflow-hidden">
                   <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      <span className="font-medium uppercase tracking-wide text-[14px] text-[#a8a8a8]">
                         Priority Order
                       </span>
                       <Badge variant="outline" className="h-5 px-1.5 text-[10px]">
@@ -550,7 +550,6 @@ export default function Policies() {
           </Tabs>
         </motion.div>
       </main>
-
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
@@ -569,7 +568,6 @@ export default function Policies() {
           </div>
         </DialogContent>
       </Dialog>
-
       <Dialog open={!!editingPolicy} onOpenChange={(open) => !open && setEditingPolicy(null)}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
