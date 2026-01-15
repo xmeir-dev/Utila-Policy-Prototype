@@ -28,7 +28,6 @@ export default function Transfer() {
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar walletState={walletState} />
-
       <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -50,7 +49,7 @@ export default function Transfer() {
           <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
               <div className="flex items-center gap-1.5">
-                <span className="font-medium text-muted-foreground">Balance</span>
+                <span className="font-medium text-muted-foreground">Balance:</span>
                 <span className="font-semibold text-foreground">{selectedAsset.balance} {selectedAsset.symbol}</span>
               </div>
               <Button 
