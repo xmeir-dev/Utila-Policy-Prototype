@@ -1,15 +1,42 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send, Plus, X, User } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
+
+interface Recipient {
+  id: string;
+  address: string;
+  label?: string;
+  amount: string;
+  isFromAddressBook: boolean;
+}
+
+interface AddressBookEntry {
+  id: string;
+  label: string;
+  address: string;
+}
+
+const addressBook: AddressBookEntry[] = [
+  { id: "ab1", label: "Alice", address: "0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f" },
+  { id: "ab2", label: "Bob", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F" },
+  { id: "ab3", label: "Charlie", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F" },
+  { id: "ab4", label: "Treasury", address: "0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F" },
+];
+
+const truncateAddress = (address: string): string => {
+  if (address.length <= 12) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
 
 const assets = [
   { symbol: "ETH", name: "Ethereum", balance: "2.5", price: 2500, icon: SiEthereum, color: "text-[#627EEA]" },
@@ -28,14 +55,80 @@ export default function Transfer() {
   const walletState = useWallet();
   const [amount, setAmount] = useState("");
   const [selectedAsset, setSelectedAsset] = useState(assets[0]);
-  const [recipient, setRecipient] = useState("");
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
   const [selectedWallets, setSelectedWallets] = useState<string[]>(["w1"]);
   const [showWalletDropdown, setShowWalletDropdown] = useState(false);
+  const [showDestinationModal, setShowDestinationModal] = useState(false);
+  const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [newAddress, setNewAddress] = useState("");
   const amountInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const walletDropdownRef = useRef<HTMLDivElement>(null);
+
+  const addRecipientFromAddressBook = (entry: AddressBookEntry) => {
+    if (recipients.find(r => r.address === entry.address)) return;
+    setRecipients([...recipients, {
+      id: `r-${Date.now()}`,
+      address: entry.address,
+      label: entry.label,
+      amount: "",
+      isFromAddressBook: true,
+    }]);
+  };
+
+  const isValidAddress = (address: string): boolean => {
+    const trimmed = address.trim();
+    if (!trimmed) return false;
+    const isFullHex = /^0x[a-fA-F0-9]{40}$/.test(trimmed);
+    const isENS = /^[a-zA-Z0-9][a-zA-Z0-9-]*\.eth$/.test(trimmed);
+    return isFullHex || isENS;
+  };
+
+  const addNewRecipient = () => {
+    if (!newAddress.trim()) return;
+    if (!isValidAddress(newAddress)) return;
+    if (recipients.find(r => r.address === newAddress)) return;
+    setRecipients([...recipients, {
+      id: `r-${Date.now()}`,
+      address: newAddress.trim(),
+      amount: "",
+      isFromAddressBook: false,
+    }]);
+    setNewAddress("");
+  };
+
+  const removeRecipient = (id: string) => {
+    setRecipients(recipients.filter(r => r.id !== id));
+  };
+
+  const updateRecipientAmount = (id: string, newAmount: string) => {
+    let val = newAmount.replace(/,/g, '');
+    if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
+    setRecipients(recipients.map(r => 
+      r.id === id ? { ...r, amount: val } : r
+    ));
+  };
+
+  const getTotalRecipientAmount = () => {
+    return recipients.reduce((sum, r) => {
+      const amt = parseFloat(r.amount) || 0;
+      return sum + amt;
+    }, 0);
+  };
+
+  const getAvailableBalance = () => {
+    const totalWalletBalance = selectedWallets.reduce((sum, id) => {
+      const wallet = availableWallets.find(w => w.id === id);
+      return sum + (wallet ? parseFloat(wallet.balance) : 0);
+    }, 0);
+    return totalWalletBalance * selectedAsset.price;
+  };
+
+  const isWithinBalance = getTotalRecipientAmount() <= getAvailableBalance();
+  const hasValidRecipients = recipients.length > 0 && 
+    recipients.every(r => r.amount && parseFloat(r.amount) > 0) && 
+    isWithinBalance;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -111,7 +204,19 @@ export default function Transfer() {
   const AssetIcon = selectedAsset.icon;
 
   const handleContinue = () => {
-    console.log("Transfer:", { amount, asset: selectedAsset.symbol, recipient });
+    const totalAmount = getTotalRecipientAmount();
+    const tokenAmount = totalAmount / selectedAsset.price;
+    console.log("Transfer:", { 
+      totalUSD: totalAmount,
+      tokenAmount: tokenAmount.toFixed(4),
+      asset: selectedAsset.symbol, 
+      recipients: recipients.map(r => ({
+        address: r.address,
+        label: r.label,
+        amountUSD: parseFloat(r.amount),
+        tokenAmount: (parseFloat(r.amount) / selectedAsset.price).toFixed(4)
+      }))
+    });
   };
 
   return (
@@ -334,7 +439,7 @@ export default function Transfer() {
               <Button
                 variant="outline"
                 className="w-full justify-between bg-card/50 border-border rounded-[16px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
-                onClick={() => {}} 
+                onClick={() => setShowDestinationModal(true)} 
                 data-testid="button-destination-selector"
               >
                 <div className="flex items-center gap-4 overflow-hidden text-left">
@@ -342,15 +447,21 @@ export default function Transfer() {
                   <div className="flex flex-col items-start gap-1 w-full">
                     <div className="flex items-center gap-2 overflow-hidden w-full">
                       <span className="shrink-0 font-medium text-[18px] text-[#000000]">To</span>
-                      <div className="flex gap-1.5 overflow-hidden">
-                        {recipient && (
-                          <span className="text-muted-foreground text-sm font-normal truncate">
-                            {recipient}
-                          </span>
-                        )}
+                      <div className="flex gap-1.5 overflow-hidden flex-wrap">
+                        {recipients.length > 0 ? (
+                          recipients.map(r => (
+                            <Badge key={r.id} variant="secondary" className="h-5 px-1.5 text-[9px] font-bold shrink-0 bg-primary/10 text-primary border-0">
+                              {r.label || truncateAddress(r.address)}
+                            </Badge>
+                          ))
+                        ) : null}
                       </div>
                     </div>
-                    <span className="text-muted-foreground text-[14px] font-normal">Choose destination wallets</span>
+                    <span className="text-muted-foreground text-[14px] font-normal">
+                      {recipients.length > 0 
+                        ? `${recipients.length} recipient${recipients.length > 1 ? 's' : ''} - Total: $${getTotalRecipientAmount().toLocaleString()}` 
+                        : "Choose destination wallets"}
+                    </span>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -373,7 +484,7 @@ export default function Transfer() {
             <Button
               size="lg"
               className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
-              disabled={!amount || !recipient}
+              disabled={!hasValidRecipients}
               onClick={handleContinue}
               data-testid="button-continue"
             >
@@ -383,7 +494,7 @@ export default function Transfer() {
               variant="ghost"
               size="sm"
               className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
-              disabled={!amount || !recipient}
+              disabled={!hasValidRecipients}
               onClick={() => console.log("Simulate Transfer")}
               data-testid="button-simulate"
             >
@@ -392,6 +503,148 @@ export default function Transfer() {
           </div>
         </motion.div>
       </main>
+
+      <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
+        <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogTitle className="text-xl font-bold">Select Recipients</DialogTitle>
+          </DialogHeader>
+          
+          <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground">Add New Address</h3>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter wallet address or ENS name"
+                  value={newAddress}
+                  onChange={(e) => setNewAddress(e.target.value)}
+                  className={`flex-1 rounded-[12px] ${newAddress && !isValidAddress(newAddress) ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  data-testid="input-new-address"
+                  onKeyDown={(e) => e.key === 'Enter' && addNewRecipient()}
+                />
+                <Button
+                  size="icon"
+                  onClick={addNewRecipient}
+                  disabled={!newAddress.trim() || !isValidAddress(newAddress)}
+                  className="rounded-[12px]"
+                  data-testid="button-add-address"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              {newAddress && !isValidAddress(newAddress) && (
+                <span className="text-xs text-destructive">Enter a full 42-character wallet address (0x...) or ENS name (.eth)</span>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground">Address Book</h3>
+              <div className="space-y-2">
+                {addressBook.map((entry) => {
+                  const isSelected = recipients.some(r => r.address === entry.address);
+                  return (
+                    <div
+                      key={entry.id}
+                      className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
+                        isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
+                      }`}
+                      onClick={() => !isSelected && addRecipientFromAddressBook(entry)}
+                      data-testid={`addressbook-${entry.id}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold">{entry.label}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">{truncateAddress(entry.address)}</span>
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <Check className="w-4 h-4 text-primary" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {recipients.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-muted-foreground">Selected Recipients & Amounts</h3>
+                <div className="space-y-3">
+                  {recipients.map((recipient) => (
+                    <div
+                      key={recipient.id}
+                      className="flex items-center gap-3 p-3 rounded-[12px] border border-border bg-card"
+                    >
+                      <div className="flex-1 flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono truncate">{truncateAddress(recipient.address)}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 bg-muted/50 rounded-[8px] px-2 py-1">
+                          <span className="text-xs text-muted-foreground">$</span>
+                          <Input
+                            type="text"
+                            placeholder="0"
+                            value={recipient.amount}
+                            onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
+                            className="w-16 h-6 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
+                            data-testid={`input-amount-${recipient.id}`}
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                          onClick={() => removeRecipient(recipient.id)}
+                          data-testid={`button-remove-${recipient.id}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex justify-between items-center pt-2 border-t border-border">
+                  <span className="text-sm text-muted-foreground">Total</span>
+                  <div className="flex flex-col items-end">
+                    <span className={`text-sm font-bold ${!isWithinBalance ? 'text-destructive' : ''}`}>
+                      ${getTotalRecipientAmount().toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Available: ${getAvailableBalance().toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+                {!isWithinBalance && (
+                  <div className="text-xs text-destructive bg-destructive/10 p-2 rounded-[8px]">
+                    Total exceeds available balance
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="p-6 pt-4 border-t border-border">
+            <Button
+              className="w-full rounded-[12px]"
+              onClick={() => setShowDestinationModal(false)}
+              disabled={recipients.length === 0 || !recipients.every(r => r.amount && parseFloat(r.amount) > 0) || !isWithinBalance}
+              data-testid="button-confirm-recipients"
+            >
+              Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
