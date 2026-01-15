@@ -175,7 +175,7 @@ export default function Transfer() {
               {/* Amount Inputs (Right) */}
               <div className="flex-1 flex flex-col justify-center px-6 gap-1 items-end">
                 <div className="flex items-center justify-end w-full">
-                  <div className="flex items-center">
+                  <div className="flex items-center justify-end">
                     {!isTokenPrimary && (
                       <span className="text-[24px] leading-none font-normal text-foreground">$</span>
                     )}
@@ -184,8 +184,12 @@ export default function Transfer() {
                       placeholder={isTokenPrimary ? "0.00" : "0"}
                       value={amount}
                       onChange={handleAmountChange}
-                      style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 16}px` : '60px' }}
-                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[60px]"
+                      style={{ 
+                        fontSize: '24px', 
+                        width: amount ? `${(amount.length || 4) * 16}px` : (isTokenPrimary ? '60px' : '30px'),
+                        textAlign: 'left'
+                      }}
+                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none min-w-[30px]"
                       data-testid="input-amount"
                     />
                     {isTokenPrimary && (
