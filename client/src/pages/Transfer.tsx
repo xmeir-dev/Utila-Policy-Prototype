@@ -376,7 +376,7 @@ export default function Transfer() {
           <div className="space-y-1">
             <div className="flex justify-between items-center text-sm">
               <div className="flex items-center gap-1.5">
-                <span className="font-medium text-muted-foreground">Balance:</span>
+                <span className="font-medium text-[#ababab]">Balance:</span>
                 <span className="font-semibold text-foreground">{selectedAsset.balance} {selectedAsset.symbol}</span>
               </div>
               <Button 
