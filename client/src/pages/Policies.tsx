@@ -195,10 +195,6 @@ function SortablePolicyItem({
         {index + 1}
       </div>
       
-      <div className={`mt-0.5 ${getActionColor(policy.action)}`}>
-        <ActionIcon className="w-5 h-5" />
-      </div>
-      
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className={`font-medium text-foreground text-[14px] ${!policy.isActive ? 'opacity-50' : ''}`}>
