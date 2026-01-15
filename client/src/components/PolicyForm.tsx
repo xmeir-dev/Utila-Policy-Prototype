@@ -376,7 +376,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 !expandedSections.includes('conditions') && "-rotate-90"
               )} 
             />
-            <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Trigger conditions</Label>
+            <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Conditions</Label>
           </button>
           <div className="flex items-center gap-2">
             <TooltipProvider>
