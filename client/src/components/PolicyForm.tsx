@@ -121,7 +121,17 @@ function TagInput({
   );
 }
 
-const AVAILABLE_USERS = ['Meir', 'Ishai', 'Roman', 'Kendall', 'Shiv', 'Tom', 'Greg'];
+const AVAILABLE_USERS = [
+  'Kendall Roy',
+  'Roman Roy',
+  'Shiv Roy',
+  'Connor Roy',
+  'Gerri Kellman',
+  'Karl Muller',
+  'Frank Vernon',
+  'Tom Wambsgans',
+  'Greg Hirsch'
+];
 
 function MultiUserSelector({ 
   selected, 
