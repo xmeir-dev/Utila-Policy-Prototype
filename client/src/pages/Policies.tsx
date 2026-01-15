@@ -535,7 +535,7 @@ export default function Policies() {
         </motion.div>
       </main>
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
             <DialogTitle className="text-xl font-bold">Create New Policy</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
@@ -553,7 +553,7 @@ export default function Policies() {
         </DialogContent>
       </Dialog>
       <Dialog open={!!editingPolicy} onOpenChange={(open) => !open && setEditingPolicy(null)}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
             <DialogTitle className="text-xl font-bold">Edit Policy</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
@@ -574,7 +574,7 @@ export default function Policies() {
         </DialogContent>
       </Dialog>
       <Dialog open={showSimulator} onOpenChange={setShowSimulator}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
             <DialogTitle className="text-xl font-bold">Simulate Transaction</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">

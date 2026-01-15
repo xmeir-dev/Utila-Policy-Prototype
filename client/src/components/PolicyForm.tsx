@@ -33,7 +33,7 @@ interface ConditionSectionProps {
 
 function ConditionSection({ title, icon, isExpanded, onToggle, children, isConfigured }: ConditionSectionProps) {
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
+    <div className="border border-border rounded-[14px] overflow-hidden">
       <button
         type="button"
         onClick={onToggle}
