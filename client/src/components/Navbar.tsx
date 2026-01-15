@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 
 import utilaLogo from "@assets/Utila-Logo-Horizontal-300x99_1768484509461.png";
-import waystarRoycoLogo from "@assets/image_1768514657224.png";
+import waystarRoycoLogo from "@assets/image_1768514730493.png";
 
 interface NavbarProps {
   walletState: ReturnType<typeof useWallet>;
