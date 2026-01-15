@@ -127,6 +127,10 @@
   * {
     @apply border-border;
   }
+  ::placeholder {
+    color: #ababab !important;
+    opacity: 1;
+  }
   body {
     @apply bg-background text-foreground font-body antialiased;
   }
