@@ -235,18 +235,6 @@ function SortablePolicyItem({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
-          onClick={onToggle}
-          disabled={isToggling}
-          data-testid={`button-toggle-policy-${policy.id}`}
-        >
-          <div className={`w-8 h-4 rounded-full p-0.5 transition-colors duration-200 flex items-center ${policy.isActive ? 'bg-green-500' : 'bg-muted'}`}>
-            <div className={`w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200 transform ${policy.isActive ? 'translate-x-4' : 'translate-x-0'}`} />
-          </div>
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
           className="h-8 w-8 text-[#8a8a8a]"
           onClick={onEdit}
           data-testid={`button-edit-policy-${policy.id}`}
