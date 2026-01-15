@@ -566,26 +566,31 @@ export default function Transfer() {
                       key={recipient.id}
                       className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
                     >
-                      <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-0.5 shrink-0">
-                        <span className="text-xs text-muted-foreground">$</span>
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold">{recipient.label || "Custom Address"}</span>
+                          <a 
+                            href={`https://etherscan.io/address/${recipient.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          >{truncateAddress(recipient.address)}</a>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
+                        <span className="text-sm text-muted-foreground">$</span>
                         <Input
                           type="text"
                           placeholder="0"
                           value={recipient.amount}
                           onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
-                          className="w-32 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                          className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-bold text-right focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
                           data-testid={`input-amount-${recipient.id}`}
                         />
-                      </div>
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end text-right">
-                        <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
-                        <a 
-                          href={`https://etherscan.io/address/${recipient.address}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-muted-foreground font-mono shrink-0 hover:text-primary hover:underline cursor-pointer"
-                          onClick={(e) => e.stopPropagation()}
-                        >{truncateAddress(recipient.address)}</a>
                       </div>
                       <Button
                         variant="ghost"
