@@ -501,7 +501,7 @@ export default function Transfer() {
                     </div>
                     <span className="text-muted-foreground text-[14px] font-normal">
                       {recipients.length > 0 
-                        ? `${recipients.length} recipient${recipients.length > 1 ? 's' : ''} - Total: $${getTotalRecipientAmount().toLocaleString()}` 
+                        ? `Total: $${getTotalRecipientAmount().toLocaleString()}` 
                         : "Choose destination wallets"}
                     </span>
                   </div>
