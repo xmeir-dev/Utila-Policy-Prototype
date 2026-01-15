@@ -48,7 +48,6 @@ export default function Transfer() {
           </div>
 
           <div className="space-y-3">
-            <label className="text-sm font-medium text-muted-foreground">Amount</label>
             <div className="relative">
               <Input
                 type="text"
@@ -94,7 +93,6 @@ export default function Transfer() {
           </div>
 
           <div className="space-y-3">
-            <label className="text-sm font-medium text-muted-foreground">Recipient</label>
             <div className="relative">
               <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
