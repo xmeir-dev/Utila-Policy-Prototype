@@ -346,7 +346,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         <div className="flex items-center justify-between">
           <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[16px] font-medium">Trigger conditions</Label>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Match</span>
             <Select
               value={formData.conditionLogic || "AND"}
               onValueChange={(value) => updateField('conditionLogic', value)}
