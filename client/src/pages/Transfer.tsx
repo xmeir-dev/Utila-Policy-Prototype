@@ -672,7 +672,7 @@ export default function Transfer() {
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">Address Book</h3>
+              <h3 className="text-sm text-muted-foreground font-medium">Contacts</h3>
               <div className="space-y-2">
                 {addressBook.map((entry) => {
                   const isSelected = recipients.some(r => r.address === entry.address);
