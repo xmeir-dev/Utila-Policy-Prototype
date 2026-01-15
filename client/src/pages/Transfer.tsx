@@ -593,43 +593,36 @@ export default function Transfer() {
             {recipients.length > 0 && (
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-muted-foreground">Selected Recipients & Amounts</h3>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {recipients.map((recipient) => (
                     <div
                       key={recipient.id}
-                      className="flex flex-col gap-2 p-3 rounded-[12px] border border-border bg-card"
+                      className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 bg-muted/50 rounded-[8px] px-2 py-1">
-                          <span className="text-xs text-muted-foreground">$</span>
-                          <Input
-                            type="text"
-                            placeholder="0"
-                            value={recipient.amount}
-                            onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
-                            className="w-20 h-6 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
-                            data-testid={`input-amount-${recipient.id}`}
-                          />
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-destructive shrink-0"
-                          onClick={() => removeRecipient(recipient.id)}
-                          data-testid={`button-remove-${recipient.id}`}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
+                      <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-0.5 shrink-0">
+                        <span className="text-xs text-muted-foreground">$</span>
+                        <Input
+                          type="text"
+                          placeholder="0"
+                          value={recipient.amount}
+                          onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
+                          className="w-16 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
+                          data-testid={`input-amount-${recipient.id}`}
+                        />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <User className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono truncate">{truncateAddress(recipient.address)}</span>
-                        </div>
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                        <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono shrink-0">{truncateAddress(recipient.address)}</span>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
+                        onClick={() => removeRecipient(recipient.id)}
+                        data-testid={`button-remove-${recipient.id}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
                     </div>
                   ))}
                 </div>
