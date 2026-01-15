@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
+import { useQuery } from "@tanstack/react-query";
 
 interface Recipient {
   id: string;
@@ -352,26 +353,47 @@ export default function Transfer() {
     });
   };
 
-  return (
-    <div className="min-h-screen bg-background text-foreground font-body">
-      <Navbar walletState={walletState} />
-      <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          <div className="flex items-center gap-4 mb-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/")}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h2 className="font-bold font-display text-foreground text-[24px]">Transfer</h2>
-          </div>
+    const { data: policies = [], isLoading: isLoadingPolicies } = useQuery<any[]>({
+      queryKey: ["/api/policies"],
+    });
+
+    const hasPolicies = !isLoadingPolicies && policies.length > 0;
+
+    return (
+      <div className="min-h-screen bg-background text-foreground font-body">
+        <Navbar walletState={walletState} />
+        <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/")}
+                data-testid="button-back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h2 className="font-bold font-display text-foreground text-[24px]">Transfer</h2>
+            </div>
+
+            {!isLoadingPolicies && !hasPolicies && (
+              <div className="flex items-center justify-between p-4 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-[14px]">
+                <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
+                  Create a policy to enable transactions.
+                </p>
+                <Button 
+                  size="sm" 
+                  onClick={() => setLocation("/policies")}
+                  className="rounded-[14px] bg-amber-500 hover:bg-amber-600 text-white border-0 h-8"
+                >
+                  Create Policy
+                </Button>
+              </div>
+            )}
 
           <div className="space-y-1">
             <div className="relative flex flex-col bg-card border border-border rounded-[24px] z-10">
