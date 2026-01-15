@@ -383,7 +383,7 @@ export default function Transfer() {
             {!isLoadingPolicies && !hasPolicies && (
               <div className="flex items-center justify-between p-4 mb-4 border border-amber-500/20 rounded-[14px] bg-[#e0ceab1a]">
                 <div className="flex flex-col gap-0.5">
-                  <h3 className="text-sm font-bold dark:text-amber-200 text-[#d67424]">
+                  <h3 className="text-sm dark:text-amber-200 text-[#d67424] font-medium">
                     Secure your account
                   </h3>
                   <p className="dark:text-amber-400 text-[#8a8a8a] text-[14px] font-normal">Create a policy to enable transactions</p>
