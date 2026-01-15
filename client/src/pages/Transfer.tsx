@@ -157,6 +157,13 @@ export default function Transfer() {
     setWalletAmounts(prev => ({ ...prev, [walletId]: formatted }));
   };
 
+  const getTotalWalletAmount = () => {
+    return selectedWallets.reduce((sum, id) => {
+      const amt = parseFloat((walletAmounts[id] || "0").replace(/,/g, '')) || 0;
+      return sum + amt;
+    }, 0);
+  };
+
   const getTotalRecipientAmount = () => {
     return recipients.reduce((sum, r) => {
       const amt = parseFloat(r.amount.replace(/,/g, '')) || 0;
@@ -453,7 +460,7 @@ export default function Transfer() {
                     </div>
                     <span className="text-muted-foreground text-[14px] font-normal">
                       {selectedWallets.length > 0 
-                        ? `${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''} - Total: $${getAvailableBalance().toLocaleString()}` 
+                        ? `${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''} - Total: $${getTotalWalletAmount().toLocaleString()}` 
                         : "Choose origin wallets"}
                     </span>
                   </div>
