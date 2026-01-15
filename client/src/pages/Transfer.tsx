@@ -373,9 +373,7 @@ export default function Transfer() {
               disabled={!amount || !recipient}
               onClick={handleContinue}
               data-testid="button-continue"
-            >
-              Continue
-            </Button>
+            >Send</Button>
           </div>
         </motion.div>
       </main>
