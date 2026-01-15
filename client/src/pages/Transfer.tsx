@@ -362,8 +362,8 @@ export default function Transfer() {
               <span className="text-[14px] font-normal text-[#ababab]">est. tx time</span>
             </div>
             <div className="flex items-baseline gap-1.5 leading-none">
-              <span className="text-[14px] font-normal text-[#ababab]">est. fee</span>
               <span className="text-sm text-foreground font-normal">$0.31</span>
+              <span className="text-[14px] font-normal text-[#ababab]">est. fee</span>
             </div>
           </div>
 
