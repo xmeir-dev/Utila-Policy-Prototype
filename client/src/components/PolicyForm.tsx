@@ -720,22 +720,20 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
         {expandedSections.includes('policyChanges') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
-            <Card className="p-4 space-y-4">
-              <div className="space-y-2">
-                <Label className="text-sm">Approvals required</Label>
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="number"
-                    min={1}
-                    value={formData.changeApprovalsRequired || 1}
-                    onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
-                    className="w-20 rounded-lg"
-                    data-testid="input-change-approvals"
-                  />
-                  <span className="text-sm text-muted-foreground">approvals needed to approve changes</span>
-                </div>
+            <div className="space-y-2">
+              <Label className="text-sm">Approvals required</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min={1}
+                  value={formData.changeApprovalsRequired || 1}
+                  onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
+                  className="w-20 rounded-lg"
+                  data-testid="input-change-approvals"
+                />
+                <span className="text-sm text-muted-foreground">approvals needed to approve changes</span>
               </div>
-            </Card>
+            </div>
           </div>
         )}
       </div>
