@@ -8,7 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
@@ -299,7 +298,7 @@ export default function Policies() {
   const walletState = useWallet();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
-  const [activeTab, setActiveTab] = useState("policies");
+  const [showSimulator, setShowSimulator] = useState(false);
   const { toast } = useToast();
 
   const sensors = useSensors(
@@ -381,7 +380,7 @@ export default function Policies() {
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest('POST', `/api/policies/${id}/approve-change`, { 
-        approver: walletState.address || 'anonymous' 
+        approver: walletState.walletAddress || 'anonymous' 
       });
     },
     onSuccess: () => {
@@ -458,20 +457,8 @@ export default function Policies() {
             </Card>
           )}
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2 rounded-lg">
-              <TabsTrigger value="policies" className="rounded-lg gap-2" data-testid="tab-policies">
-                <Shield className="w-4 h-4" />
-                Policies
-              </TabsTrigger>
-              <TabsTrigger value="simulate" className="rounded-lg gap-2" data-testid="tab-simulate">
-                <Beaker className="w-4 h-4" />
-                Test & Simulate
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="policies" className="space-y-4">
-              {isLoading ? (
+          <div className="space-y-4">
+            {isLoading ? (
                 <Card className="p-6">
                   <div className="flex items-center justify-center">
                     <span className="text-muted-foreground">Loading policies...</span>
@@ -542,12 +529,19 @@ export default function Policies() {
                   </DndContext>
                 </Card>
               )}
-            </TabsContent>
+          </div>
 
-            <TabsContent value="simulate">
-              <TransactionSimulator />
-            </TabsContent>
-          </Tabs>
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="secondary"
+              onClick={() => setShowSimulator(true)}
+              className="gap-2 rounded-lg"
+              data-testid="button-simulate-transaction"
+            >
+              <Beaker className="w-4 h-4" />
+              Simulate Transaction
+            </Button>
+          </div>
         </motion.div>
       </main>
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
@@ -586,6 +580,19 @@ export default function Policies() {
                 submitLabel="Save Changes"
               />
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showSimulator} onOpenChange={setShowSimulator}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
+          <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
+            <DialogTitle className="text-xl font-bold">Simulate Transaction</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Test which policy would apply to a hypothetical transaction.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            <TransactionSimulator />
           </div>
         </DialogContent>
       </Dialog>
