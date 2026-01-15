@@ -143,6 +143,20 @@ export default function Transfer() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const total = getTotalRecipientAmount();
+    if (total > 0) {
+      if (isTokenPrimary) {
+        const tokenVal = total / selectedAsset.price;
+        setAmount(tokenVal.toFixed(2));
+      } else {
+        setAmount(new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(total));
+      }
+    } else if (recipients.length === 0) {
+      setAmount("");
+    }
+  }, [recipients, isTokenPrimary, selectedAsset.price]);
+
   const formatUSD = (val: string) => {
     const num = parseFloat(val.replace(/,/g, ''));
     if (isNaN(num)) return val;
