@@ -739,7 +739,7 @@ export default function Transfer() {
           <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
             {selectedWallets.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-muted-foreground">Selected Wallets</h3>
+                <h3 className="text-sm text-muted-foreground font-medium">Selected wallets</h3>
                 <div className="space-y-2">
                   {selectedWallets.map((walletId) => {
                     const wallet = availableWallets.find(w => w.id === walletId);
