@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -22,12 +22,35 @@ export default function Transfer() {
   const [selectedAsset, setSelectedAsset] = useState(assets[0]);
   const [recipient, setRecipient] = useState("");
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
+  const [isTokenPrimary, setIsTokenPrimary] = useState(false);
 
   const handleContinue = () => {
     console.log("Transfer:", { amount, asset: selectedAsset.symbol, recipient });
   };
 
   const AssetIcon = selectedAsset.icon;
+
+  const togglePrimary = () => {
+    if (!amount) {
+      setIsTokenPrimary(!isTokenPrimary);
+      return;
+    }
+
+    const currentVal = parseFloat(amount.replace(/,/g, ''));
+    if (isNaN(currentVal)) {
+      setIsTokenPrimary(!isTokenPrimary);
+      return;
+    }
+
+    if (isTokenPrimary) {
+      // Switching from Token to USD
+      setAmount((currentVal * selectedAsset.price).toFixed(2));
+    } else {
+      // Switching from USD to Token
+      setAmount((currentVal / selectedAsset.price).toFixed(6));
+    }
+    setIsTokenPrimary(!isTokenPrimary);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
@@ -116,19 +139,41 @@ export default function Transfer() {
               {/* Amount Inputs (Right) */}
               <div className="flex-1 flex flex-col justify-center px-6 gap-1 items-end">
                 <div className="flex items-center justify-end w-full">
-                  <span className="text-[24px] leading-none font-normal text-foreground">$</span>
-                  <Input
-                    type="text"
-                    placeholder="0.00"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 14}px` : '50px' }}
-                    className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[50px]"
-                    data-testid="input-amount"
-                  />
+                  <div className="flex items-center">
+                    {!isTokenPrimary && (
+                      <span className="text-[24px] leading-none font-normal text-foreground">$</span>
+                    )}
+                    <Input
+                      type="text"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 14}px` : '50px' }}
+                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[50px]"
+                      data-testid="input-amount"
+                    />
+                    {isTokenPrimary && (
+                      <span className="text-[24px] leading-none font-normal text-foreground ml-1">{selectedAsset.symbol}</span>
+                    )}
+                  </div>
                 </div>
-                <div className="text-sm font-medium text-muted-foreground mr-0">
-                  {amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(6) : "0.00"} {selectedAsset.symbol}
+                <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                  <span>
+                    {isTokenPrimary ? (
+                      `$${amount ? (parseFloat(amount.replace(/,/g, '')) * selectedAsset.price).toFixed(2) : "0.00"}`
+                    ) : (
+                      `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(6) : "0.00"} ${selectedAsset.symbol}`
+                    )}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 p-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                    onClick={togglePrimary}
+                    data-testid="button-switch-unit"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                  </Button>
                 </div>
               </div>
             </div>
