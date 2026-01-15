@@ -356,24 +356,26 @@ export default function Transfer() {
             </div>
           </div>
 
-          <div className="pt-4 space-y-3">
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full text-lg font-semibold rounded-[16px] h-[48px] border-2"
-              disabled={!amount || !recipient}
-              onClick={() => console.log("Simulate Transfer")}
-              data-testid="button-simulate"
-            >
-              Simulate Transfer
-            </Button>
+          <div className="pt-4 flex flex-col items-center gap-2">
             <Button
               size="lg"
               className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
               disabled={!amount || !recipient}
               onClick={handleContinue}
               data-testid="button-continue"
-            >Send</Button>
+            >
+              Send
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
+              disabled={!amount || !recipient}
+              onClick={() => console.log("Simulate Transfer")}
+              data-testid="button-simulate"
+            >
+              Simulate Transfer
+            </Button>
           </div>
         </motion.div>
       </main>
