@@ -494,7 +494,7 @@ export default function Transfer() {
                 data-testid="button-wallet-selector"
               >
                 <div className="flex items-center gap-2 overflow-hidden">
-                  <span className="shrink-0 font-medium text-[14px] text-muted-foreground">From</span>
+                  <span className="shrink-0 font-medium text-[14px] text-[#171717]">From</span>
                   <div className="flex gap-1.5 overflow-hidden flex-wrap">
                     {selectedWallets.length > 0 ? (
                       selectedWallets.map(id => {
