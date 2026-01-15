@@ -50,9 +50,11 @@ export function Navbar({ walletState }: NavbarProps) {
                   alt="Waystar Royco" 
                   className="h-6 w-auto" 
                 />
-                <div className={`flex items-center justify-center w-6 h-6 rounded-full ${connectedUser.avatarBg || 'bg-muted'} ${connectedUser.avatarColor || 'text-foreground'}`}>
-                  <span className="text-xs font-semibold">{connectedUser.name?.charAt(0) || '?'}</span>
-                </div>
+                <img 
+                  src={waystarRoycoLogo} 
+                  alt={connectedUser.name} 
+                  className="w-6 h-6 rounded-full object-cover" 
+                />
                 <span className="text-sm font-medium">{connectedUser.name}</span>
               </div>
             )}
@@ -63,9 +65,11 @@ export function Navbar({ walletState }: NavbarProps) {
                 onClick={() => disconnect()}
                 className="rounded-[16px] font-mono text-sm h-[48px]"
               >
-                <div className={`flex items-center justify-center w-6 h-6 rounded-full mr-2 ${connectedUser.avatarBg || 'bg-muted'} ${connectedUser.avatarColor || 'text-foreground'}`}>
-                  <span className="text-xs font-semibold">{connectedUser.name?.charAt(0) || '?'}</span>
-                </div>
+                <img 
+                  src={waystarRoycoLogo} 
+                  alt={connectedUser.name} 
+                  className="w-6 h-6 rounded-full mr-2 object-cover" 
+                />
                 {connectedUser.name}
               </Button>
             ) : (
@@ -105,9 +109,11 @@ export function Navbar({ walletState }: NavbarProps) {
                 onClick={() => handleUserSelect(user.address)}
                 className="justify-start h-14 px-4 rounded-[14px]"
               >
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full mr-3 ${user.avatarBg} ${user.avatarColor}`}>
-                  <span className="text-sm font-semibold">{user.name.charAt(0)}</span>
-                </div>
+                <img 
+                  src={waystarRoycoLogo} 
+                  alt={user.name} 
+                  className="w-8 h-8 rounded-full mr-3 object-cover" 
+                />
                 <div className="flex flex-col items-start">
                   <span className="font-medium">{user.name}</span>
                   <span className="text-xs text-muted-foreground font-mono">
