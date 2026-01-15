@@ -582,7 +582,6 @@ export default function Transfer() {
           </div>
         </motion.div>
       </main>
-
       <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
         <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
           <DialogHeader className="p-6 pb-4 border-b border-border">
@@ -633,8 +632,8 @@ export default function Transfer() {
                     <span className={`text-sm font-bold ${!isWithinBalance ? 'text-destructive' : ''}`}>
                       ${getTotalRecipientAmount().toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      Available: ${getAvailableBalance().toLocaleString()}
+                    <span className="text-muted-foreground text-[14px]">
+                      Total available: ${getAvailableBalance().toLocaleString()}
                     </span>
                   </div>
                 </div>
