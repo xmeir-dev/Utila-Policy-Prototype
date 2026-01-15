@@ -99,7 +99,7 @@ function TagInput({
           className="flex-1 rounded-lg"
           data-testid={testId}
         />
-        <Button type="button" variant="outline" size="icon" onClick={addTag} data-testid={`${testId}-add`}>
+        <Button type="button" variant="outline" size="icon" onClick={addTag} data-testid={`${testId}-add`} className="rounded-[14px]">
           <Plus className="w-4 h-4" />
         </Button>
       </div>
@@ -165,7 +165,7 @@ function MultiUserSelector({
             }
           }}
         >
-          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors [&>svg]:hidden">
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-[14px] transition-colors [&>svg]:hidden">
             <div className="flex items-center gap-1">
               <Plus className="w-3 h-3" />
               <span>Add User</span>
@@ -227,7 +227,7 @@ function MultiWalletSelector({
             }
           }}
         >
-          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors [&>svg]:hidden">
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-[14px] transition-colors [&>svg]:hidden">
             <div className="flex items-center gap-1">
               <Plus className="w-3 h-3" />
               <span>Add Wallet</span>
@@ -382,27 +382,27 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex bg-muted p-1 rounded-md h-8 items-center">
-                    <button
-                      type="button"
-                      onClick={() => updateField('conditionLogic', 'AND')}
-                      className={cn(
-                        "px-3 h-6 text-xs font-medium rounded-sm transition-all",
-                        formData.conditionLogic === 'AND' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      And
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateField('conditionLogic', 'OR')}
-                      className={cn(
-                        "px-3 h-6 text-xs font-medium rounded-sm transition-all",
-                        formData.conditionLogic === 'OR' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      Or
-                    </button>
+                  <div className="flex bg-muted p-1 rounded-[14px] h-8 items-center">
+          <button
+            type="button"
+            onClick={() => updateField('conditionLogic', 'AND')}
+            className={cn(
+              "px-3 h-6 text-xs font-medium rounded-[14px] transition-all",
+              formData.conditionLogic === 'AND' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            And
+          </button>
+          <button
+            type="button"
+            onClick={() => updateField('conditionLogic', 'OR')}
+            className={cn(
+              "px-3 h-6 text-xs font-medium rounded-[14px] transition-all",
+              formData.conditionLogic === 'OR' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Or
+          </button>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>

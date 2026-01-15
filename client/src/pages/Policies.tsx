@@ -488,14 +488,16 @@ export default function Policies() {
           </div>
 
           <div className="flex justify-center pt-4">
-            <Button
-              variant="secondary"
-              onClick={() => setShowSimulator(true)}
-              className="gap-2 rounded-lg"
-              data-testid="button-simulate-transaction"
-            >
-              Simulate a Transaction
-            </Button>
+            {policies.length > 0 && (
+              <Button
+                variant="secondary"
+                onClick={() => setShowSimulator(true)}
+                className="gap-2 rounded-lg"
+                data-testid="button-simulate-transaction"
+              >
+                Simulate a Transaction
+              </Button>
+            )}
           </div>
         </motion.div>
       </main>
