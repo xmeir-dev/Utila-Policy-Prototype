@@ -617,18 +617,18 @@ export default function Transfer() {
               <Button
                 size="lg"
                 className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
-                disabled={!canSend || !hasPolicies}
+                disabled={!canSend}
                 onClick={handleContinue}
                 data-testid="button-continue"
               >
-                {!hasPolicies ? "Create a Policy to enable transactions" : "Send"}
+                Send
               </Button>
             )}
             <Button
               variant="ghost"
               size="sm"
               className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
-              disabled={!canSend || !hasPolicies}
+              disabled={!canSend}
               onClick={() => console.log("Simulate Transfer")}
               data-testid="button-simulate"
             >
