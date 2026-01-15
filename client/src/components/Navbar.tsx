@@ -23,7 +23,7 @@ export function Navbar({ walletState }: NavbarProps) {
           <img 
             src={utilaLogo} 
             alt="Utila" 
-            className="h-8 w-auto invert dark:invert-0" 
+            className="h-8 w-auto grayscale brightness-0" 
           />
         </Link>
 
