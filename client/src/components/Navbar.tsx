@@ -89,7 +89,7 @@ export function Navbar({ walletState }: NavbarProps) {
         </div>
       </nav>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-[22px]" data-testid="dialog-select-wallet">
+        <DialogContent className="sm:max-w-md rounded-[22px] sm:rounded-[22px]" data-testid="dialog-select-wallet">
           <DialogHeader>
             <DialogTitle className="tracking-tight font-medium text-[18px]">Select a wallet</DialogTitle>
           </DialogHeader>
