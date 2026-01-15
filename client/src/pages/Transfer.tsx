@@ -356,6 +356,17 @@ export default function Transfer() {
             </div>
           </div>
 
+          <div className="flex justify-between items-center px-2 py-2">
+            <div className="flex flex-col items-start leading-none">
+              <span className="text-sm font-semibold text-foreground">x sec</span>
+              <span className="text-[10px] font-medium text-muted-foreground">est. tx time</span>
+            </div>
+            <div className="flex flex-col items-end leading-none">
+              <span className="text-sm font-semibold text-foreground">$0.31</span>
+              <span className="text-[10px] font-medium text-muted-foreground">est. fee</span>
+            </div>
+          </div>
+
           <div className="pt-4 flex flex-col items-center gap-2">
             <Button
               size="lg"
