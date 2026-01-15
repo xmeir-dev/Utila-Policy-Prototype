@@ -34,7 +34,7 @@ export function Navbar({ walletState }: NavbarProps) {
               data-testid="button-disconnect-wallet"
               variant="outline"
               onClick={() => disconnect()}
-              className="rounded-md font-mono text-sm"
+              className="rounded-[16px] font-mono text-sm"
             >
               <img 
                 src={walletAvatar} 
