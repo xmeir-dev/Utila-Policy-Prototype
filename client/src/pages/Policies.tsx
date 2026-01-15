@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, X, Shield, ShieldCheck, ShieldX, ShieldAlert, ToggleLeft, ToggleRight, Trash2, Scale } from "lucide-react";
+import { 
+  ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, 
+  ToggleLeft, ToggleRight, Trash2, Scale, GripVertical, Edit, 
+  Clock, CheckCircle, AlertTriangle, Beaker 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
@@ -14,11 +17,32 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@shared/routes";
-import type { Policy } from "@shared/schema";
+import type { Policy, InsertPolicy } from "@shared/schema";
+import { PolicyForm } from "@/components/PolicyForm";
+import { TransactionSimulator } from "@/components/TransactionSimulator";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const getActionIcon = (action: string) => {
   switch (action) {
-    case 'approve':
+    case 'allow':
+    case 'approve': // Legacy support
       return ShieldCheck;
     case 'deny':
       return ShieldX;
@@ -31,7 +55,8 @@ const getActionIcon = (action: string) => {
 
 const getActionColor = (action: string) => {
   switch (action) {
-    case 'approve':
+    case 'allow':
+    case 'approve': // Legacy support
       return 'text-green-500';
     case 'deny':
       return 'text-red-500';
@@ -44,10 +69,11 @@ const getActionColor = (action: string) => {
 
 const getActionLabel = (action: string) => {
   switch (action) {
-    case 'approve':
-      return 'Auto Approve';
+    case 'allow':
+    case 'approve': // Legacy support
+      return 'Allow';
     case 'deny':
-      return 'Auto Deny';
+      return 'Deny';
     case 'require_approval':
       return 'Require Approval';
     default:
@@ -55,33 +81,263 @@ const getActionLabel = (action: string) => {
   }
 };
 
+const getStatusBadge = (status: string | null) => {
+  switch (status) {
+    case 'pending_approval':
+      return (
+        <Badge variant="outline" className="h-5 px-1.5 text-[10px] gap-1 border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+          <Clock className="w-3 h-3" />
+          Pending Approval
+        </Badge>
+      );
+    case 'draft':
+      return (
+        <Badge variant="outline" className="h-5 px-1.5 text-[10px] gap-1">
+          Draft
+        </Badge>
+      );
+    default:
+      return null;
+  }
+};
+
+function getConditionSummary(policy: Policy): string[] {
+  const conditions: string[] = [];
+  
+  if (policy.initiatorType && policy.initiatorType !== 'any') {
+    const count = policy.initiatorValues?.length || 0;
+    conditions.push(`${policy.initiatorType === 'user' ? 'Users' : 'Groups'}: ${count}`);
+  }
+  
+  if (policy.sourceWalletType && policy.sourceWalletType !== 'any') {
+    conditions.push(`Source: ${policy.sourceWallets?.length || 0} wallets`);
+  }
+  
+  if (policy.destinationType && policy.destinationType !== 'any') {
+    conditions.push(`Dest: ${policy.destinationType}`);
+  }
+  
+  if (policy.amountCondition && policy.amountCondition !== 'any') {
+    if (policy.amountCondition === 'above') {
+      conditions.push(`>${policy.amountMin} USD`);
+    } else if (policy.amountCondition === 'below') {
+      conditions.push(`<${policy.amountMin} USD`);
+    } else if (policy.amountCondition === 'between') {
+      conditions.push(`${policy.amountMin}-${policy.amountMax} USD`);
+    }
+  }
+  
+  if (policy.assetType && policy.assetType !== 'any') {
+    conditions.push(`Assets: ${policy.assetValues?.join(', ') || 'specific'}`);
+  }
+  
+  return conditions;
+}
+
+interface SortablePolicyItemProps {
+  policy: Policy;
+  index: number;
+  totalPolicies: number;
+  onToggle: () => void;
+  onDelete: () => void;
+  onEdit: () => void;
+  onApprove: () => void;
+  isToggling: boolean;
+  isDeleting: boolean;
+}
+
+function SortablePolicyItem({ 
+  policy, 
+  index, 
+  totalPolicies,
+  onToggle, 
+  onDelete, 
+  onEdit,
+  onApprove,
+  isToggling, 
+  isDeleting 
+}: SortablePolicyItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: policy.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const ActionIcon = getActionIcon(policy.action);
+  const conditions = getConditionSummary(policy);
+  const isPendingApproval = policy.status === 'pending_approval';
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-start gap-3 px-4 py-4 ${index !== totalPolicies - 1 ? 'border-b border-border' : ''} ${isDragging ? 'bg-muted/50' : ''}`}
+      data-testid={`policy-item-${policy.id}`}
+    >
+      <button
+        className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+        {...attributes}
+        {...listeners}
+        data-testid={`drag-handle-${policy.id}`}
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+      
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-medium text-muted-foreground shrink-0">
+        {index + 1}
+      </div>
+      
+      <div className={`mt-0.5 ${getActionColor(policy.action)}`}>
+        <ActionIcon className="w-5 h-5" />
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          <span className={`font-medium text-foreground text-[14px] ${!policy.isActive ? 'opacity-50' : ''}`}>
+            {policy.name}
+          </span>
+          <Badge 
+            variant="outline" 
+            className={`h-5 px-1.5 text-[11px] ${!policy.isActive ? 'opacity-50' : ''}`}
+          >
+            {getActionLabel(policy.action)}
+          </Badge>
+          {!policy.isActive && (
+            <Badge variant="secondary" className="h-5 px-1.5 text-[11px]">
+              Disabled
+            </Badge>
+          )}
+          {getStatusBadge(policy.status)}
+        </div>
+        
+        <p className={`text-[13px] text-muted-foreground ${!policy.isActive ? 'opacity-50' : ''}`}>
+          {policy.description}
+        </p>
+        
+        {conditions.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+              {policy.conditionLogic || 'AND'}
+            </Badge>
+            {conditions.map((condition, i) => (
+              <Badge key={i} variant="outline" className="h-5 px-1.5 text-[10px]">
+                {condition}
+              </Badge>
+            ))}
+          </div>
+        )}
+        
+        {policy.action === 'require_approval' && policy.approvers && policy.approvers.length > 0 && (
+          <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+            <span>Quorum: {policy.quorumRequired} of {policy.approvers.length}</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex items-center gap-1 shrink-0">
+        {isPendingApproval && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-500/10"
+            onClick={onApprove}
+            data-testid={`button-approve-policy-${policy.id}`}
+          >
+            <CheckCircle className="w-4 h-4 mr-1" />
+            Approve
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onEdit}
+          data-testid={`button-edit-policy-${policy.id}`}
+        >
+          <Edit className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onToggle}
+          disabled={isToggling}
+          data-testid={`button-toggle-policy-${policy.id}`}
+        >
+          {policy.isActive ? (
+            <ToggleRight className="w-5 h-5 text-green-500" />
+          ) : (
+            <ToggleLeft className="w-5 h-5 text-muted-foreground" />
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-red-500"
+          onClick={onDelete}
+          disabled={isDeleting}
+          data-testid={`button-delete-policy-${policy.id}`}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function Policies() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newPolicy, setNewPolicy] = useState({
-    name: "",
-    description: "",
-    action: "require_approval",
-  });
+  const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
+  const [activeTab, setActiveTab] = useState("policies");
   const { toast } = useToast();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { data: policies = [], isLoading, isError } = useQuery<Policy[]>({
     queryKey: [api.policies.list.path],
   });
 
   const createMutation = useMutation({
-    mutationFn: async (policy: { name: string; description: string; action: string }) => {
+    mutationFn: async (policy: InsertPolicy) => {
       return await apiRequest('POST', api.policies.create.path, policy);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
       setShowAddModal(false);
-      setNewPolicy({ name: "", description: "", action: "require_approval" });
-      toast({ title: "Policy added successfully" });
+      toast({ title: "Policy created successfully" });
     },
     onError: () => {
-      toast({ title: "Failed to add policy", variant: "destructive" });
+      toast({ title: "Failed to create policy", variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertPolicy> }) => {
+      return await apiRequest('PUT', `/api/policies/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+      setEditingPolicy(null);
+      toast({ title: "Policy updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update policy", variant: "destructive" });
     },
   });
 
@@ -110,21 +366,56 @@ export default function Policies() {
     },
   });
 
-  const handleAddPolicy = () => {
-    if (!newPolicy.name.trim() || !newPolicy.description.trim()) return;
-    createMutation.mutate(newPolicy);
+  const reorderMutation = useMutation({
+    mutationFn: async (orderedIds: number[]) => {
+      return await apiRequest('POST', api.policies.reorder.path, { orderedIds });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+    },
+    onError: () => {
+      toast({ title: "Failed to reorder policies", variant: "destructive" });
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('POST', `/api/policies/${id}/approve-change`, { 
+        approver: walletState.address || 'anonymous' 
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+      toast({ title: "Policy change approved" });
+    },
+    onError: () => {
+      toast({ title: "Failed to approve policy change", variant: "destructive" });
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = policies.findIndex((p) => p.id === active.id);
+      const newIndex = policies.findIndex((p) => p.id === over.id);
+      const newOrder = arrayMove(policies, oldIndex, newIndex);
+      reorderMutation.mutate(newOrder.map(p => p.id));
+    }
   };
+
+  const pendingPolicies = policies.filter(p => p.status === 'pending_approval');
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar walletState={walletState} />
-      <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
+      <main className="max-w-3xl mx-auto px-6 py-12 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
+          className="space-y-6"
         >
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
@@ -133,178 +424,170 @@ export default function Policies() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h2 className="text-3xl font-bold font-display text-foreground">Policies</h2>
-          </div>
-
-          <div className="space-y-3">
-            {!isLoading && !isError && policies.length > 0 && (
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold font-display text-foreground">Policy Builder</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Define rules for transfer approvals. First matching policy wins.
+              </p>
+            </div>
+            {policies.length > 0 && (
               <Button
-                variant="outline"
-                className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
                 onClick={() => setShowAddModal(true)}
-                data-testid="button-add-policy"
+                className="gap-2 rounded-lg"
+                data-testid="button-add-policy-header"
               >
-                <div className="flex items-center gap-4 text-left">
-                  <Plus className="w-6 h-6 text-muted-foreground shrink-0" />
-                  <div className="flex flex-col items-start gap-1">
-                    <span className="font-medium text-foreground text-[14px]">Add New Policy</span>
-                    <span className="text-[13px] text-muted-foreground">Define rules for transfer approvals</span>
-                  </div>
-                </div>
+                <Plus className="w-4 h-4" />
+                Add Policy
               </Button>
             )}
+          </div>
 
-            {isLoading ? (
-              <div className="relative flex flex-col bg-card border border-border rounded-[24px] p-6">
-                <div className="flex items-center justify-center">
-                  <span className="text-muted-foreground">Loading policies...</span>
+          {pendingPolicies.length > 0 && (
+            <Card className="p-4 border-amber-500/30 bg-amber-500/5">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                    {pendingPolicies.length} policy change{pendingPolicies.length > 1 ? 's' : ''} pending approval
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Review and approve to activate changes
+                  </p>
                 </div>
               </div>
-            ) : isError ? (
-              <div className="relative flex flex-col bg-card border border-border rounded-[24px] p-6">
-                <div className="flex flex-col items-center justify-center gap-2 py-4">
-                  <ShieldX className="w-10 h-10 text-red-500/50" />
-                  <span className="text-muted-foreground text-sm">Failed to load policies</span>
-                </div>
-              </div>
-            ) : policies.length === 0 ? (
-              <div className="relative flex flex-col p-6">
-                <div className="flex flex-col items-center justify-center gap-2 py-4">
+            </Card>
+          )}
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2 rounded-lg">
+              <TabsTrigger value="policies" className="rounded-lg gap-2" data-testid="tab-policies">
+                <Shield className="w-4 h-4" />
+                Policies
+              </TabsTrigger>
+              <TabsTrigger value="simulate" className="rounded-lg gap-2" data-testid="tab-simulate">
+                <Beaker className="w-4 h-4" />
+                Test & Simulate
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="policies" className="space-y-4">
+              {isLoading ? (
+                <Card className="p-6">
+                  <div className="flex items-center justify-center">
+                    <span className="text-muted-foreground">Loading policies...</span>
+                  </div>
+                </Card>
+              ) : isError ? (
+                <Card className="p-6">
+                  <div className="flex flex-col items-center justify-center gap-2 py-4">
+                    <ShieldX className="w-10 h-10 text-red-500/50" />
+                    <span className="text-muted-foreground text-sm">Failed to load policies</span>
+                  </div>
+                </Card>
+              ) : policies.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-3 py-12">
                   <Scale className="w-16 h-16 text-muted-foreground/30" />
-                  <span className="text-sm text-[#171717] text-center max-w-[280px]">Without an active policy, all outgoing transfers are automatically denied. Set up your first policy to start moving funds.</span>
+                  <p className="text-sm text-muted-foreground text-center max-w-[320px]">
+                    Without an active policy, all outgoing transfers are automatically denied. 
+                    Set up your first policy to start moving funds.
+                  </p>
                   <Button 
-                    className="mt-4 gap-2 rounded-[12px]" 
+                    className="mt-2 gap-2 rounded-lg" 
                     onClick={() => setShowAddModal(true)}
                     data-testid="button-add-first-policy"
                   >
                     <Plus className="w-4 h-4" />
-                    Add a Policy
+                    Add Your First Policy
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <div className="relative flex flex-col bg-card border border-border rounded-[24px] overflow-hidden">
-                {policies.map((policy, index) => {
-                  const ActionIcon = getActionIcon(policy.action);
-                  return (
-                    <div
-                      key={policy.id}
-                      className={`flex items-start gap-4 px-4 py-4 ${index !== policies.length - 1 ? 'border-b border-border' : ''}`}
-                      data-testid={`policy-item-${policy.id}`}
-                    >
-                      <div className={`mt-0.5 ${getActionColor(policy.action)}`}>
-                        <ActionIcon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-foreground text-[14px]">{policy.name}</span>
-                          <Badge 
-                            variant="outline" 
-                            className={`h-5 px-1.5 text-[11px] ${!policy.isActive ? 'opacity-50' : ''}`}
-                          >
-                            {getActionLabel(policy.action)}
-                          </Badge>
-                          {!policy.isActive && (
-                            <Badge variant="secondary" className="h-5 px-1.5 text-[11px]">
-                              Disabled
-                            </Badge>
-                          )}
-                        </div>
-                        <p className={`text-[13px] text-muted-foreground ${!policy.isActive ? 'opacity-50' : ''}`}>
-                          {policy.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => toggleMutation.mutate(policy.id)}
-                          disabled={toggleMutation.isPending}
-                          data-testid={`button-toggle-policy-${policy.id}`}
-                        >
-                          {policy.isActive ? (
-                            <ToggleRight className="w-5 h-5 text-green-500" />
-                          ) : (
-                            <ToggleLeft className="w-5 h-5 text-muted-foreground" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-red-500"
-                          onClick={() => deleteMutation.mutate(policy.id)}
-                          disabled={deleteMutation.isPending}
-                          data-testid={`button-delete-policy-${policy.id}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+              ) : (
+                <Card className="overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Priority Order
+                      </span>
+                      <Badge variant="outline" className="h-5 px-1.5 text-[10px]">
+                        First Match Wins
+                      </Badge>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    <span className="text-xs text-muted-foreground">
+                      Drag to reorder
+                    </span>
+                  </div>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={policies.map(p => p.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {policies.map((policy, index) => (
+                        <SortablePolicyItem
+                          key={policy.id}
+                          policy={policy}
+                          index={index}
+                          totalPolicies={policies.length}
+                          onToggle={() => toggleMutation.mutate(policy.id)}
+                          onDelete={() => deleteMutation.mutate(policy.id)}
+                          onEdit={() => setEditingPolicy(policy)}
+                          onApprove={() => approveMutation.mutate(policy.id)}
+                          isToggling={toggleMutation.isPending}
+                          isDeleting={deleteMutation.isPending}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="simulate">
+              <TransactionSimulator />
+            </TabsContent>
+          </Tabs>
         </motion.div>
       </main>
+
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-border">
-            <DialogTitle className="text-xl font-bold">Add New Policy</DialogTitle>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
+          <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
+            <DialogTitle className="text-xl font-bold">Create New Policy</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Define trigger conditions and actions for transaction approval.
+            </DialogDescription>
           </DialogHeader>
-          
-          <div className="p-6 space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Policy Name</label>
-              <Input
-                placeholder="e.g., Large Bitcoin Transfer Approval"
-                value={newPolicy.name}
-                onChange={(e) => setNewPolicy({ ...newPolicy, name: e.target.value })}
-                className="rounded-[12px]"
-                data-testid="input-policy-name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Description</label>
-              <Textarea
-                placeholder="Describe what this policy does..."
-                value={newPolicy.description}
-                onChange={(e) => setNewPolicy({ ...newPolicy, description: e.target.value })}
-                className="rounded-[12px] min-h-[100px] resize-none"
-                data-testid="input-policy-description"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Action</label>
-              <Select
-                value={newPolicy.action}
-                onValueChange={(value) => setNewPolicy({ ...newPolicy, action: value })}
-              >
-                <SelectTrigger className="rounded-[12px]" data-testid="select-policy-action">
-                  <SelectValue placeholder="Select action" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="require_approval">Require Approval</SelectItem>
-                  <SelectItem value="approve">Auto Approve</SelectItem>
-                  <SelectItem value="deny">Auto Deny</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="p-6">
+            <PolicyForm
+              onSubmit={(data) => createMutation.mutate(data)}
+              onCancel={() => setShowAddModal(false)}
+              isSubmitting={createMutation.isPending}
+              submitLabel="Create Policy"
+            />
           </div>
+        </DialogContent>
+      </Dialog>
 
-          <div className="p-6 pt-0">
-            <Button
-              size="lg"
-              className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
-              onClick={handleAddPolicy}
-              disabled={!newPolicy.name.trim() || !newPolicy.description.trim() || createMutation.isPending}
-              data-testid="button-save-policy"
-            >
-              {createMutation.isPending ? 'Adding...' : 'Add Policy'}
-            </Button>
+      <Dialog open={!!editingPolicy} onOpenChange={(open) => !open && setEditingPolicy(null)}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-lg p-0 gap-0">
+          <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
+            <DialogTitle className="text-xl font-bold">Edit Policy</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Modify trigger conditions and actions for this policy.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            {editingPolicy && (
+              <PolicyForm
+                initialData={editingPolicy}
+                onSubmit={(data) => updateMutation.mutate({ id: editingPolicy.id, data })}
+                onCancel={() => setEditingPolicy(null)}
+                isSubmitting={updateMutation.isPending}
+                submitLabel="Save Changes"
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>

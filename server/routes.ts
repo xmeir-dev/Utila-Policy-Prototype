@@ -70,12 +70,28 @@ export async function registerRoutes(
     }
   });
 
+  app.get('/api/policies/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      const policy = await storage.getPolicy(id);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.status(200).json(policy);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch policy" });
+    }
+  });
+
   app.post(api.policies.create.path, async (req, res) => {
     try {
       const input = api.policies.create.input.parse(req.body);
       
       // Validate action field
-      const validActions = ['approve', 'deny', 'require_approval'];
+      const validActions = ['allow', 'deny', 'require_approval'];
       if (!validActions.includes(input.action)) {
         return res.status(400).json({
           message: `Invalid action. Must be one of: ${validActions.join(', ')}`,
@@ -93,6 +109,42 @@ export async function registerRoutes(
         });
       }
       res.status(500).json({ message: "Failed to create policy" });
+    }
+  });
+
+  app.put('/api/policies/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      
+      const input = api.policies.update.input.parse(req.body);
+      
+      // Validate action if provided
+      if (input.action) {
+        const validActions = ['allow', 'deny', 'require_approval'];
+        if (!validActions.includes(input.action)) {
+          return res.status(400).json({
+            message: `Invalid action. Must be one of: ${validActions.join(', ')}`,
+            field: 'action',
+          });
+        }
+      }
+      
+      const policy = await storage.updatePolicy(id, input);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.status(200).json(policy);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      res.status(500).json({ message: "Failed to update policy" });
     }
   });
 
@@ -125,6 +177,61 @@ export async function registerRoutes(
       res.status(200).json(policy);
     } catch (err) {
       res.status(500).json({ message: "Failed to toggle policy" });
+    }
+  });
+
+  app.post(api.policies.reorder.path, async (req, res) => {
+    try {
+      const input = api.policies.reorder.input.parse(req.body);
+      const policies = await storage.reorderPolicies(input.orderedIds);
+      res.status(200).json(policies);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      res.status(500).json({ message: "Failed to reorder policies" });
+    }
+  });
+
+  app.post(api.policies.simulate.path, async (req, res) => {
+    try {
+      const input = api.policies.simulate.input.parse(req.body);
+      const result = await storage.simulateTransaction(input);
+      res.status(200).json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      res.status(500).json({ message: "Failed to simulate transaction" });
+    }
+  });
+
+  app.post('/api/policies/:id/approve-change', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      const input = api.policies.approveChange.input.parse(req.body);
+      const policy = await storage.approvePolicyChange(id, input.approver);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found or not pending approval" });
+      }
+      res.status(200).json(policy);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      res.status(500).json({ message: "Failed to approve policy change" });
     }
   });
 
