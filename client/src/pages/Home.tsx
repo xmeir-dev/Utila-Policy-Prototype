@@ -6,8 +6,10 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { type Transaction } from "@shared/schema";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const walletState = useWallet();
   const { data: pendingTransactions } = useQuery<Transaction[]>({
     queryKey: [api.transactions.listPending.path],
@@ -77,16 +79,22 @@ export default function Home() {
               className="w-full max-w-2xl mx-auto"
             >
               <div className="grid grid-cols-3 gap-4 mb-12">
-                <Button variant="outline" className="flex flex-col items-center justify-center h-24 gap-2 hover-elevate group">
-                  <Send className="w-6 h-6 text-primary transition-transform group-hover:scale-110" />
+                <Button 
+                  variant="outline"
+                  size="lg"
+                  className="flex flex-col items-center justify-center gap-2"
+                  onClick={() => setLocation("/transfer")}
+                  data-testid="button-transfer"
+                >
+                  <Send className="w-6 h-6 text-primary" />
                   <span className="font-semibold">Transfer</span>
                 </Button>
-                <Button variant="outline" className="flex flex-col items-center justify-center h-24 gap-2 hover-elevate group">
-                  <Gavel className="w-6 h-6 text-primary transition-transform group-hover:scale-110" />
+                <Button variant="outline" size="lg" className="flex flex-col items-center justify-center gap-2">
+                  <Gavel className="w-6 h-6 text-primary" />
                   <span className="font-semibold">Policies</span>
                 </Button>
-                <Button variant="outline" className="flex flex-col items-center justify-center h-24 gap-2 hover-elevate group">
-                  <LibraryBig className="w-6 h-6 text-primary transition-transform group-hover:scale-110" />
+                <Button variant="outline" size="lg" className="flex flex-col items-center justify-center gap-2">
+                  <LibraryBig className="w-6 h-6 text-primary" />
                   <span className="font-semibold">History</span>
                 </Button>
               </div>
