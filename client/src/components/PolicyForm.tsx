@@ -742,7 +742,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                     data-testid="input-change-approvals"
                   />
                   <span className="text-sm text-muted-foreground">
-                    of {(formData.changeApproversList || []).length || 0} approvers must approve changes
+                    of {(formData.changeApproversList || []).length || 0} users must approve changes
                   </span>
                 </div>
               </div>
