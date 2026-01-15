@@ -689,7 +689,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                         data-testid="input-quorum-required"
                       />
                       <span className="text-sm text-muted-foreground">
-                        of {(formData.approvers || []).length || 0} approvers must approve
+                        of {(formData.approvers || []).length || 0} users must approve transactions
                       </span>
                     </div>
                   </div>
@@ -741,7 +741,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                     className="w-20 rounded-lg"
                     data-testid="input-change-approvals"
                   />
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-[#8a8a8a]">
                     of {(formData.changeApproversList || []).length || 0} users must approve changes
                   </span>
                 </div>
