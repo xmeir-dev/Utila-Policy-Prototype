@@ -755,7 +755,7 @@ export default function Transfer() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <h3 className="text-sm text-muted-foreground font-medium">Selected wallets</h3>
-                  <span className="text-sm font-medium">Total ${getTotalWalletAmount().toLocaleString()}</span>
+                  <span className="text-sm font-medium"><span className="text-[#ababab]">Total</span> <span className="text-foreground">${getTotalWalletAmount().toLocaleString()}</span></span>
                 </div>
                 <div className="space-y-2">
                   {selectedWallets.map((walletId) => {
