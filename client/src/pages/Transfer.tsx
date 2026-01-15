@@ -798,9 +798,9 @@ export default function Transfer() {
                 </div>
                 
                 <div className="flex justify-between items-center pt-2">
-                  <span className="text-sm text-muted-foreground">Total Available</span>
+                  <span className="text-sm text-muted-foreground">Total</span>
                   <span className="text-sm font-bold">
-                    ${getAvailableBalance().toLocaleString()}
+                    ${getTotalWalletAmount().toLocaleString()}
                   </span>
                 </div>
               </div>
