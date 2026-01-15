@@ -60,13 +60,12 @@ export default function Transfer() {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
   const [selectedWallets, setSelectedWallets] = useState<string[]>(["w1"]);
-  const [showWalletDropdown, setShowWalletDropdown] = useState(false);
+  const [showSourceModal, setShowSourceModal] = useState(false);
   const [showDestinationModal, setShowDestinationModal] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [newAddress, setNewAddress] = useState("");
   const amountInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const walletDropdownRef = useRef<HTMLDivElement>(null);
   const userEnteredAmountRef = useRef<string>("");
 
   const getTotalBudget = () => {
@@ -183,9 +182,6 @@ export default function Transfer() {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowAssetDropdown(false);
-      }
-      if (walletDropdownRef.current && !walletDropdownRef.current.contains(event.target as Node)) {
-        setShowWalletDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -422,11 +418,11 @@ export default function Transfer() {
           </div>
 
           <div className="space-y-1">
-            <div className="relative" ref={walletDropdownRef}>
+            <div className="relative">
               <Button
                 variant="outline"
                 className="w-full justify-between bg-card/50 border-border rounded-[16px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
-                onClick={() => setShowWalletDropdown(!showWalletDropdown)}
+                onClick={() => setShowSourceModal(true)}
                 data-testid="button-wallet-selector"
               >
                 <div className="flex items-center gap-4 overflow-hidden text-left">
@@ -434,7 +430,7 @@ export default function Transfer() {
                   <div className="flex flex-col items-start gap-1 w-full">
                     <div className="flex items-center gap-2 overflow-hidden w-full">
                       <span className="shrink-0 font-medium text-[18px] text-[#000000]">From</span>
-                      <div className="flex gap-1.5 overflow-hidden">
+                      <div className="flex gap-1.5 overflow-hidden flex-wrap">
                         {selectedWallets.length > 0 ? (
                           selectedWallets.map(id => {
                             const wallet = availableWallets.find(w => w.id === id);
@@ -444,55 +440,18 @@ export default function Transfer() {
                               </Badge>
                             ) : null;
                           })
-                        ) : (
-                          <span className="text-muted-foreground text-sm font-normal">Select source wallets</span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
-                    <span className="text-muted-foreground text-[14px] font-normal">Choose origin wallets</span>
+                    <span className="text-muted-foreground text-[14px] font-normal">
+                      {selectedWallets.length > 0 
+                        ? `${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''} - Total: $${getAvailableBalance().toLocaleString()}` 
+                        : "Choose origin wallets"}
+                    </span>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </Button>
-
-              {showWalletDropdown && (
-                <div className="absolute left-0 right-0 top-full mt-2 bg-card border border-border rounded-[16px] shadow-xl z-50 overflow-hidden py-1">
-                  {availableWallets.map((wallet) => (
-                    <div
-                      key={wallet.id}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const isSelected = selectedWallets.includes(wallet.id);
-                        if (isSelected) {
-                          setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
-                        } else {
-                          setSelectedWallets([...selectedWallets, wallet.id]);
-                        }
-                      }}
-                      data-testid={`option-wallet-${wallet.id}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={selectedWallets.includes(wallet.id)}
-                          onCheckedChange={() => {}} // Handled by div click
-                          className="rounded-sm border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold">{wallet.name}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
-                        <div className="text-[10px] text-muted-foreground">
-                          ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
@@ -739,6 +698,123 @@ export default function Transfer() {
               data-testid="button-confirm-recipients"
             >
               Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSourceModal} onOpenChange={setShowSourceModal}>
+        <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogTitle className="text-xl font-bold">Select Source Wallets</DialogTitle>
+          </DialogHeader>
+          
+          <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+            {selectedWallets.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-muted-foreground">Selected Wallets</h3>
+                <div className="space-y-2">
+                  {selectedWallets.map((walletId) => {
+                    const wallet = availableWallets.find(w => w.id === walletId);
+                    if (!wallet) return null;
+                    return (
+                      <div
+                        key={wallet.id}
+                        className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            <Wallet className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold">{wallet.name}</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                          </div>
+                        </div>
+                        <div className="text-right mr-2">
+                          <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
+                          onClick={() => setSelectedWallets(selectedWallets.filter(id => id !== wallet.id))}
+                          data-testid={`button-remove-wallet-${wallet.id}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                <div className="flex justify-between items-center pt-2 border-t border-border">
+                  <span className="text-sm text-muted-foreground">Total Available</span>
+                  <span className="text-sm font-bold">
+                    ${getAvailableBalance().toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <h3 className="text-sm text-muted-foreground font-medium">Available Wallets</h3>
+              <div className="space-y-2">
+                {availableWallets.map((wallet) => {
+                  const isSelected = selectedWallets.includes(wallet.id);
+                  return (
+                    <div
+                      key={wallet.id}
+                      className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
+                        isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
+                      }`}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
+                        } else {
+                          setSelectedWallets([...selectedWallets, wallet.id]);
+                        }
+                      }}
+                      data-testid={`option-wallet-${wallet.id}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => {}}
+                          className="rounded-sm border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                          <Wallet className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold">{wallet.name}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 pt-4 border-t border-border">
+            <Button
+              className="w-full rounded-[12px]"
+              onClick={() => setShowSourceModal(false)}
+              disabled={selectedWallets.length === 0}
+              data-testid="button-confirm-wallets"
+            >
+              Confirm {selectedWallets.length > 0 ? `(${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''})` : ''}
             </Button>
           </div>
         </DialogContent>
