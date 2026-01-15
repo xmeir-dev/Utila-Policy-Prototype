@@ -78,7 +78,7 @@ export default function Home() {
               className="w-full max-w-2xl mx-auto"
             >
               <h2 className="text-2xl font-display mb-8 text-center font-medium">
-                Hi {walletState.connectedUser?.name}, welcome to your Waystar Royco workspace
+                Hi <span className="font-bold">{walletState.connectedUser?.name}</span>, welcome to your Waystar Royco workspace
               </h2>
 
               <div className="grid grid-cols-3 gap-4 mb-12">
