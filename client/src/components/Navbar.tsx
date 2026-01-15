@@ -106,6 +106,19 @@ export function Navbar({ walletState }: NavbarProps) {
                 </div>
               </Button>
             ))}
+            
+            {isConnected && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  disconnect();
+                  setIsDialogOpen(false);
+                }}
+                className="mt-2 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-[14px] h-12"
+              >
+                Disconnect
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
