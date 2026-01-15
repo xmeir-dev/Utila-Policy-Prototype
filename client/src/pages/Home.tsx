@@ -79,24 +79,22 @@ export default function Home() {
               className="w-full max-w-2xl mx-auto"
             >
               <div className="grid grid-cols-3 gap-4 mb-12">
-                <Button 
-                  variant="outline"
-                  size="lg"
-                  className="flex flex-col items-center justify-center gap-2"
+                <div 
+                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
                   data-testid="button-transfer"
                 >
-                  <Send className="w-6 h-6 text-primary" />
+                  <Send className="w-10 h-10 text-primary" />
                   <span className="font-semibold">Transfer</span>
-                </Button>
-                <Button variant="outline" size="lg" className="flex flex-col items-center justify-center gap-2">
-                  <Gavel className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2">
+                  <Gavel className="w-10 h-10 text-primary" />
                   <span className="font-semibold">Policies</span>
-                </Button>
-                <Button variant="outline" size="lg" className="flex flex-col items-center justify-center gap-2">
-                  <LibraryBig className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2">
+                  <LibraryBig className="w-10 h-10 text-primary" />
                   <span className="font-semibold">History</span>
-                </Button>
+                </div>
               </div>
 
               <div className="flex items-center justify-between mb-8">
