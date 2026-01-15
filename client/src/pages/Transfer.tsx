@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ChevronDown, Wallet } from "lucide-react";
+import { SiEthereum, SiTether } from "react-icons/si";
+import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
@@ -8,9 +10,9 @@ import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 
 const assets = [
-  { symbol: "ETH", name: "Ethereum", balance: "2.5" },
-  { symbol: "USDC", name: "USD Coin", balance: "1,250.00" },
-  { symbol: "USDT", name: "Tether", balance: "500.00" },
+  { symbol: "ETH", name: "Ethereum", balance: "2.5", icon: SiEthereum, color: "text-[#627EEA]" },
+  { symbol: "USDC", name: "USD Coin", balance: "1,250.00", icon: MdOutlinePaid, color: "text-[#2775CA]" },
+  { symbol: "USDT", name: "Tether", balance: "500.00", icon: SiTether, color: "text-[#26A17B]" },
 ];
 
 export default function Transfer() {
@@ -25,9 +27,12 @@ export default function Transfer() {
     console.log("Transfer:", { amount, asset: selectedAsset.symbol, recipient });
   };
 
+  const AssetIcon = selectedAsset.icon;
+
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar walletState={walletState} />
+
       <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -74,29 +79,36 @@ export default function Transfer() {
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
                 <Button
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 px-3"
                   onClick={() => setShowAssetDropdown(!showAssetDropdown)}
                   data-testid="button-asset-selector"
                 >
+                  <AssetIcon className={`w-5 h-5 ${selectedAsset.color}`} />
                   <span className="font-semibold">{selectedAsset.symbol}</span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
                 {showAssetDropdown && (
-                  <div className="absolute right-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-10 min-w-40">
-                    {assets.map((asset) => (
-                      <button
-                        key={asset.symbol}
-                        className="w-full px-4 py-3 text-left hover-elevate flex items-center justify-between"
-                        onClick={() => {
-                          setSelectedAsset(asset);
-                          setShowAssetDropdown(false);
-                        }}
-                        data-testid={`option-asset-${asset.symbol.toLowerCase()}`}
-                      >
-                        <span className="font-medium">{asset.symbol}</span>
-                        <span className="text-sm text-muted-foreground">{asset.balance}</span>
-                      </button>
-                    ))}
+                  <div className="absolute right-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-10 min-w-40 overflow-hidden">
+                    {assets.map((asset) => {
+                      const Icon = asset.icon;
+                      return (
+                        <button
+                          key={asset.symbol}
+                          className="w-full px-4 py-3 text-left hover-elevate flex items-center justify-between"
+                          onClick={() => {
+                            setSelectedAsset(asset);
+                            setShowAssetDropdown(false);
+                          }}
+                          data-testid={`option-asset-${asset.symbol.toLowerCase()}`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Icon className={`w-5 h-5 ${asset.color}`} />
+                            <span className="font-medium">{asset.symbol}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{asset.balance}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
