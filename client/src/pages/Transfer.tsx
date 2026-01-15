@@ -276,7 +276,7 @@ export default function Transfer() {
                         )}
                       </div>
                     </div>
-                    <span className="text-[10px] text-muted-foreground font-medium leading-none">Choose origin wallets</span>
+                    <span className="text-muted-foreground text-[14px] font-normal">Choose origin wallets</span>
                   </div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
