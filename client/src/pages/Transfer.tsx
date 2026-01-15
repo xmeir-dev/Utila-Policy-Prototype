@@ -116,16 +116,18 @@ export default function Transfer() {
               {/* Amount Inputs (Right) */}
               <div className="flex-1 flex flex-col justify-center px-6 gap-1 items-end">
                 <div className="flex items-center justify-end w-full">
-                  <span className="text-[24px] leading-none font-normal text-foreground">$</span>
-                  <Input
-                    type="text"
-                    placeholder="0.00"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    style={{ fontSize: '24px' }}
-                    className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-right"
-                    data-testid="input-amount"
-                  />
+                  <div className="flex items-center">
+                    <span className="text-[24px] leading-none font-normal text-foreground">$</span>
+                    <Input
+                      type="text"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      style={{ fontSize: '24px' }}
+                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-right w-auto min-w-[50px]"
+                      data-testid="input-amount"
+                    />
+                  </div>
                 </div>
                 <div className="text-sm font-medium text-muted-foreground mr-0">
                   {amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(6) : "0.00"} {selectedAsset.symbol}
