@@ -67,13 +67,20 @@ export default function Transfer() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const walletDropdownRef = useRef<HTMLDivElement>(null);
 
+  const getInitialRecipientAmount = () => {
+    const parsed = parseFloat(amount.replace(/,/g, ''));
+    if (isNaN(parsed) || parsed <= 0) return "";
+    const usdAmount = isTokenPrimary ? parsed * selectedAsset.price : parsed;
+    return usdAmount.toString();
+  };
+
   const addRecipientFromAddressBook = (entry: AddressBookEntry) => {
     if (recipients.find(r => r.address === entry.address)) return;
     setRecipients([...recipients, {
       id: `r-${Date.now()}`,
       address: entry.address,
       label: entry.label,
-      amount: "",
+      amount: recipients.length === 0 ? getInitialRecipientAmount() : "",
       isFromAddressBook: true,
     }]);
   };
@@ -93,7 +100,7 @@ export default function Transfer() {
     setRecipients([...recipients, {
       id: `r-${Date.now()}`,
       address: newAddress.trim(),
-      amount: "",
+      amount: recipients.length === 0 ? getInitialRecipientAmount() : "",
       isFromAddressBook: false,
     }]);
     setNewAddress("");
@@ -622,15 +629,6 @@ export default function Transfer() {
                       key={recipient.id}
                       className="flex items-center gap-3 p-3 rounded-[12px] border border-border bg-card"
                     >
-                      <div className="flex-1 flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <User className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono truncate">{truncateAddress(recipient.address)}</span>
-                        </div>
-                      </div>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 bg-muted/50 rounded-[8px] px-2 py-1">
                           <span className="text-xs text-muted-foreground">$</span>
@@ -643,16 +641,25 @@ export default function Transfer() {
                             data-testid={`input-amount-${recipient.id}`}
                           />
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                          onClick={() => removeRecipient(recipient.id)}
-                          data-testid={`button-remove-${recipient.id}`}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
                       </div>
+                      <div className="flex-1 flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono truncate">{truncateAddress(recipient.address)}</span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive shrink-0"
+                        onClick={() => removeRecipient(recipient.id)}
+                        data-testid={`button-remove-${recipient.id}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
                     </div>
                   ))}
                 </div>
