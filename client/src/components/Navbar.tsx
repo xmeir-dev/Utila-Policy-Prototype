@@ -4,6 +4,7 @@ import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
 
 import utilaLogo from "@assets/Utila-Logo-Horizontal-300x99_1768484509461.png";
+import walletAvatar from "@assets/avatar_1768484752964.png";
 
 interface NavbarProps {
   walletState: ReturnType<typeof useWallet>;
@@ -35,7 +36,11 @@ export function Navbar({ walletState }: NavbarProps) {
               onClick={() => disconnect()}
               className="rounded-md font-mono text-sm"
             >
-              <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
+              <img 
+                src={walletAvatar} 
+                alt="Avatar" 
+                className="w-5 h-5 rounded-full mr-2" 
+              />
               {formattedAddress}
             </Button>
           ) : (
