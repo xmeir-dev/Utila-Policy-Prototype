@@ -367,7 +367,7 @@ export default function Transfer() {
             </div>
           </div>
 
-          <div className="pt-4 flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 pt-[0px] pb-[0px]">
             <Button
               size="lg"
               className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
