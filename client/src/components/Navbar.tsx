@@ -43,21 +43,6 @@ export function Navbar({ walletState }: NavbarProps) {
           </Link>
 
           <div className="flex items-center gap-2">
-            {isConnected && connectedUser && connectedUser.name && (
-              <div className="flex items-center gap-2 bg-muted/30 rounded-[16px] px-3 h-[48px] border">
-                <img 
-                  src={waystarRoycoLogo} 
-                  alt="Waystar Royco" 
-                  className="h-6 w-auto" 
-                />
-                <img 
-                  src={waystarRoycoLogo} 
-                  alt={connectedUser.name} 
-                  className="h-6 w-auto object-contain" 
-                />
-                <span className="text-sm font-medium">{connectedUser.name}</span>
-              </div>
-            )}
             {isConnected && connectedUser && connectedUser.name ? (
               <Button
                 data-testid="button-disconnect-wallet"
