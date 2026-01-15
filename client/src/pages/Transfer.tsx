@@ -656,7 +656,16 @@ export default function Transfer() {
                       className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
                         isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
                       }`}
-                      onClick={() => !isSelected && addRecipientFromAddressBook(entry)}
+                      onClick={() => {
+                        if (isSelected) {
+                          const recipientToRemove = recipients.find(r => r.address === entry.address);
+                          if (recipientToRemove) {
+                            removeRecipient(recipientToRemove.id);
+                          }
+                        } else {
+                          addRecipientFromAddressBook(entry);
+                        }
+                      }}
                       data-testid={`addressbook-${entry.id}`}
                     >
                       <div className="flex items-center gap-3">
