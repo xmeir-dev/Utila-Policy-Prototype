@@ -100,7 +100,7 @@ export function Navbar({ walletState }: NavbarProps) {
                 variant="outline"
                 data-testid={`button-select-user-${user.name.toLowerCase()}`}
                 onClick={() => handleUserSelect(user.address)}
-                className="justify-start h-14 px-4"
+                className="justify-start h-14 px-4 rounded-[14px]"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted mr-3">
                   <User className="w-4 h-4" />
