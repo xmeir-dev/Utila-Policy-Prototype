@@ -663,9 +663,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         {expandedSections.includes('approvals') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
             {formData.action === 'require_approval' ? (
-              <Card className="p-4 space-y-4">
-                <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Approval settings</Label>
-                
+              <div className="space-y-4">
                 <div className="space-y-3">
                   <div className="space-y-2">
                     <Label className="text-sm">Approvers</Label>
@@ -696,7 +694,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                     </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground">No approvals required for this action.</p>
             )}
