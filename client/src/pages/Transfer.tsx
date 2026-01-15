@@ -381,21 +381,21 @@ export default function Transfer() {
             </div>
 
             {!isLoadingPolicies && !hasPolicies && (
-              <div className="flex items-center justify-between p-4 mb-4 border border-amber-500/20 rounded-[14px] bg-[#e0ceab1a]">
+              <div 
+                className="flex items-center justify-between p-4 mb-4 border border-amber-500/20 rounded-[14px] bg-[#e0ceab1a] cursor-pointer hover:bg-[#e0ceab33] transition-colors group"
+                onClick={() => setLocation("/policies")}
+              >
                 <div className="flex flex-col gap-0.5">
                   <h3 className="text-sm dark:text-amber-200 text-[#d67424] font-medium">
                     Secure your account
                   </h3>
                   <p className="dark:text-amber-400 text-[#8a8a8a] text-[14px] font-normal">Create a policy to enable transactions</p>
                 </div>
-                <Button 
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/policies")}
-                  className="rounded-full hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 h-8 w-8 shrink-0"
+                <div 
+                  className="rounded-full h-8 w-8 flex items-center justify-center text-amber-700 dark:text-amber-400 shrink-0 group-hover:bg-amber-500/20 transition-colors"
                 >
                   <ChevronRight className="w-8 h-8 text-[#d67424]" />
-                </Button>
+                </div>
               </div>
             )}
 
