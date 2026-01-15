@@ -168,9 +168,9 @@ export default function Policies() {
                 </div>
               </div>
             ) : policies.length === 0 ? (
-              <div className="relative flex flex-col bg-card border border-border rounded-[24px] p-6">
+              <div className="relative flex flex-col p-6">
                 <div className="flex flex-col items-center justify-center gap-2 py-4">
-                  <Scale className="w-10 h-10 text-muted-foreground/50" />
+                  <Scale className="w-16 h-16 text-muted-foreground/30" />
                   <span className="text-sm text-[#171717] text-center max-w-[280px]">Get the most out of Utila by defining rules for transfer approvals</span>
                   <Button 
                     className="mt-4 gap-2 rounded-[12px]" 
