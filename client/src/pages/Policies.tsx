@@ -169,7 +169,7 @@ export default function Policies() {
               <div className="relative flex flex-col bg-card border border-border rounded-[24px] p-6">
                 <div className="flex flex-col items-center justify-center gap-2 py-4">
                   <Scale className="w-10 h-10 text-muted-foreground/50" />
-                  <span className="text-sm text-[171717]">It's time to add your first policy</span>
+                  <span className="text-sm text-[171717]">Get the most out of Utila by defining rules for transfer approvals</span>
                 </div>
               </div>
             ) : (
