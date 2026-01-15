@@ -52,7 +52,7 @@ export function Navbar({ walletState }: NavbarProps) {
                 <div className={`flex items-center justify-center w-6 h-6 rounded-full mr-2 ${connectedUser.avatarBg || 'bg-muted'} ${connectedUser.avatarColor || 'text-foreground'}`}>
                   <span className="text-xs font-semibold">{connectedUser.name?.charAt(0) || '?'}</span>
                 </div>
-                {formattedAddress}
+                {connectedUser.name}
               </Button>
             ) : (
               <Button
