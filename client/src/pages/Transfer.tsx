@@ -573,7 +573,10 @@ export default function Transfer() {
           <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
             {recipients.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-sm text-muted-foreground font-medium">Selected recipients</h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm text-muted-foreground font-medium">Selected recipients</h3>
+                  <span className="text-sm font-medium"><span className="text-[#ababab]">Total</span> <span className="text-foreground">${getTotalRecipientAmount().toLocaleString()}</span><span className="text-[#ababab]"> / </span><span className="text-foreground">${getTotalWalletAmount().toLocaleString()}</span></span>
+                </div>
                 <div className="space-y-2">
                   {recipients.map((recipient) => (
                     <div
