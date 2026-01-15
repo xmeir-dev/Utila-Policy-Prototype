@@ -60,6 +60,7 @@ export default function Transfer() {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
   const [selectedWallets, setSelectedWallets] = useState<string[]>(["w1"]);
+  const [walletAmounts, setWalletAmounts] = useState<Record<string, string>>({ w1: "3,750" });
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [showDestinationModal, setShowDestinationModal] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
@@ -147,6 +148,13 @@ export default function Transfer() {
     setRecipients(recipients.map(r => 
       r.id === id ? { ...r, amount: formatted } : r
     ));
+  };
+
+  const updateWalletAmount = (walletId: string, newAmount: string) => {
+    let val = newAmount.replace(/,/g, '');
+    if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
+    const formatted = formatAmountWithCommas(val);
+    setWalletAmounts(prev => ({ ...prev, [walletId]: formatted }));
   };
 
   const getTotalRecipientAmount = () => {
@@ -745,11 +753,16 @@ export default function Transfer() {
                             <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
                           </div>
                         </div>
-                        <div className="text-right mr-2">
-                          <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
-                          <div className="text-[10px] text-muted-foreground">
-                            ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
-                          </div>
+                        <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
+                          <span className="text-sm text-muted-foreground">$</span>
+                          <Input
+                            type="text"
+                            placeholder="0"
+                            value={walletAmounts[wallet.id] || ""}
+                            onChange={(e) => updateWalletAmount(wallet.id, e.target.value)}
+                            className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-bold text-right focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                            data-testid={`input-wallet-amount-${wallet.id}`}
+                          />
                         </div>
                         <Button
                           variant="ghost"
@@ -765,7 +778,7 @@ export default function Transfer() {
                   })}
                 </div>
                 
-                <div className="flex justify-between items-center pt-2 border-t border-border">
+                <div className="flex justify-between items-center pt-2">
                   <span className="text-sm text-muted-foreground">Total Available</span>
                   <span className="text-sm font-bold">
                     ${getAvailableBalance().toLocaleString()}
