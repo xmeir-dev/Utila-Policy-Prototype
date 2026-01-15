@@ -531,8 +531,7 @@ export default function Policies() {
               className="gap-2 rounded-lg"
               data-testid="button-simulate-transaction"
             >
-              <TestTubeDiagonal className="w-4 h-4" />
-              Simulate Transaction
+              Simulate a Transaction
             </Button>
           </div>
         </motion.div>
