@@ -116,13 +116,13 @@ export default function Transfer() {
               {/* Amount Inputs (Right) */}
               <div className="flex-1 flex flex-col justify-center px-6 gap-1">
                 <div className="flex items-center">
-                  <span className="text-[24px] font-normal text-foreground mr-1">$</span>
+                  <span className="text-2xl font-normal text-foreground">$</span>
                   <Input
                     type="text"
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="text-[24px] font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground"
+                    className="text-2xl font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground"
                     data-testid="input-amount"
                   />
                 </div>
