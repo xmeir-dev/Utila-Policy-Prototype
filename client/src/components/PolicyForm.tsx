@@ -427,25 +427,31 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               isConfigured={isInitiatorConfigured}
             >
               <div className="space-y-3 pt-3">
-                <Select
-                  value={formData.initiatorType || "any"}
-                  onValueChange={(value) => updateField('initiatorType', value)}
-                >
-                  <SelectTrigger className="rounded-[14px]" data-testid="select-initiator-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any User</SelectItem>
-                    <SelectItem value="user">Specific Users</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm">Initiator type</Label>
+                  <Select
+                    value={formData.initiatorType || "any"}
+                    onValueChange={(value) => updateField('initiatorType', value)}
+                  >
+                    <SelectTrigger className="rounded-[14px]" data-testid="select-initiator-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any User</SelectItem>
+                      <SelectItem value="user">Specific Users</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 {formData.initiatorType === 'user' && (
-                  <MultiUserSelector
-                    selected={formData.initiatorValues || []}
-                    onChange={(values) => updateField('initiatorValues', values)}
-                    placeholder="Select users..."
-                    testId="select-initiator-users"
-                  />
+                  <div className="space-y-2">
+                    <Label className="text-sm">Specific users</Label>
+                    <MultiUserSelector
+                      selected={formData.initiatorValues || []}
+                      onChange={(values) => updateField('initiatorValues', values)}
+                      placeholder="Select users..."
+                      testId="select-initiator-users"
+                    />
+                  </div>
                 )}
               </div>
             </ConditionSection>
@@ -458,24 +464,30 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               isConfigured={isSourceConfigured}
             >
               <div className="space-y-3 pt-3">
-                <Select
-                  value={formData.sourceWalletType || "any"}
-                  onValueChange={(value) => updateField('sourceWalletType', value)}
-                >
-                  <SelectTrigger className="rounded-[14px]" data-testid="select-source-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Wallet</SelectItem>
-                    <SelectItem value="specific">Specific Wallets</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm">Source type</Label>
+                  <Select
+                    value={formData.sourceWalletType || "any"}
+                    onValueChange={(value) => updateField('sourceWalletType', value)}
+                  >
+                    <SelectTrigger className="rounded-[14px]" data-testid="select-source-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any Wallet</SelectItem>
+                      <SelectItem value="specific">Specific Wallets</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 {formData.sourceWalletType === 'specific' && (
-                  <MultiWalletSelector
-                    selected={formData.sourceWallets || []}
-                    onChange={(values) => updateField('sourceWallets', values)}
-                    testId="select-source-wallets"
-                  />
+                  <div className="space-y-2">
+                    <Label className="text-sm">Specific wallets</Label>
+                    <MultiWalletSelector
+                      selected={formData.sourceWallets || []}
+                      onChange={(values) => updateField('sourceWallets', values)}
+                      testId="select-source-wallets"
+                    />
+                  </div>
                 )}
               </div>
             </ConditionSection>
@@ -488,27 +500,33 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               isConfigured={isDestinationConfigured}
             >
               <div className="space-y-3 pt-3">
-                <Select
-                  value={formData.destinationType || "any"}
-                  onValueChange={(value) => updateField('destinationType', value)}
-                >
-                  <SelectTrigger className="rounded-[14px]" data-testid="select-destination-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Destination</SelectItem>
-                    <SelectItem value="internal">Internal Only</SelectItem>
-                    <SelectItem value="external">External Only</SelectItem>
-                    <SelectItem value="whitelist">Whitelisted Addresses</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm">Destination type</Label>
+                  <Select
+                    value={formData.destinationType || "any"}
+                    onValueChange={(value) => updateField('destinationType', value)}
+                  >
+                    <SelectTrigger className="rounded-[14px]" data-testid="select-destination-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any Destination</SelectItem>
+                      <SelectItem value="internal">Internal Only</SelectItem>
+                      <SelectItem value="external">External Only</SelectItem>
+                      <SelectItem value="whitelist">Whitelisted Addresses</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 {formData.destinationType === 'whitelist' && (
-                  <TagInput
-                    values={formData.destinationValues || []}
-                    onChange={(values) => updateField('destinationValues', values)}
-                    placeholder="Enter whitelisted address..."
-                    testId="input-destination-values"
-                  />
+                  <div className="space-y-2">
+                    <Label className="text-sm">Whitelisted addresses</Label>
+                    <TagInput
+                      values={formData.destinationValues || []}
+                      onChange={(values) => updateField('destinationValues', values)}
+                      placeholder="Enter whitelisted address..."
+                      testId="input-destination-values"
+                    />
+                  </div>
                 )}
               </div>
             </ConditionSection>
@@ -521,20 +539,23 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               isConfigured={isAmountConfigured}
             >
               <div className="space-y-3 pt-3">
-                <Select
-                  value={formData.amountCondition || "any"}
-                  onValueChange={(value) => updateField('amountCondition', value)}
-                >
-                  <SelectTrigger className="rounded-[14px]" data-testid="select-amount-condition">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Amount</SelectItem>
-                    <SelectItem value="above">Above Threshold</SelectItem>
-                    <SelectItem value="below">Below Threshold</SelectItem>
-                    <SelectItem value="between">Between Range</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm">Amount condition</Label>
+                  <Select
+                    value={formData.amountCondition || "any"}
+                    onValueChange={(value) => updateField('amountCondition', value)}
+                  >
+                    <SelectTrigger className="rounded-[14px]" data-testid="select-amount-condition">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any Amount</SelectItem>
+                      <SelectItem value="above">Above Threshold</SelectItem>
+                      <SelectItem value="below">Below Threshold</SelectItem>
+                      <SelectItem value="between">Between Range</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 {formData.amountCondition === 'above' && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">Greater than $</span>
@@ -569,7 +590,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       value={formData.amountMin || ""}
                       onChange={(e) => updateField('amountMin', e.target.value)}
                       placeholder="0"
-                      className="w-28 rounded-lg"
+                      className="w-28 rounded-[14px]"
                       data-testid="input-amount-min"
                     />
                     <span className="text-sm text-muted-foreground">and $</span>
@@ -594,41 +615,47 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               isConfigured={isAssetConfigured}
             >
               <div className="space-y-3 pt-3">
-                <Select
-                  value={formData.assetType || "any"}
-                  onValueChange={(value) => updateField('assetType', value)}
-                >
-                  <SelectTrigger className="rounded-[14px]" data-testid="select-asset-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Asset</SelectItem>
-                    <SelectItem value="specific">Specific Assets</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm">Asset type</Label>
+                  <Select
+                    value={formData.assetType || "any"}
+                    onValueChange={(value) => updateField('assetType', value)}
+                  >
+                    <SelectTrigger className="rounded-[14px]" data-testid="select-asset-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any Asset</SelectItem>
+                      <SelectItem value="specific">Specific Assets</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 {formData.assetType === 'specific' && (
-                  <>
-                    <div className="flex flex-wrap gap-1">
-                      {COMMON_ASSETS.map((asset) => (
-                        <Button
-                          key={asset}
-                          type="button"
-                          variant={(formData.assetValues || []).includes(asset) ? "default" : "outline"}
-                          size="sm"
-                          className="h-7 text-xs rounded-[14px]"
-                          onClick={() => {
-                            const current = formData.assetValues || [];
-                            if (current.includes(asset)) {
-                              updateField('assetValues', current.filter(a => a !== asset));
-                            } else {
-                              updateField('assetValues', [...current, asset]);
-                            }
-                          }}
-                          data-testid={`button-asset-${asset.toLowerCase()}`}
-                        >
-                          {asset}
-                        </Button>
-                      ))}
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label className="text-sm">Specific assets</Label>
+                      <div className="flex flex-wrap gap-1">
+                        {COMMON_ASSETS.map((asset) => (
+                          <Button
+                            key={asset}
+                            type="button"
+                            variant={(formData.assetValues || []).includes(asset) ? "default" : "outline"}
+                            size="sm"
+                            className="h-7 text-xs rounded-[14px]"
+                            onClick={() => {
+                              const current = formData.assetValues || [];
+                              if (current.includes(asset)) {
+                                updateField('assetValues', current.filter(a => a !== asset));
+                              } else {
+                                updateField('assetValues', [...current, asset]);
+                              }
+                            }}
+                            data-testid={`button-asset-${asset.toLowerCase()}`}
+                          >
+                            {asset}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                     <TagInput
                       values={(formData.assetValues || []).filter(a => !COMMON_ASSETS.includes(a))}
@@ -639,7 +666,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       placeholder="Add custom asset symbol..."
                       testId="input-asset-values"
                     />
-                  </>
+                  </div>
                 )}
               </div>
             </ConditionSection>
