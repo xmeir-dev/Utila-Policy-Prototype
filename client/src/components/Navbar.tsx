@@ -48,7 +48,7 @@ export function Navbar({ walletState }: NavbarProps) {
                 data-testid="button-disconnect-wallet"
                 variant="outline"
                 onClick={() => disconnect()}
-                className="rounded-[16px] font-mono text-sm h-[48px] gap-2"
+                className="rounded-[16px] font-mono text-sm h-[48px] gap-2 pl-[8px] pr-[8px]"
               >
                 <img 
                   src={waystarRoycoLogo} 
