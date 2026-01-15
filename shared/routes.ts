@@ -36,6 +36,15 @@ export const api = {
       },
     },
   },
+  transactions: {
+    listPending: {
+      method: 'GET' as const,
+      path: '/api/transactions/pending',
+      responses: {
+        200: z.array(z.custom<typeof users.$inferSelect & { type: string, amount: string, status: string, txHash?: string }>()),
+      },
+    },
+  },
 };
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {

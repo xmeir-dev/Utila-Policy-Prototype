@@ -50,5 +50,15 @@ export async function registerRoutes(
     res.status(200).json({ success: true });
   });
 
+  app.get(api.transactions.listPending.path, async (req, res) => {
+    // For demo, we'll just return some hardcoded pending transactions for any connected user
+    // In a real app, we'd use session/auth
+    const pendingTxs = [
+      { id: 1, type: "Send ETH", amount: "0.5 ETH", status: "pending", txHash: "0x123...abc" },
+      { id: 2, type: "Swap", amount: "100 USDC to 0.04 ETH", status: "pending", txHash: "0x456...def" }
+    ];
+    res.status(200).json(pendingTxs);
+  });
+
   return httpServer;
 }

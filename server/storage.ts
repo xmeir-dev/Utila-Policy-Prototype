@@ -1,12 +1,14 @@
+import { users, transactions, type User, type InsertUser, type Transaction, type InsertTransaction } from "@shared/schema";
 import { db } from "./db";
-import { users, type User, type InsertUser } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByAddress(address: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
+  getPendingTransactions(userId: number): Promise<Transaction[]>;
+  createTransaction(tx: InsertTransaction): Promise<Transaction>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -32,6 +34,18 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return user;
+  }
+
+  async getPendingTransactions(userId: number): Promise<Transaction[]> {
+    return await db
+      .select()
+      .from(transactions)
+      .where(and(eq(transactions.userId, userId), eq(transactions.status, "pending")));
+  }
+
+  async createTransaction(tx: InsertTransaction): Promise<Transaction> {
+    const [transaction] = await db.insert(transactions).values(tx).returning();
+    return transaction;
   }
 }
 
