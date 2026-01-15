@@ -183,7 +183,7 @@ function SortablePolicyItem({
       data-testid={`policy-item-${policy.id}`}
     >
       <button
-        className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+        className="mt-1 cursor-grab active:cursor-grabbing text-[#ababab] hover:text-foreground transition-colors"
         {...attributes}
         {...listeners}
         data-testid={`drag-handle-${policy.id}`}
