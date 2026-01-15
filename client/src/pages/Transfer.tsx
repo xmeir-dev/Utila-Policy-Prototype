@@ -190,8 +190,10 @@ export default function Transfer() {
     return isTokenPrimary ? parsed * selectedAsset.price : parsed;
   };
 
-  const amountsMatch = Math.abs(getTopContainerAmountUSD() - getTotalRecipientAmount()) < 0.01;
-  const canSend = hasValidRecipients && amountsMatch;
+  const fromTotal = getTotalWalletAmount();
+  const toTotal = getTotalRecipientAmount();
+  const amountsMatch = fromTotal > 0 && toTotal > 0 && Math.abs(fromTotal - toTotal) < 0.01;
+  const canSend = hasValidRecipients && selectedWallets.length > 0 && amountsMatch;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -523,7 +525,7 @@ export default function Transfer() {
           </div>
 
           <div className="flex flex-col items-center gap-2 pt-[0px] pb-[0px]">
-            {!canSend && hasValidRecipients && !amountsMatch ? (
+            {!canSend && (hasValidRecipients || selectedWallets.length > 0) ? (
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <span className="w-full cursor-not-allowed" tabIndex={0}>
@@ -538,7 +540,13 @@ export default function Transfer() {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Amount above must match the total recipient amount (${getTotalRecipientAmount().toLocaleString()})</p>
+                  <p>
+                    {selectedWallets.length === 0 
+                      ? "Select source wallets first"
+                      : !hasValidRecipients 
+                        ? "Select recipients and set amounts"
+                        : `From ($${fromTotal.toLocaleString()}) and To ($${toTotal.toLocaleString()}) totals must match`}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             ) : (
