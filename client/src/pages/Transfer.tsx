@@ -25,13 +25,14 @@ interface AddressBookEntry {
   id: string;
   label: string;
   address: string;
+  isInternal: boolean;
 }
 
 const addressBook: AddressBookEntry[] = [
-  { id: "ab1", label: "Alice", address: "0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f" },
-  { id: "ab2", label: "Bob", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F" },
-  { id: "ab3", label: "Charlie", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F" },
-  { id: "ab4", label: "Treasury", address: "0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F" },
+  { id: "ab1", label: "Alice", address: "0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f", isInternal: true },
+  { id: "ab2", label: "Bob", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: false },
+  { id: "ab3", label: "Charlie", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F", isInternal: true },
+  { id: "ab4", label: "Treasury", address: "0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: true },
 ];
 
 const truncateAddress = (address: string): string => {
@@ -690,7 +691,12 @@ export default function Transfer() {
                           <User className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-sm font-semibold">{entry.label}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold">{entry.label}</span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${entry.isInternal ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                              {entry.isInternal ? 'Internal' : 'External'}
+                            </span>
+                          </div>
                           <span className="text-[10px] text-muted-foreground font-mono">{truncateAddress(entry.address)}</span>
                         </div>
                       </div>
