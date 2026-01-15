@@ -424,7 +424,7 @@ export default function Policies() {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1">
-              <h2 className="text-3xl font-bold font-display text-foreground">Policy Builder</h2>
+              <h2 className="text-3xl font-bold font-display text-foreground">Policies</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Define rules for transfer approvals. First matching policy wins.
               </p>
