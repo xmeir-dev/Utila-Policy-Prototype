@@ -84,15 +84,15 @@ export default function Home() {
                   onClick={() => setLocation("/transfer")}
                   data-testid="button-transfer"
                 >
-                  <Send className="w-10 h-10 text-primary" />
+                  <Send className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Transfer</span>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2">
-                  <Gavel className="w-10 h-10 text-primary" />
+                  <Gavel className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Policies</span>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-md bg-card cursor-pointer hover-elevate active-elevate-2">
-                  <LibraryBig className="w-10 h-10 text-primary" />
+                  <LibraryBig className="w-8 h-8 text-primary" />
                   <span className="font-semibold">History</span>
                 </div>
               </div>
