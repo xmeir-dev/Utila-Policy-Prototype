@@ -258,10 +258,10 @@ export default function Transfer() {
                 data-testid="button-wallet-selector"
               >
                 <div className="flex items-center gap-3 overflow-hidden text-left">
-                  <div className="flex flex-col items-start gap-1">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider leading-none">From</span>
-                    <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="flex flex-col items-start gap-1 w-full">
+                    <div className="flex items-center gap-2 overflow-hidden w-full">
                       <Wallet className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-[12px] font-bold text-muted-foreground shrink-0">From</span>
                       <div className="flex gap-1.5 overflow-hidden">
                         {selectedWallets.length > 0 ? (
                           selectedWallets.map(id => {
@@ -277,7 +277,7 @@ export default function Transfer() {
                         )}
                       </div>
                     </div>
-                    <span className="text-[10px] text-muted-foreground font-medium leading-none">Choose origin wallets</span>
+                    <span className="text-[10px] text-muted-foreground font-medium leading-none ml-6">Choose origin wallets</span>
                   </div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
