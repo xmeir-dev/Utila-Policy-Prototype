@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
@@ -129,6 +130,15 @@ export default function Transfer() {
   const hasValidRecipients = recipients.length > 0 && 
     recipients.every(r => r.amount && parseFloat(r.amount) > 0) && 
     isWithinBalance;
+
+  const getTopContainerAmountUSD = () => {
+    const parsed = parseFloat(amount.replace(/,/g, ''));
+    if (isNaN(parsed)) return 0;
+    return isTokenPrimary ? parsed * selectedAsset.price : parsed;
+  };
+
+  const amountsMatch = Math.abs(getTopContainerAmountUSD() - getTotalRecipientAmount()) < 0.01;
+  const canSend = hasValidRecipients && amountsMatch;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -495,20 +505,40 @@ export default function Transfer() {
           </div>
 
           <div className="flex flex-col items-center gap-2 pt-[0px] pb-[0px]">
-            <Button
-              size="lg"
-              className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
-              disabled={!hasValidRecipients}
-              onClick={handleContinue}
-              data-testid="button-continue"
-            >
-              Send
-            </Button>
+            {!canSend && hasValidRecipients && !amountsMatch ? (
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <span className="w-full cursor-not-allowed" tabIndex={0}>
+                    <Button
+                      size="lg"
+                      className="w-full text-lg font-semibold rounded-[16px] h-[48px] pointer-events-none"
+                      disabled
+                      data-testid="button-continue"
+                    >
+                      Send
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Amount above must match the total recipient amount (${getTotalRecipientAmount().toLocaleString()})</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button
+                size="lg"
+                className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
+                disabled={!canSend}
+                onClick={handleContinue}
+                data-testid="button-continue"
+              >
+                Send
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
               className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
-              disabled={!hasValidRecipients}
+              disabled={!canSend}
               onClick={() => console.log("Simulate Transfer")}
               data-testid="button-simulate"
             >
