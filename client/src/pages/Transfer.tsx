@@ -573,7 +573,7 @@ export default function Transfer() {
           <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
             {recipients.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-muted-foreground">Selected Recipients & Amounts</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground">Selected recipients</h3>
                 <div className="space-y-2">
                   {recipients.map((recipient) => (
                     <div
