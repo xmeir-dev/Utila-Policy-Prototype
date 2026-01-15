@@ -68,23 +68,39 @@ export default function Transfer() {
   const walletDropdownRef = useRef<HTMLDivElement>(null);
   const userEnteredAmountRef = useRef<string>("");
 
-  const getInitialRecipientAmount = () => {
+  const getTotalBudget = () => {
     const amountToUse = userEnteredAmountRef.current || amount;
     const parsed = parseFloat(amountToUse.replace(/,/g, ''));
-    if (isNaN(parsed) || parsed <= 0) return "";
-    const usdAmount = isTokenPrimary ? parsed * selectedAsset.price : parsed;
-    return usdAmount.toString();
+    if (isNaN(parsed) || parsed <= 0) return 0;
+    return isTokenPrimary ? parsed * selectedAsset.price : parsed;
+  };
+
+  const distributeAmounts = (recipientsList: Recipient[], totalBudget: number): Recipient[] => {
+    if (recipientsList.length === 0 || totalBudget <= 0) return recipientsList;
+    
+    const count = recipientsList.length;
+    const totalCents = Math.round(totalBudget * 100);
+    const baseAmount = Math.floor(totalCents / count);
+    const remainder = totalCents % count;
+    
+    return recipientsList.map((r, index) => ({
+      ...r,
+      amount: ((baseAmount + (index < remainder ? 1 : 0)) / 100).toFixed(2)
+    }));
   };
 
   const addRecipientFromAddressBook = (entry: AddressBookEntry) => {
     if (recipients.find(r => r.address === entry.address)) return;
-    setRecipients([...recipients, {
+    const newRecipient: Recipient = {
       id: `r-${Date.now()}`,
       address: entry.address,
       label: entry.label,
-      amount: getInitialRecipientAmount(),
+      amount: "",
       isFromAddressBook: true,
-    }]);
+    };
+    const newList = [...recipients, newRecipient];
+    const totalBudget = getTotalBudget();
+    setRecipients(totalBudget > 0 ? distributeAmounts(newList, totalBudget) : newList);
   };
 
   const isValidAddress = (address: string): boolean => {
@@ -99,17 +115,22 @@ export default function Transfer() {
     if (!newAddress.trim()) return;
     if (!isValidAddress(newAddress)) return;
     if (recipients.find(r => r.address === newAddress)) return;
-    setRecipients([...recipients, {
+    const newRecipient: Recipient = {
       id: `r-${Date.now()}`,
       address: newAddress.trim(),
-      amount: getInitialRecipientAmount(),
+      amount: "",
       isFromAddressBook: false,
-    }]);
+    };
+    const newList = [...recipients, newRecipient];
+    const totalBudget = getTotalBudget();
+    setRecipients(totalBudget > 0 ? distributeAmounts(newList, totalBudget) : newList);
     setNewAddress("");
   };
 
   const removeRecipient = (id: string) => {
-    setRecipients(recipients.filter(r => r.id !== id));
+    const newList = recipients.filter(r => r.id !== id);
+    const totalBudget = getTotalBudget();
+    setRecipients(totalBudget > 0 && newList.length > 0 ? distributeAmounts(newList, totalBudget) : newList);
   };
 
   const updateRecipientAmount = (id: string, newAmount: string) => {
