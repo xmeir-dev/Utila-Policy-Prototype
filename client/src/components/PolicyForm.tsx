@@ -321,7 +321,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         {expandedSections.includes('details') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
             <div className="space-y-2">
-              <Label htmlFor="policy-name">Policy Name</Label>
+              <Label htmlFor="policy-name">Policy name</Label>
               <Input
                 id="policy-name"
                 placeholder="e.g., Large Bitcoin Transfer Approval"
