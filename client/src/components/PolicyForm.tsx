@@ -688,7 +688,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                         className="w-20 rounded-lg"
                         data-testid="input-quorum-required"
                       />
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-[#8a8a8a]">
                         of {(formData.approvers || []).length || 0} users must approve transactions
                       </span>
                     </div>
