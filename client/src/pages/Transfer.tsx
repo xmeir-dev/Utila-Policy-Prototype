@@ -568,7 +568,7 @@ export default function Transfer() {
           </div>
 
           <div className="flex flex-col items-center gap-2 pt-[0px] pb-[0px]">
-            {!canSend && (hasValidRecipients || selectedWallets.length > 0) ? (
+            {!canSend && (hasValidRecipients || selectedWallets.length > 0 || amount) ? (
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <span className="w-full cursor-not-allowed" tabIndex={0}>
