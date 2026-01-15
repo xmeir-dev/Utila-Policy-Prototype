@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -52,8 +52,8 @@
 
   --radius: 0.5rem;
 
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: "Satoshi", sans-serif;
+  --font-body: "Satoshi", sans-serif;
 
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
