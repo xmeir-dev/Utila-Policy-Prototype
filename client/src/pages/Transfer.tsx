@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ChevronDown, Wallet, RefreshCw } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
@@ -23,6 +23,7 @@ export default function Transfer() {
   const [recipient, setRecipient] = useState("");
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
   const formatUSD = (val: string) => {
     const num = parseFloat(val.replace(/,/g, ''));
@@ -173,13 +174,17 @@ export default function Transfer() {
               </div>
 
               {/* Amount Inputs (Right) */}
-              <div className="flex-1 flex flex-col justify-center px-6 gap-1 items-end">
+              <div 
+                className="flex-1 flex flex-col justify-center px-6 gap-1 items-end cursor-text"
+                onClick={() => amountInputRef.current?.focus()}
+              >
                 <div className="flex items-center justify-end w-full">
                   <div className="flex items-center">
                     {!isTokenPrimary && (
                       <span className="text-[24px] leading-none font-normal text-foreground">$</span>
                     )}
                     <Input
+                      ref={amountInputRef}
                       type="text"
                       placeholder={isTokenPrimary ? "0.00" : "0"}
                       value={amount}
