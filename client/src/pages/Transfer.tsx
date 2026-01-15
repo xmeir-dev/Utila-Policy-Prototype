@@ -4,6 +4,8 @@ import { ArrowLeft, ChevronDown, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
+import { Navbar } from "@/components/Navbar";
+import { useWallet } from "@/hooks/use-wallet";
 
 const assets = [
   { symbol: "ETH", name: "Ethereum", balance: "2.5" },
@@ -13,6 +15,7 @@ const assets = [
 
 export default function Transfer() {
   const [, setLocation] = useLocation();
+  const walletState = useWallet();
   const [amount, setAmount] = useState("");
   const [selectedAsset, setSelectedAsset] = useState(assets[0]);
   const [recipient, setRecipient] = useState("");
@@ -24,26 +27,26 @@ export default function Transfer() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
-      <header className="border-b border-border">
-        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/")}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold font-display">Transfer</h1>
-        </div>
-      </header>
+      <Navbar walletState={walletState} />
 
-      <main className="max-w-2xl mx-auto px-6 py-12">
+      <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
+          <div className="flex items-center gap-4 mb-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/")}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-3xl font-bold font-display text-foreground">Transfer</h1>
+          </div>
+
           <div className="space-y-3">
             <label className="text-sm font-medium text-muted-foreground">Amount</label>
             <div className="relative">
