@@ -258,7 +258,7 @@ function SortablePolicyItem({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 text-[#8a8a8a]"
           onClick={onEdit}
           data-testid={`button-edit-policy-${policy.id}`}
         >
@@ -279,7 +279,7 @@ function SortablePolicyItem({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-red-500"
+          className="h-8 w-8 text-[#8a8a8a] hover:text-red-500"
           onClick={onDelete}
           disabled={isDeleting}
           data-testid={`button-delete-policy-${policy.id}`}
