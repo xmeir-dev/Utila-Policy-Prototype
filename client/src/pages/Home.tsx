@@ -77,7 +77,7 @@ export default function Home() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="w-full max-w-2xl mx-auto"
             >
-              <h2 className="text-2xl font-display mb-8 text-center font-medium">
+              <h2 className="font-display mb-8 text-center font-medium text-[28px]">
                 Hi <span className="font-bold">{walletState.connectedUser?.name}</span>, welcome to your Waystar Royco workspace
               </h2>
 
