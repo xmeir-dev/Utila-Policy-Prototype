@@ -122,15 +122,11 @@ function TagInput({
 }
 
 const AVAILABLE_USERS = [
-  'Kendall Roy',
-  'Roman Roy',
-  'Shiv Roy',
-  'Connor Roy',
-  'Gerri Kellman',
-  'Karl Muller',
-  'Frank Vernon',
-  'Tom Wambsgans',
-  'Greg Hirsch'
+  'Meir',
+  'Ishai',
+  'Omer',
+  'Lena',
+  'Vitalik'
 ];
 
 function MultiUserSelector({ 
