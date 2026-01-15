@@ -43,7 +43,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar walletState={walletState} />
-
       <main className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[90vh]">
         
         <AnimatePresence mode="wait">
@@ -78,7 +77,7 @@ export default function Home() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="w-full max-w-2xl mx-auto"
             >
-              <h2 className="text-2xl font-bold font-display mb-8 text-center">
+              <h2 className="text-2xl font-display mb-8 text-center font-medium">
                 Hi {walletState.connectedUser?.name}, welcome to your Waystar Royco workspace
               </h2>
 
@@ -130,7 +129,6 @@ export default function Home() {
           )}
         </AnimatePresence>
       </main>
-
       <footer className="w-full py-8 text-center text-sm text-muted-foreground">
         <p className="text-[#bdbdbd]">By Meir Rosenschein, January 15th 2026</p>
       </footer>
