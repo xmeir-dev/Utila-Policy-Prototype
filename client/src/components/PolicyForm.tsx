@@ -730,7 +730,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm">Quorum Required</Label>
+                <Label className="text-sm">Quorum required</Label>
                 <div className="flex items-center gap-3">
                   <Input
                     type="number"
