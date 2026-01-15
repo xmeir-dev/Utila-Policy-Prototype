@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import type { Policy, InsertPolicy } from "@shared/schema";
 
 const COMMON_ASSETS = ['BTC', 'ETH', 'USDC', 'USDT', 'SOL', 'MATIC', 'AVAX', 'BNB'];
@@ -344,20 +346,43 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
       </div>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[16px] font-medium">Trigger conditions</Label>
+          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Trigger conditions</Label>
           <div className="flex items-center gap-2">
-            <Select
-              value={formData.conditionLogic || "AND"}
-              onValueChange={(value) => updateField('conditionLogic', value)}
-            >
-              <SelectTrigger className="w-24 h-8 text-xs rounded-lg" data-testid="select-condition-logic">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="AND">ALL (AND)</SelectItem>
-                <SelectItem value="OR">ANY (OR)</SelectItem>
-              </SelectContent>
-            </Select>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex bg-muted p-1 rounded-md h-8 items-center">
+                    <button
+                      type="button"
+                      onClick={() => updateField('conditionLogic', 'AND')}
+                      className={cn(
+                        "px-3 h-6 text-xs font-medium rounded-sm transition-all",
+                        formData.conditionLogic === 'AND' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      And
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateField('conditionLogic', 'OR')}
+                      className={cn(
+                        "px-3 h-6 text-xs font-medium rounded-sm transition-all",
+                        formData.conditionLogic === 'OR' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Or
+                    </button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">
+                    {formData.conditionLogic === 'AND' 
+                      ? '"And" triggers when all conditions are true.' 
+                      : '"Or" triggers when at least one is true.'}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
