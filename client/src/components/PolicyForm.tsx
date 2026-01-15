@@ -667,11 +667,11 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 <div className="space-y-3">
                   <div className="space-y-2">
                     <Label className="text-sm">Approvers</Label>
-                    <TagInput
-                      values={formData.approvers || []}
+                    <MultiUserSelector
+                      selected={formData.approvers || []}
                       onChange={(values) => updateField('approvers', values)}
-                      placeholder="Enter approver address or ID..."
-                      testId="input-approvers"
+                      placeholder="Select who can approve transactions"
+                      testId="select-approvers"
                     />
                   </div>
 
