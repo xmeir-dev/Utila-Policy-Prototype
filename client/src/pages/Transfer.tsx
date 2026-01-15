@@ -382,13 +382,18 @@ export default function Transfer() {
 
             {!isLoadingPolicies && !hasPolicies && (
               <div className="flex items-center justify-between p-4 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-[14px]">
-                <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
-                  Create a policy to enable transactions.
-                </p>
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                    Secure your account
+                  </h3>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                    Create a policy to enable transactions.
+                  </p>
+                </div>
                 <Button 
                   size="sm" 
                   onClick={() => setLocation("/policies")}
-                  className="rounded-[14px] bg-amber-500 hover:bg-amber-600 text-white border-0 h-8"
+                  className="rounded-[14px] bg-amber-500 hover:bg-amber-600 text-white border-0 h-8 shrink-0"
                 >
                   Create Policy
                 </Button>
