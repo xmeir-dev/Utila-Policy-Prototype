@@ -467,12 +467,9 @@ export default function Transfer() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-                    <span>
-                      {isTokenPrimary ? (
-                        `$${amount ? new Intl.NumberFormat('en-US').format(Math.round(parseFloat(amount.replace(/,/g, '')) * selectedAsset.price)) : "0"}`
-                      ) : (
-                        `${amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(2) : "0.00"} ${selectedAsset.symbol}`
-                      )}
+                    <span className="text-[#ababab]">Balance:</span>
+                    <span className="text-foreground">
+                      {selectedAsset.balance} {selectedAsset.symbol}
                     </span>
                     <Button
                       variant="ghost"
