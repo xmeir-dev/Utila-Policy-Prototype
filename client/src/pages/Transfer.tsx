@@ -610,7 +610,7 @@ export default function Transfer() {
                           data-testid={`input-amount-${recipient.id}`}
                         />
                       </div>
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end text-right">
                         <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
                         <span className="text-[10px] text-muted-foreground font-mono shrink-0">{truncateAddress(recipient.address)}</span>
                       </div>
