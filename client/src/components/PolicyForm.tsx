@@ -651,7 +651,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         <button
           type="button"
           onClick={() => toggleSection('approvals')}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 group"
         >
           <ChevronDown 
             className={cn(
@@ -659,12 +659,12 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               !expandedSections.includes('approvals') && "-rotate-90"
             )} 
           />
-          <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Approval & Change Settings</Label>
+          <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Approvals</Label>
         </button>
 
         {expandedSections.includes('approvals') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
-            {formData.action === 'require_approval' && (
+            {formData.action === 'require_approval' ? (
               <Card className="p-4 space-y-4">
                 <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Approval settings</Label>
                 
@@ -699,8 +699,30 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   </div>
                 </div>
               </Card>
+            ) : (
+              <p className="text-sm text-muted-foreground">No approvals required for this action.</p>
             )}
+          </div>
+        )}
+      </div>
 
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => toggleSection('policyChanges')}
+          className="flex items-center gap-2 group"
+        >
+          <ChevronDown 
+            className={cn(
+              "w-5 h-5 text-[#8a8a8a] transition-transform duration-200",
+              !expandedSections.includes('policyChanges') && "-rotate-90"
+            )} 
+          />
+          <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Policy Changes</Label>
+        </button>
+
+        {expandedSections.includes('policyChanges') && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
             <Card className="p-4 space-y-4">
               <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Policy changes</Label>
               <div className="space-y-2">
