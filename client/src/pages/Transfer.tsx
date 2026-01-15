@@ -589,7 +589,25 @@ export default function Transfer() {
           </div>
 
           <div className="flex flex-col items-center gap-2 pt-[0px] pb-[0px]">
-            {!canSend && (hasValidRecipients || selectedWallets.length > 0 || amount) ? (
+            {!hasPolicies ? (
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <span className="w-full cursor-not-allowed">
+                    <Button
+                      size="lg"
+                      className="w-full text-lg font-semibold rounded-[16px] h-[48px] pointer-events-none"
+                      disabled
+                      data-testid="button-continue"
+                    >
+                      Send
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Create a Policy to enable transactions</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : !canSend ? (
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <span className="w-full cursor-not-allowed" tabIndex={0}>
@@ -628,7 +646,7 @@ export default function Transfer() {
               variant="ghost"
               size="sm"
               className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
-              disabled={!canSend}
+              disabled={!canSend || !hasPolicies}
               onClick={() => console.log("Simulate Transfer")}
               data-testid="button-simulate"
             >
