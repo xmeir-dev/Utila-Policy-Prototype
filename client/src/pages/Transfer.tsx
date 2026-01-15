@@ -533,7 +533,7 @@ export default function Transfer() {
                   <Send className="w-6 h-6 text-muted-foreground shrink-0" />
                   <div className="flex flex-col items-start gap-1 w-full">
                     <div className="flex items-center gap-2 overflow-hidden w-full">
-                      <span className="shrink-0 font-medium text-[18px] text-[#000000]">To</span>
+                      <span className="shrink-0 font-medium text-[#000000] text-[14px]">To</span>
                       <div className="flex gap-1.5 overflow-hidden flex-wrap">
                         {recipients.length > 0 ? (
                           recipients.map(r => (
