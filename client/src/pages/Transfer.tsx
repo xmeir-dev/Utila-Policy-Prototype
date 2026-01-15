@@ -606,7 +606,7 @@ export default function Transfer() {
                           placeholder="0"
                           value={recipient.amount}
                           onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
-                          className="w-16 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
+                          className="w-24 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0"
                           data-testid={`input-amount-${recipient.id}`}
                         />
                       </div>
