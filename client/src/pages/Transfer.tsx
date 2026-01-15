@@ -332,7 +332,7 @@ export default function Transfer() {
               </Button>
             </div>
 
-            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-[24px] h-32 z-10">
+            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-[24px] h-20 z-10">
               {/* Token Selector (Left) */}
               <div className="flex items-center px-4 border-r border-border min-w-[140px] z-20" ref={dropdownRef}>
                 <div className="relative w-full">
