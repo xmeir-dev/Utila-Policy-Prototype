@@ -99,10 +99,6 @@ export default function Home() {
 
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-bold font-display">Pending Transactions</h2>
-                <div className="px-3 py-1 bg-muted rounded-full text-xs font-medium flex items-center gap-2">
-                  <Clock className="w-3 h-3 animate-pulse" />
-                  Live Updates
-                </div>
               </div>
 
               <div className="space-y-4">
