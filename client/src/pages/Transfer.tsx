@@ -184,8 +184,8 @@ export default function Transfer() {
                       placeholder="0.00"
                       value={amount}
                       onChange={handleAmountChange}
-                      style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 14}px` : '50px' }}
-                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[50px]"
+                      style={{ fontSize: '24px', width: amount ? `${(amount.length || 4) * 16}px` : '60px' }}
+                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[60px]"
                       data-testid="input-amount"
                     />
                     {isTokenPrimary && (
