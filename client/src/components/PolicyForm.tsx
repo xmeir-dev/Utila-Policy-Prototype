@@ -121,6 +121,61 @@ function TagInput({
   );
 }
 
+const AVAILABLE_USERS = ['Meir', 'Ishai', 'Roman', 'Kendall', 'Shiv', 'Tom', 'Greg'];
+
+function MultiUserSelector({ 
+  selected, 
+  onChange, 
+  placeholder,
+  testId
+}: { 
+  selected: string[]; 
+  onChange: (values: string[]) => void; 
+  placeholder: string;
+  testId: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-lg bg-background min-h-[42px]">
+        {selected.map((user) => (
+          <Badge key={user} variant="secondary" className="h-7 gap-1 pl-2 pr-1">
+            <span className="text-xs font-medium">{user}</span>
+            <button
+              type="button"
+              onClick={() => onChange(selected.filter(u => u !== user))}
+              className="hover:bg-background/50 rounded p-0.5"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </Badge>
+        ))}
+        <Select
+          value=""
+          onValueChange={(user) => {
+            if (user && !selected.includes(user)) {
+              onChange([...selected, user]);
+            }
+          }}
+        >
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors">
+            <div className="flex items-center gap-1">
+              <Plus className="w-3 h-3" />
+              <span>Add User</span>
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            {AVAILABLE_USERS.filter(u => !selected.includes(u)).map((user) => (
+              <SelectItem key={user} value={user}>
+                {user}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
 export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, submitLabel = "Save Policy" }: PolicyFormProps) {
   const [formData, setFormData] = useState<Partial<InsertPolicy>>({
     name: "",
@@ -255,15 +310,14 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               <SelectContent>
                 <SelectItem value="any">Any User</SelectItem>
                 <SelectItem value="user">Specific Users</SelectItem>
-                <SelectItem value="group">User Groups</SelectItem>
               </SelectContent>
             </Select>
-            {formData.initiatorType !== 'any' && (
-              <TagInput
-                values={formData.initiatorValues || []}
+            {formData.initiatorType === 'user' && (
+              <MultiUserSelector
+                selected={formData.initiatorValues || []}
                 onChange={(values) => updateField('initiatorValues', values)}
-                placeholder={formData.initiatorType === 'user' ? "Enter user ID..." : "Enter group name..."}
-                testId="input-initiator-values"
+                placeholder="Select users..."
+                testId="select-initiator-users"
               />
             )}
           </div>
