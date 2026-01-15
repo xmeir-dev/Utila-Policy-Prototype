@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ChevronDown, Wallet, RefreshCw } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
@@ -24,6 +24,17 @@ export default function Transfer() {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
   const amountInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowAssetDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const formatUSD = (val: string) => {
     const num = parseFloat(val.replace(/,/g, ''));
@@ -132,7 +143,7 @@ export default function Transfer() {
             </div>
             <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-md h-32 z-10">
               {/* Token Selector (Left) */}
-              <div className="flex items-center px-4 border-r border-border min-w-[140px] z-20">
+              <div className="flex items-center px-4 border-r border-border min-w-[140px] z-20" ref={dropdownRef}>
                 <div className="relative w-full">
                   <Button
                     variant="ghost"
