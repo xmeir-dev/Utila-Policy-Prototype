@@ -620,7 +620,13 @@ export default function Transfer() {
                       </div>
                       <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end text-right">
                         <span className="text-sm font-semibold truncate">{recipient.label || "Custom Address"}</span>
-                        <span className="text-[10px] text-muted-foreground font-mono shrink-0">{truncateAddress(recipient.address)}</span>
+                        <a 
+                          href={`https://etherscan.io/address/${recipient.address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-muted-foreground font-mono shrink-0 hover:text-primary hover:underline cursor-pointer"
+                          onClick={(e) => e.stopPropagation()}
+                        >{truncateAddress(recipient.address)}</a>
                       </div>
                       <Button
                         variant="ghost"
@@ -706,7 +712,13 @@ export default function Transfer() {
                               {entry.isInternal ? 'Internal' : 'External'}
                             </span>
                           </div>
-                          <span className="text-[10px] text-muted-foreground font-mono">{truncateAddress(entry.address)}</span>
+                          <a 
+                            href={`https://etherscan.io/address/${entry.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          >{truncateAddress(entry.address)}</a>
                         </div>
                       </div>
                       {isSelected && (
