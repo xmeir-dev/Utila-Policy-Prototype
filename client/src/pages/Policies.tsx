@@ -493,8 +493,8 @@ export default function Policies() {
                         Priority Order
                       </span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      Drag to reorder
+                    <span className="text-[14px] text-[#ababab]">
+                      Drag to reorder. Higher policies take priority
                     </span>
                   </div>
                   <DndContext
