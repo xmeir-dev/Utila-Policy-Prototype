@@ -730,7 +730,6 @@ export default function Transfer() {
           </div>
         </DialogContent>
       </Dialog>
-
       <Dialog open={showSourceModal} onOpenChange={setShowSourceModal}>
         <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
           <DialogHeader className="p-6 pb-4 border-b border-border">
@@ -794,7 +793,7 @@ export default function Transfer() {
             )}
 
             <div className="space-y-3">
-              <h3 className="text-sm text-muted-foreground font-medium">Available Wallets</h3>
+              <h3 className="text-sm text-muted-foreground font-medium">Available wallets</h3>
               <div className="space-y-2">
                 {availableWallets.map((wallet) => {
                   const isSelected = selectedWallets.includes(wallet.id);
