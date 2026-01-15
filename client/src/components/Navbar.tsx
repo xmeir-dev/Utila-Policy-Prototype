@@ -34,7 +34,7 @@ export function Navbar({ walletState }: NavbarProps) {
               data-testid="button-disconnect-wallet"
               variant="outline"
               onClick={() => disconnect()}
-              className="rounded-[16px] font-mono text-sm"
+              className="rounded-[16px] font-mono text-sm h-[48px]"
             >
               <img 
                 src={walletAvatar} 
@@ -48,7 +48,7 @@ export function Navbar({ walletState }: NavbarProps) {
               data-testid="button-connect-wallet"
               onClick={() => connect()}
               disabled={isConnecting}
-              className="rounded-[16px]"
+              className="rounded-[16px] h-[48px]"
             >
               {isConnecting ? (
                 <>

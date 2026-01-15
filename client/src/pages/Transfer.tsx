@@ -251,7 +251,7 @@ export default function Transfer() {
           <div className="pt-8">
             <Button
               size="lg"
-              className="w-full text-lg font-semibold rounded-[16px]"
+              className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
               disabled={!amount || !recipient}
               onClick={handleContinue}
               data-testid="button-continue"
