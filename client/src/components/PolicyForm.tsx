@@ -519,9 +519,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               approvals needed before edits go live
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Set to 1 for immediate changes, or higher to require team approval.
-          </p>
         </div>
       </Card>
 
