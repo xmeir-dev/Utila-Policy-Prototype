@@ -59,8 +59,8 @@ export default function Transfer() {
   const [selectedAsset, setSelectedAsset] = useState(assets[0]);
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
-  const [selectedWallets, setSelectedWallets] = useState<string[]>(["w1"]);
-  const [walletAmounts, setWalletAmounts] = useState<Record<string, string>>({ w1: "3,750" });
+  const [selectedWallets, setSelectedWallets] = useState<string[]>([]);
+  const [walletAmounts, setWalletAmounts] = useState<Record<string, string>>({});
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [showDestinationModal, setShowDestinationModal] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
