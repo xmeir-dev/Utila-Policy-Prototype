@@ -391,11 +391,12 @@ export default function Transfer() {
                   </p>
                 </div>
                 <Button 
-                  size="sm" 
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setLocation("/policies")}
-                  className="rounded-[14px] bg-amber-500 hover:bg-amber-600 text-white border-0 h-8 shrink-0"
+                  className="rounded-full hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 h-8 w-8 shrink-0"
                 >
-                  Create Policy
+                  <ChevronRight className="w-8 h-8" />
                 </Button>
               </div>
             )}
