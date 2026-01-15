@@ -361,7 +361,15 @@ export default function Transfer() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <div className="space-y-4">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/")}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <h2 className="text-3xl font-bold font-display text-foreground">Transfer</h2>
           </div>
 
