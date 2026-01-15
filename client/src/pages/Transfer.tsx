@@ -383,7 +383,7 @@ export default function Transfer() {
             {!isLoadingPolicies && !hasPolicies && (
               <div className="flex items-center justify-between p-4 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-[14px]">
                 <div className="flex flex-col gap-0.5">
-                  <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                  <h3 className="text-sm font-bold dark:text-amber-200 text-[#d67424]">
                     Secure your account
                   </h3>
                   <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
@@ -661,200 +661,258 @@ export default function Transfer() {
           </div>
         </motion.div>
       </main>
-      <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
-        <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-border">
-            <DialogTitle className="text-xl font-bold">Select recipients</DialogTitle>
-          </DialogHeader>
-          
-          <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
-            {recipients.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-sm text-muted-foreground font-medium">Selected recipients</h3>
-                  <span className="text-sm font-medium"><span className="text-[#ababab]">Total</span> <span className="text-foreground">${getTotalRecipientAmount().toLocaleString()}</span><span className="text-[#ababab]"> / </span><span className="text-foreground">${getTotalWalletAmount().toLocaleString()}</span></span>
-                </div>
-                <div className="space-y-2">
-                  {recipients.map((recipient) => (
-                    <div
-                      key={recipient.id}
-                      className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          <User className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold">{recipient.label || "Custom Address"}</span>
-                          <a 
-                            href={`https://etherscan.io/address/${recipient.address}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
-                            onClick={(e) => e.stopPropagation()}
-                          >{truncateAddress(recipient.address)}</a>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
-                        <span className="text-sm text-muted-foreground">$</span>
-                        <Input
-                          type="text"
-                          placeholder="0"
-                          value={recipient.amount}
-                          onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
-                          className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-bold text-right focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
-                          data-testid={`input-amount-${recipient.id}`}
-                        />
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
-                        onClick={() => removeRecipient(recipient.id)}
-                        data-testid={`button-remove-${recipient.id}`}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <h3 className="text-sm text-muted-foreground font-medium">New address</h3>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter wallet address or ENS name"
-                  value={newAddress}
-                  onChange={(e) => setNewAddress(e.target.value)}
-                  className={`flex-1 rounded-[12px] ${newAddress && !isValidAddress(newAddress) ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-                  data-testid="input-new-address"
-                  onKeyDown={(e) => e.key === 'Enter' && addNewRecipient()}
-                />
-                <Button
-                  size="icon"
-                  onClick={addNewRecipient}
-                  disabled={!newAddress.trim() || !isValidAddress(newAddress)}
-                  className="rounded-[12px]"
-                  data-testid="button-add-address"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              {newAddress && !isValidAddress(newAddress) && (
-                <span className="text-xs text-destructive">Enter a full 42-character wallet address (0x...) or ENS name (.eth)</span>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-sm text-muted-foreground font-medium">Contacts</h3>
-              <div className="space-y-2">
-                {addressBook.map((entry) => {
-                  const isSelected = recipients.some(r => r.address === entry.address);
-                  return (
-                    <div
-                      key={entry.id}
-                      className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
-                        isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
-                      }`}
-                      onClick={() => {
-                        if (isSelected) {
-                          const recipientToRemove = recipients.find(r => r.address === entry.address);
-                          if (recipientToRemove) {
-                            removeRecipient(recipientToRemove.id);
-                          }
-                        } else {
-                          addRecipientFromAddressBook(entry);
-                        }
-                      }}
-                      data-testid={`addressbook-${entry.id}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          <User className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold">{entry.label}</span>
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 ${entry.isInternal ? 'bg-emerald-500/10 text-emerald-600' : 'bg-orange-500/10 text-orange-600'}`}>
-                              {entry.isInternal ? <Lock className="w-2.5 h-2.5" /> : <CornerUpRight className="w-2.5 h-2.5" />}
-                              {entry.isInternal ? 'Internal' : 'External'}
-                            </span>
-                          </div>
-                          <a 
-                            href={`https://etherscan.io/address/${entry.address}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
-                            onClick={(e) => e.stopPropagation()}
-                          >{truncateAddress(entry.address)}</a>
-                        </div>
-                      </div>
-                      {isSelected && (
-                        <Check className="w-4 h-4 text-primary" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 pt-4 border-t border-border">
-            {!isWithinBalance && recipients.length > 0 ? (
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <span className="w-full cursor-not-allowed" tabIndex={0}>
-                    <Button
-                      className="w-full rounded-[12px] pointer-events-none"
-                      disabled
-                      data-testid="button-confirm-recipients"
-                    >
-                      Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Total exceeds available balance</p>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              <Button
-                className="w-full rounded-[12px]"
-                onClick={() => setShowDestinationModal(false)}
-                disabled={recipients.length === 0 || !recipients.every(r => r.amount && parseFloat(r.amount) > 0)}
-                data-testid="button-confirm-recipients"
-              >
-                Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
-              </Button>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={showSourceModal} onOpenChange={setShowSourceModal}>
-        <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-border">
-            <DialogTitle className="text-xl font-bold">Select source wallets</DialogTitle>
-          </DialogHeader>
-          
-          <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
-            {selectedWallets.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-sm text-muted-foreground font-medium">Selected wallets</h3>
-                  <span className="text-sm font-medium"><span className="text-[#ababab]">Total</span> <span className="text-foreground">${getTotalWalletAmount().toLocaleString()}</span></span>
-                </div>
-                <div className="space-y-2">
-                  {selectedWallets.map((walletId) => {
-                    const wallet = availableWallets.find(w => w.id === walletId);
-                    if (!wallet) return null;
-                    return (
+        <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
+          <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-4 border-b border-border">
+              <DialogTitle className="text-xl font-bold">Select recipients</DialogTitle>
+            </DialogHeader>
+            
+            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+              {recipients.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-sm text-muted-foreground font-medium">Selected recipients</h3>
+                    <span className="text-sm font-medium"><span className="text-[#ababab]">Total</span> <span className="text-foreground">${getTotalRecipientAmount().toLocaleString()}</span><span className="text-[#ababab]"> / </span><span className="text-foreground">${getTotalWalletAmount().toLocaleString()}</span></span>
+                  </div>
+                  <div className="space-y-2">
+                    {recipients.map((recipient) => (
                       <div
-                        key={wallet.id}
+                        key={recipient.id}
                         className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
                       >
                         <div className="flex items-center gap-3 flex-1">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            <User className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold">{recipient.label || "Custom Address"}</span>
+                            <a 
+                              href={`https://etherscan.io/address/${recipient.address}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
+                              onClick={(e) => e.stopPropagation()}
+                            >{truncateAddress(recipient.address)}</a>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
+                          <span className="text-sm text-muted-foreground">$</span>
+                          <Input
+                            type="text"
+                            placeholder="0"
+                            value={recipient.amount}
+                            onChange={(e) => updateRecipientAmount(recipient.id, e.target.value)}
+                            className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-bold text-right focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                            data-testid={`input-amount-${recipient.id}`}
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
+                          onClick={() => removeRecipient(recipient.id)}
+                          data-testid={`button-remove-${recipient.id}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <h3 className="text-sm text-muted-foreground font-medium">New address</h3>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter wallet address or ENS name"
+                    value={newAddress}
+                    onChange={(e) => setNewAddress(e.target.value)}
+                    className={`flex-1 rounded-[12px] ${newAddress && !isValidAddress(newAddress) ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    data-testid="input-new-address"
+                    onKeyDown={(e) => e.key === 'Enter' && addNewRecipient()}
+                  />
+                  <Button
+                    size="icon"
+                    onClick={addNewRecipient}
+                    disabled={!newAddress.trim() || !isValidAddress(newAddress)}
+                    className="rounded-[12px]"
+                    data-testid="button-add-address"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {newAddress && !isValidAddress(newAddress) && (
+                  <span className="text-xs text-destructive">Enter a full 42-character wallet address (0x...) or ENS name (.eth)</span>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-sm text-muted-foreground font-medium">Contacts</h3>
+                <div className="space-y-2">
+                  {addressBook.map((entry) => {
+                    const isSelected = recipients.some(r => r.address === entry.address);
+                    return (
+                      <div
+                        key={entry.id}
+                        className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
+                          isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
+                        }`}
+                        onClick={() => {
+                          if (isSelected) {
+                            const recipientToRemove = recipients.find(r => r.address === entry.address);
+                            if (recipientToRemove) {
+                              removeRecipient(recipientToRemove.id);
+                            }
+                          } else {
+                            addRecipientFromAddressBook(entry);
+                          }
+                        }}
+                        data-testid={`addressbook-${entry.id}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            <User className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold">{entry.label}</span>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 ${entry.isInternal ? 'bg-emerald-500/10 text-emerald-600' : 'bg-orange-500/10 text-orange-600'}`}>
+                                {entry.isInternal ? <Lock className="w-2.5 h-2.5" /> : <CornerUpRight className="w-2.5 h-2.5" />}
+                                {entry.isInternal ? 'Internal' : 'External'}
+                              </span>
+                            </div>
+                            <a 
+                              href={`https://etherscan.io/address/${entry.address}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] text-muted-foreground font-mono hover:text-primary hover:underline cursor-pointer"
+                              onClick={(e) => e.stopPropagation()}
+                            >{truncateAddress(entry.address)}</a>
+                          </div>
+                        </div>
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-primary" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 pt-4 border-t border-border">
+              {!isWithinBalance && recipients.length > 0 ? (
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <span className="w-full cursor-not-allowed" tabIndex={0}>
+                      <Button
+                        className="w-full rounded-[12px] pointer-events-none"
+                        disabled
+                        data-testid="button-confirm-recipients"
+                      >
+                        Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Total exceeds available balance</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Button
+                  className="w-full rounded-[12px]"
+                  onClick={() => setShowDestinationModal(false)}
+                  disabled={recipients.length === 0 || !recipients.every(r => r.amount && parseFloat(r.amount) > 0)}
+                  data-testid="button-confirm-recipients"
+                >
+                  Confirm {recipients.length > 0 ? `(${recipients.length} recipient${recipients.length > 1 ? 's' : ''})` : ''}
+                </Button>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={showSourceModal} onOpenChange={setShowSourceModal}>
+          <DialogContent className="sm:max-w-[500px] rounded-[16px] p-0 gap-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-4 border-b border-border">
+              <DialogTitle className="text-xl font-bold">Select source wallets</DialogTitle>
+            </DialogHeader>
+            
+            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+              {selectedWallets.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-sm text-muted-foreground font-medium">Selected wallets</h3>
+                    <span className="text-sm font-medium"><span className="text-[#ababab]">Total</span> <span className="text-foreground">${getTotalWalletAmount().toLocaleString()}</span></span>
+                  </div>
+                  <div className="space-y-2">
+                    {selectedWallets.map((walletId) => {
+                      const wallet = availableWallets.find(w => w.id === walletId);
+                      if (!wallet) return null;
+                      return (
+                        <div
+                          key={wallet.id}
+                          className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <Wallet className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-semibold">{wallet.name}</span>
+                              <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
+                            <span className="text-sm text-muted-foreground">$</span>
+                            <Input
+                              type="text"
+                              placeholder="0"
+                              value={walletAmounts[wallet.id] || ""}
+                              onChange={(e) => updateWalletAmount(wallet.id, e.target.value)}
+                              className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-bold text-right focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                              data-testid={`input-wallet-amount-${wallet.id}`}
+                            />
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
+                            onClick={() => handleRemoveWallet(wallet.id)}
+                            data-testid={`button-remove-wallet-${wallet.id}`}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm text-muted-foreground font-medium">Available wallets</h3>
+                  <span className="text-sm font-medium"><span className="text-[#ababab]">Total balance</span> <span className="text-foreground">${(parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toLocaleString()}</span></span>
+                </div>
+                <div className="space-y-2">
+                  {availableWallets.map((wallet) => {
+                    const isSelected = selectedWallets.includes(wallet.id);
+                    return (
+                      <div
+                        key={wallet.id}
+                        className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
+                          isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
+                        }`}
+                        onClick={() => handleWalletSelection(wallet.id, isSelected)}
+                        data-testid={`option-wallet-${wallet.id}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => {}}
+                            className="rounded-sm border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          />
                           <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                             <Wallet className="w-4 h-4 text-muted-foreground" />
                           </div>
@@ -863,89 +921,31 @@ export default function Transfer() {
                             <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-1 shrink-0">
-                          <span className="text-sm text-muted-foreground">$</span>
-                          <Input
-                            type="text"
-                            placeholder="0"
-                            value={walletAmounts[wallet.id] || ""}
-                            onChange={(e) => updateWalletAmount(wallet.id, e.target.value)}
-                            className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-bold text-right focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
-                            data-testid={`input-wallet-amount-${wallet.id}`}
-                          />
+                        <div className="text-right">
+                          <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
+                          </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
-                          onClick={() => handleRemoveWallet(wallet.id)}
-                          data-testid={`button-remove-wallet-${wallet.id}`}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
                       </div>
                     );
                   })}
                 </div>
               </div>
-            )}
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm text-muted-foreground font-medium">Available wallets</h3>
-                <span className="text-sm font-medium"><span className="text-[#ababab]">Total balance</span> <span className="text-foreground">${(parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toLocaleString()}</span></span>
-              </div>
-              <div className="space-y-2">
-                {availableWallets.map((wallet) => {
-                  const isSelected = selectedWallets.includes(wallet.id);
-                  return (
-                    <div
-                      key={wallet.id}
-                      className={`flex items-center justify-between p-3 rounded-[12px] border cursor-pointer transition-colors ${
-                        isSelected ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent/30'
-                      }`}
-                      onClick={() => handleWalletSelection(wallet.id, isSelected)}
-                      data-testid={`option-wallet-${wallet.id}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => {}}
-                          className="rounded-sm border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                        />
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          <Wallet className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold">{wallet.name}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
-                        <div className="text-[10px] text-muted-foreground">
-                          ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
-          </div>
 
-          <div className="p-6 pt-4 border-t border-border">
-            <Button
-              className="w-full rounded-[12px]"
-              onClick={() => setShowSourceModal(false)}
-              disabled={selectedWallets.length === 0}
-              data-testid="button-confirm-wallets"
-            >
-              Confirm {selectedWallets.length > 0 ? `(${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''})` : ''}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
+            <div className="p-6 pt-4 border-t border-border">
+              <Button
+                className="w-full rounded-[12px]"
+                onClick={() => setShowSourceModal(false)}
+                disabled={selectedWallets.length === 0}
+                data-testid="button-confirm-wallets"
+              >
+                Confirm {selectedWallets.length > 0 ? `(${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''})` : ''}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
 }
