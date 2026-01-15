@@ -268,6 +268,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
     assetValues: [],
     approvers: [],
     quorumRequired: 1,
+    changeApproversList: [],
     changeApprovalsRequired: 1,
     ...initialData,
   });
@@ -717,18 +718,33 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
         {expandedSections.includes('policyChanges') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
-            <div className="space-y-2">
-              <Label className="text-sm">Approvals required</Label>
-              <div className="flex items-center gap-3">
-                <Input
-                  type="number"
-                  min={1}
-                  value={formData.changeApprovalsRequired || 1}
-                  onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
-                  className="w-20 rounded-lg"
-                  data-testid="input-change-approvals"
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label className="text-sm">Policy Change Approvers</Label>
+                <MultiUserSelector
+                  selected={formData.changeApproversList || []}
+                  onChange={(values) => updateField('changeApproversList', values)}
+                  placeholder="Select who can approve policy changes"
+                  testId="select-change-approvers"
                 />
-                <span className="text-sm text-muted-foreground">approvals needed to approve changes</span>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm">Quorum Required</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={(formData.changeApproversList || []).length || 1}
+                    value={formData.changeApprovalsRequired || 1}
+                    onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
+                    className="w-20 rounded-lg"
+                    data-testid="input-change-approvals"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    of {(formData.changeApproversList || []).length || 0} approvers must approve changes
+                  </span>
+                </div>
               </div>
             </div>
           </div>

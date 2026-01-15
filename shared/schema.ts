@@ -70,7 +70,8 @@ export const policies = pgTable("policies", {
   // Policy change approval tracking
   status: text("status").default("active"), // 'active', 'pending_approval', 'draft'
   pendingChanges: text("pending_changes"), // JSON string of proposed changes
-  changeApprovals: text("change_approvals").array(), // approvers who approved the change
+  changeApprovers: text("change_approvals").array(), // approvers who approved the change
+  changeApproversList: text("change_approvers_list").array(), // list of who CAN approve changes
   changeApprovalsRequired: integer("change_approvals_required").default(1),
   
   createdAt: text("created_at").default("now()"),
