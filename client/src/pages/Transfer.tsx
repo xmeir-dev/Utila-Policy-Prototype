@@ -250,11 +250,6 @@ export default function Transfer() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex justify-end items-center text-xs">
-              <span className="text-muted-foreground">
-                {selectedWallets.length} selected
-              </span>
-            </div>
             <div className="relative" ref={walletDropdownRef}>
               <Button
                 variant="outline"
