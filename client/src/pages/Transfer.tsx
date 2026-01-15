@@ -394,7 +394,7 @@ export default function Transfer() {
                   onClick={() => setLocation("/policies")}
                   className="rounded-full hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 h-8 w-8 shrink-0"
                 >
-                  <ChevronRight className="w-8 h-8" />
+                  <ChevronRight className="w-8 h-8 text-[#d67424]" />
                 </Button>
               </div>
             )}
