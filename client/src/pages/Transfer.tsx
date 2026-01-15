@@ -323,6 +323,12 @@ export default function Transfer() {
             </div>
           </div>
 
+          <div className="flex justify-center -my-3 relative z-20">
+            <svg width="32" height="35" viewBox="0 0 32 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 1.35034C23.3576 1.35034 29.3496 7.34237 29.3496 14.7C29.3496 22.0575 23.3576 28.0496 16 28.0496C8.64242 28.0496 2.65039 22.0575 2.65039 14.7C2.65039 7.34237 8.64242 1.35034 16 1.35034Z" fill="#E9E9EE" stroke="white" stroke-width="2.7"/>
+            </svg>
+          </div>
+
           <div className="space-y-3">
             <div className="relative">
               <Button
