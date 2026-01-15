@@ -343,9 +343,11 @@ export default function Transfer() {
                     <div className="flex items-center gap-2 overflow-hidden w-full">
                       <span className="shrink-0 font-medium text-[18px] text-[#000000]">To</span>
                       <div className="flex gap-1.5 overflow-hidden">
-                        <span className="text-muted-foreground text-sm font-normal truncate">
-                          {recipient || "Enter wallet address or ENS name"}
-                        </span>
+                        {recipient && (
+                          <span className="text-muted-foreground text-sm font-normal truncate">
+                            {recipient}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <span className="text-muted-foreground text-[14px] font-normal">Choose destination wallets</span>
