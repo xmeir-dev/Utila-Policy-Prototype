@@ -60,7 +60,6 @@ export default function Transfer() {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [isTokenPrimary, setIsTokenPrimary] = useState(false);
   const [selectedWallets, setSelectedWallets] = useState<string[]>(["w1"]);
-  const [sourceWalletAmounts, setSourceWalletAmounts] = useState<Record<string, string>>({ w1: "1.5" });
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [showDestinationModal, setShowDestinationModal] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
@@ -157,21 +156,8 @@ export default function Transfer() {
     }, 0);
   };
 
-  const updateSourceWalletAmount = (walletId: string, newAmount: string) => {
-    let val = newAmount.replace(/,/g, '');
-    if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
-    setSourceWalletAmounts(prev => ({
-      ...prev,
-      [walletId]: val
-    }));
-  };
-
   const getAvailableBalance = () => {
     const totalWalletBalance = selectedWallets.reduce((sum, id) => {
-      const customAmount = sourceWalletAmounts[id];
-      if (customAmount !== undefined) {
-        return sum + (parseFloat(customAmount) || 0);
-      }
       const wallet = availableWallets.find(w => w.id === id);
       return sum + (wallet ? parseFloat(wallet.balance) : 0);
     }, 0);
@@ -614,7 +600,8 @@ export default function Transfer() {
                   ))}
                 </div>
                 
-                <div className="flex justify-end items-center pt-2">
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-sm text-muted-foreground">Total</span>
                   <div className="flex flex-col items-end">
                     <span className={`text-sm font-bold ${!isWithinBalance ? 'text-destructive' : ''}`}>
                       ${getTotalRecipientAmount().toLocaleString()}
@@ -744,47 +731,26 @@ export default function Transfer() {
                         key={wallet.id}
                         className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border bg-card"
                       >
-                        <div className="flex items-center gap-1 bg-muted/50 rounded-[6px] px-2 py-0.5 shrink-0">
-                          <Input
-                            type="text"
-                            placeholder="0"
-                            value={sourceWalletAmounts[wallet.id] || ""}
-                            onChange={(e) => updateSourceWalletAmount(wallet.id, e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-20 h-5 p-0 bg-transparent border-0 text-sm font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 outline-none text-right"
-                            data-testid={`input-wallet-amount-${wallet.id}`}
-                          />
-                          <span className="text-xs text-muted-foreground">{selectedAsset.symbol}</span>
-                        </div>
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                             <Wallet className="w-4 h-4 text-muted-foreground" />
                           </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-semibold truncate">{wallet.name}</span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold">{wallet.name}</span>
                             <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
                           </div>
                         </div>
-                        <div className="text-right shrink-0">
+                        <div className="text-right mr-2">
+                          <div className="text-sm font-bold">{wallet.balance} {selectedAsset.symbol}</div>
                           <div className="text-[10px] text-muted-foreground">
-                            max: {wallet.balance} {selectedAsset.symbol}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            ${new Intl.NumberFormat('en-US').format((parseFloat(sourceWalletAmounts[wallet.id]) || 0) * selectedAsset.price)}
+                            ${new Intl.NumberFormat('en-US').format(parseFloat(wallet.balance) * selectedAsset.price)}
                           </div>
                         </div>
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-5 w-5 text-muted-foreground hover:text-destructive shrink-0"
-                          onClick={() => {
-                            setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
-                            setSourceWalletAmounts(prev => {
-                              const newAmounts = { ...prev };
-                              delete newAmounts[wallet.id];
-                              return newAmounts;
-                            });
-                          }}
+                          onClick={() => setSelectedWallets(selectedWallets.filter(id => id !== wallet.id))}
                           data-testid={`button-remove-wallet-${wallet.id}`}
                         >
                           <X className="w-3 h-3" />
@@ -794,7 +760,8 @@ export default function Transfer() {
                   })}
                 </div>
                 
-                <div className="flex justify-end items-center pt-2">
+                <div className="flex justify-between items-center pt-2 border-t border-border">
+                  <span className="text-sm text-muted-foreground">Total Available</span>
                   <span className="text-sm font-bold">
                     ${getAvailableBalance().toLocaleString()}
                   </span>
@@ -816,17 +783,8 @@ export default function Transfer() {
                       onClick={() => {
                         if (isSelected) {
                           setSelectedWallets(selectedWallets.filter(id => id !== wallet.id));
-                          setSourceWalletAmounts(prev => {
-                            const newAmounts = { ...prev };
-                            delete newAmounts[wallet.id];
-                            return newAmounts;
-                          });
                         } else {
                           setSelectedWallets([...selectedWallets, wallet.id]);
-                          setSourceWalletAmounts(prev => ({
-                            ...prev,
-                            [wallet.id]: wallet.balance
-                          }));
                         }
                       }}
                       data-testid={`option-wallet-${wallet.id}`}
