@@ -184,12 +184,7 @@ export default function Transfer() {
                       placeholder={isTokenPrimary ? "0.00" : "0"}
                       value={amount}
                       onChange={handleAmountChange}
-                      style={{ 
-                        fontSize: '24px', 
-                        width: amount ? `${(amount.length || 4) * 16}px` : (isTokenPrimary ? '60px' : '30px'),
-                        textAlign: 'left'
-                      }}
-                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none min-w-[30px]"
+                      className="text-[24px] font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-right w-full"
                       data-testid="input-amount"
                     />
                     {isTokenPrimary && (
