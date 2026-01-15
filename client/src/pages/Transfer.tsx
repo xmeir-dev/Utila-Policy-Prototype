@@ -33,6 +33,8 @@ const addressBook: AddressBookEntry[] = [
   { id: "ab2", label: "Finances", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: true },
   { id: "ab3", label: "Treasury", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F", isInternal: true },
   { id: "ab4", label: "Vitalik Buterin", address: "0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: false },
+  { id: "ab5", label: "Meir", address: "0xE1f2A3b4C5d6E7f8A9B0c1D2E3f4A5b6C7d8E9f0", isInternal: true },
+  { id: "ab6", label: "Ishai", address: "0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9", isInternal: true },
 ];
 
 const truncateAddress = (address: string): string => {
@@ -41,15 +43,16 @@ const truncateAddress = (address: string): string => {
 };
 
 const assets = [
-  { symbol: "ETH", name: "Ethereum", balance: "2.5", price: 2500, icon: SiEthereum, color: "text-[#627EEA]" },
-  { symbol: "USDC", name: "USD Coin", balance: "1,250.00", price: 1, icon: MdOutlinePaid, color: "text-[#2775CA]" },
-  { symbol: "USDT", name: "Tether", balance: "500.00", price: 1, icon: SiTether, color: "text-[#26A17B]" },
+  { symbol: "ETH", name: "Ethereum", balance: "1,255", price: 2500, icon: SiEthereum, color: "text-[#627EEA]" },
+  { symbol: "USDC", name: "USD Coin", balance: "1,059,505", price: 1, icon: MdOutlinePaid, color: "text-[#2775CA]" },
+  { symbol: "USDT", name: "Tether", balance: "750,500", price: 1, icon: SiTether, color: "text-[#26A17B]" },
 ];
 
 const availableWallets = [
-  { id: "w1", name: "Main Wallet", address: "0x1234...5678", balance: "1.5" },
-  { id: "w2", name: "Hardware Wallet", address: "0x8765...4321", balance: "0.8" },
-  { id: "w3", name: "Savings", address: "0xabcd...efgh", balance: "0.2" },
+  { id: "w1", name: "Finances", address: "0xb0bF...7E8F", balance: "502" },
+  { id: "w2", name: "Treasury", address: "0xcAfE...3E2F", balance: "421" },
+  { id: "w3", name: "Meir", address: "0xE1f2...E9f0", balance: "198" },
+  { id: "w4", name: "Ishai", address: "0xF0e1...E8f9", balance: "134" },
 ];
 
 export default function Transfer() {
