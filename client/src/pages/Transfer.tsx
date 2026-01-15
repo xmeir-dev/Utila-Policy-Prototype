@@ -330,7 +330,7 @@ export default function Transfer() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-7 px-2 text-xs font-semibold text-primary hover:bg-primary/10"
+                className="h-7 px-2 hover:bg-primary/10 font-medium text-[14px] text-[#8f8f8f]"
                 onClick={() => {
                   const maxAmount = (parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toString();
                   setAmount(maxAmount);
