@@ -10,9 +10,9 @@ import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 
 const assets = [
-  { symbol: "ETH", name: "Ethereum", balance: "2.5", icon: SiEthereum, color: "text-[#627EEA]" },
-  { symbol: "USDC", name: "USD Coin", balance: "1,250.00", icon: MdOutlinePaid, color: "text-[#2775CA]" },
-  { symbol: "USDT", name: "Tether", balance: "500.00", icon: SiTether, color: "text-[#26A17B]" },
+  { symbol: "ETH", name: "Ethereum", balance: "2.5", price: 2500, icon: SiEthereum, color: "text-[#627EEA]" },
+  { symbol: "USDC", name: "USD Coin", balance: "1,250.00", price: 1, icon: MdOutlinePaid, color: "text-[#2775CA]" },
+  { symbol: "USDT", name: "Tether", balance: "500.00", price: 1, icon: SiTether, color: "text-[#26A17B]" },
 ];
 
 export default function Transfer() {
@@ -61,56 +61,74 @@ export default function Transfer() {
                 variant="ghost" 
                 size="sm" 
                 className="h-7 px-2 text-xs font-semibold text-primary hover:bg-primary/10"
-                onClick={() => setAmount(selectedAsset.balance.replace(/,/g, ''))}
+                onClick={() => {
+                  const maxAmount = (parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toString();
+                  setAmount(maxAmount);
+                }}
                 data-testid="button-max"
               >
                 Max
               </Button>
             </div>
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="text-4xl font-bold pr-32 bg-card border-border"
-                data-testid="input-amount"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 px-3"
-                  onClick={() => setShowAssetDropdown(!showAssetDropdown)}
-                  data-testid="button-asset-selector"
-                >
-                  <AssetIcon className={`w-5 h-5 ${selectedAsset.color}`} />
-                  <span className="font-semibold">{selectedAsset.symbol}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-                {showAssetDropdown && (
-                  <div className="absolute right-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-10 min-w-40 overflow-hidden">
-                    {assets.map((asset) => {
-                      const Icon = asset.icon;
-                      return (
-                        <button
-                          key={asset.symbol}
-                          className="w-full px-4 py-3 text-left hover-elevate flex items-center justify-between"
-                          onClick={() => {
-                            setSelectedAsset(asset);
-                            setShowAssetDropdown(false);
-                          }}
-                          data-testid={`option-asset-${asset.symbol.toLowerCase()}`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Icon className={`w-5 h-5 ${asset.color}`} />
-                            <span className="font-medium">{asset.symbol}</span>
-                          </div>
-                          <span className="text-xs text-muted-foreground">{asset.balance}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+            <div className="relative flex items-stretch gap-0 bg-card border border-border rounded-md overflow-hidden h-32">
+              {/* Token Selector (Left) */}
+              <div className="flex items-center px-4 border-r border-border min-w-[140px]">
+                <div className="relative w-full">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-2 w-full justify-between px-2 hover:bg-transparent"
+                    onClick={() => setShowAssetDropdown(!showAssetDropdown)}
+                    data-testid="button-asset-selector"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AssetIcon className={`w-6 h-6 ${selectedAsset.color}`} />
+                      <span className="font-bold text-lg">{selectedAsset.symbol}</span>
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </Button>
+                  {showAssetDropdown && (
+                    <div className="absolute left-0 top-full mt-2 bg-card border border-border rounded-md shadow-lg z-20 min-w-[200px] overflow-hidden">
+                      {assets.map((asset) => {
+                        const Icon = asset.icon;
+                        return (
+                          <button
+                            key={asset.symbol}
+                            className="w-full px-4 py-3 text-left hover-elevate flex items-center justify-between gap-3"
+                            onClick={() => {
+                              setSelectedAsset(asset);
+                              setShowAssetDropdown(false);
+                            }}
+                            data-testid={`option-asset-${asset.symbol.toLowerCase()}`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon className={`w-5 h-5 ${asset.color}`} />
+                              <span className="font-medium">{asset.symbol}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{asset.balance}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Amount Inputs (Right) */}
+              <div className="flex-1 flex flex-col justify-center px-6 gap-1">
+                <div className="flex items-center">
+                  <span className="text-3xl font-bold text-muted-foreground mr-1">$</span>
+                  <Input
+                    type="text"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="text-4xl font-bold p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto"
+                    data-testid="input-amount"
+                  />
+                </div>
+                <div className="text-sm font-medium text-muted-foreground ml-1">
+                  {amount ? (parseFloat(amount.replace(/,/g, '')) / selectedAsset.price).toFixed(6) : "0.00"} {selectedAsset.symbol}
+                </div>
               </div>
             </div>
           </div>
