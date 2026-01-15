@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
-import { Clock, ExternalLink } from "lucide-react";
+import { Clock, ExternalLink, Send, Gavel, LibraryBig } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { type Transaction } from "@shared/schema";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const walletState = useWallet();
@@ -75,6 +76,21 @@ export default function Home() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="w-full max-w-2xl mx-auto"
             >
+              <div className="grid grid-cols-3 gap-4 mb-12">
+                <Button variant="outline" className="flex flex-col items-center justify-center h-24 gap-2 hover-elevate group">
+                  <Send className="w-6 h-6 text-primary transition-transform group-hover:scale-110" />
+                  <span className="font-semibold">Transfer</span>
+                </Button>
+                <Button variant="outline" className="flex flex-col items-center justify-center h-24 gap-2 hover-elevate group">
+                  <Gavel className="w-6 h-6 text-primary transition-transform group-hover:scale-110" />
+                  <span className="font-semibold">Policies</span>
+                </Button>
+                <Button variant="outline" className="flex flex-col items-center justify-center h-24 gap-2 hover-elevate group">
+                  <LibraryBig className="w-6 h-6 text-primary transition-transform group-hover:scale-110" />
+                  <span className="font-semibold">History</span>
+                </Button>
+              </div>
+
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-bold font-display">Pending Transactions</h2>
                 <div className="px-3 py-1 bg-muted rounded-full text-xs font-medium flex items-center gap-2">
