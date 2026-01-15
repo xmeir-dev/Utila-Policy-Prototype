@@ -117,7 +117,6 @@ export default function Transfer() {
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar walletState={walletState} />
-
       <main className="max-w-2xl mx-auto px-6 py-12 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -261,7 +260,7 @@ export default function Transfer() {
                   <Wallet className="w-6 h-6 text-muted-foreground shrink-0" />
                   <div className="flex flex-col items-start gap-1 w-full">
                     <div className="flex items-center gap-2 overflow-hidden w-full">
-                      <span className="text-[12px] font-bold text-muted-foreground shrink-0">From</span>
+                      <span className="shrink-0 font-medium text-[18px] text-[#000000]">From</span>
                       <div className="flex gap-1.5 overflow-hidden">
                         {selectedWallets.length > 0 ? (
                           selectedWallets.map(id => {
