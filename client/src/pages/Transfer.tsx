@@ -29,10 +29,10 @@ interface AddressBookEntry {
 }
 
 const addressBook: AddressBookEntry[] = [
-  { id: "ab1", label: "Alice", address: "0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f", isInternal: true },
-  { id: "ab2", label: "Bob", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: false },
-  { id: "ab3", label: "Charlie", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F", isInternal: true },
-  { id: "ab4", label: "Treasury", address: "0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: true },
+  { id: "ab1", label: "Bank of America", address: "0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f", isInternal: false },
+  { id: "ab2", label: "Finances", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: true },
+  { id: "ab3", label: "Treasury", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F", isInternal: true },
+  { id: "ab4", label: "Vitalik Buterin", address: "0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", isInternal: false },
 ];
 
 const truncateAddress = (address: string): string => {
