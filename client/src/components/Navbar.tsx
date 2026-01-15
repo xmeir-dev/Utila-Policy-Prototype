@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 
 import utilaLogo from "@assets/Utila-Logo-Horizontal-300x99_1768484509461.png";
+import waystarRoycoLogo from "@assets/image_1768514657224.png";
 
 interface NavbarProps {
   walletState: ReturnType<typeof useWallet>;
@@ -41,7 +42,20 @@ export function Navbar({ walletState }: NavbarProps) {
             />
           </Link>
 
-          <div>
+          <div className="flex items-center gap-2">
+            {isConnected && connectedUser && connectedUser.name && (
+              <div className="flex items-center gap-2 bg-muted/30 rounded-[16px] px-3 h-[48px] border">
+                <img 
+                  src={waystarRoycoLogo} 
+                  alt="Waystar Royco" 
+                  className="h-6 w-auto" 
+                />
+                <div className={`flex items-center justify-center w-6 h-6 rounded-full ${connectedUser.avatarBg || 'bg-muted'} ${connectedUser.avatarColor || 'text-foreground'}`}>
+                  <span className="text-xs font-semibold">{connectedUser.name?.charAt(0) || '?'}</span>
+                </div>
+                <span className="text-sm font-medium">{connectedUser.name}</span>
+              </div>
+            )}
             {isConnected && connectedUser && connectedUser.name ? (
               <Button
                 data-testid="button-disconnect-wallet"
