@@ -344,7 +344,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
       </div>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-semibold text-[18px] text-[#171717]">Trigger conditions</Label>
+          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[16px] font-medium">Trigger conditions</Label>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Match</span>
             <Select
@@ -589,7 +589,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
       </div>
       {formData.action === 'require_approval' && (
         <Card className="p-4 space-y-4">
-          <Label className="text-base font-semibold">Approval Settings</Label>
+          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Approval settings</Label>
           
           <div className="space-y-3">
             <div className="space-y-2">
@@ -624,7 +624,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         </Card>
       )}
       <Card className="p-4 space-y-4">
-        <Label className="text-base font-semibold">Policy Change Approval</Label>
+        <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Policy changes</Label>
         <div className="space-y-2">
           <Label className="text-sm">Approvals Required for Changes</Label>
           <div className="flex items-center gap-3">
