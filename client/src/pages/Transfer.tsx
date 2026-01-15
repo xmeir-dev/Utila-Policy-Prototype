@@ -393,9 +393,9 @@ export default function Transfer() {
                       onChange={handleAmountChange}
                       style={{ 
                         fontSize: '24px', 
-                        width: amount ? `${(amount.length || 4) * 14}px` : (isTokenPrimary ? '60px' : '30px'),
+                        width: amount ? `${Math.max((amount.length || 1) * 16, 40)}px` : (isTokenPrimary ? '60px' : '40px'),
                       }}
-                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[30px]"
+                      className="font-normal p-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto text-foreground leading-none text-left min-w-[40px]"
                       data-testid="input-amount"
                     />
                     {isTokenPrimary && (
