@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Wallet, Loader2, User } from "lucide-react";
+import { Wallet, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,11 @@ import utilaLogo from "@assets/Utila-Logo-Horizontal-300x99_1768484509461.png";
 import walletAvatar from "@assets/avatar_1768484752964.png";
 
 const WALLET_USERS = [
-  { name: "Meir", address: "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1" },
-  { name: "Ishai", address: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D" },
-  { name: "Omer", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
-  { name: "Lena", address: "0x6B175474E89094C44Da98b954EesecdB6F8e5389" },
-  { name: "Vitalik", address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" },
+  { name: "Meir", address: "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1", avatarBg: "bg-blue-500", avatarColor: "text-white" },
+  { name: "Ishai", address: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", avatarBg: "bg-emerald-500", avatarColor: "text-white" },
+  { name: "Omer", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", avatarBg: "bg-orange-500", avatarColor: "text-white" },
+  { name: "Lena", address: "0x6B175474E89094C44Da98b954EesecdB6F8e5389", avatarBg: "bg-purple-500", avatarColor: "text-white" },
+  { name: "Vitalik", address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", avatarBg: "bg-rose-500", avatarColor: "text-white" },
 ];
 
 interface NavbarProps {
@@ -102,8 +102,8 @@ export function Navbar({ walletState }: NavbarProps) {
                 onClick={() => handleUserSelect(user.address)}
                 className="justify-start h-14 px-4 rounded-[14px]"
               >
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted mr-3">
-                  <User className="w-4 h-4" />
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full mr-3 ${user.avatarBg} ${user.avatarColor}`}>
+                  <span className="text-sm font-semibold">{user.name.charAt(0)}</span>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-medium">{user.name}</span>
