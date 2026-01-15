@@ -421,8 +421,18 @@ export default function Transfer() {
                       className="text-[#ababab] cursor-pointer hover:text-foreground transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
-                        const maxAmount = (parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toString();
-                        setAmount(maxAmount);
+                        const rawBalance = selectedAsset.balance.replace(/,/g, '');
+                        const balanceNum = parseFloat(rawBalance);
+                        const maxAmount = (balanceNum * selectedAsset.price).toString();
+                        
+                        if (!isTokenPrimary) {
+                          // Format with commas for USD
+                          const formatted = new Intl.NumberFormat('en-US').format(Math.floor(parseFloat(maxAmount)));
+                          setAmount(formatted);
+                        } else {
+                          // For token, use balance as is (already has commas from assets array or we can re-format)
+                          setAmount(selectedAsset.balance);
+                        }
                       }}
                       data-testid="button-max"
                     >
