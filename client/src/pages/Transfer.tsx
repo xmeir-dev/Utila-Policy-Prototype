@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -279,7 +279,7 @@ export default function Transfer() {
                     <span className="text-muted-foreground text-[14px] font-normal">Choose origin wallets</span>
                   </div>
                 </div>
-                <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </Button>
 
               {showWalletDropdown && (
@@ -345,7 +345,7 @@ export default function Transfer() {
                     <span className="text-muted-foreground text-[14px] font-normal">Choose destination wallets</span>
                   </div>
                 </div>
-                <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </Button>
             </div>
           </div>
