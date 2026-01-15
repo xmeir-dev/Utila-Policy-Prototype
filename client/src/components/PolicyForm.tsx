@@ -362,7 +362,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           </div>
         )}
       </div>
-
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <button
@@ -646,7 +645,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           </div>
         )}
       </div>
-
       <div className="space-y-4">
         <button
           type="button"
@@ -705,7 +703,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           </div>
         )}
       </div>
-
       <div className="space-y-4">
         <button
           type="button"
@@ -725,7 +722,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
             <Card className="p-4 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm">Approvals Required for Changes</Label>
+                <Label className="text-sm">Approvals required</Label>
                 <div className="flex items-center gap-3">
                   <Input
                     type="number"
