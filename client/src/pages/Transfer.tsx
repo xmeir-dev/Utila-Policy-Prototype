@@ -325,15 +325,28 @@ export default function Transfer() {
 
           <div className="space-y-3">
             <div className="relative">
-              <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Enter wallet address or ENS name"
-                value={recipient}
-                onChange={(e) => setRecipient(e.target.value)}
-                className="pl-12 bg-card border-border rounded-[24px]"
-                data-testid="input-recipient"
-              />
+              <Button
+                variant="outline"
+                className="w-full justify-between bg-card/50 border-border rounded-[16px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
+                onClick={() => {}} 
+                data-testid="button-destination-selector"
+              >
+                <div className="flex items-center gap-4 overflow-hidden text-left">
+                  <Wallet className="w-6 h-6 text-muted-foreground shrink-0" />
+                  <div className="flex flex-col items-start gap-1 w-full">
+                    <div className="flex items-center gap-2 overflow-hidden w-full">
+                      <span className="shrink-0 font-medium text-[18px] text-[#000000]">To</span>
+                      <div className="flex gap-1.5 overflow-hidden">
+                        <span className="text-muted-foreground text-sm font-normal truncate">
+                          {recipient || "Enter wallet address or ENS name"}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-muted-foreground text-[14px] font-normal">Choose destination wallets</span>
+                  </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+              </Button>
             </div>
           </div>
 
