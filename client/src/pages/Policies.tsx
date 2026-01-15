@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, 
   ToggleLeft, ToggleRight, Trash2, Scale, GripVertical, Edit, 
-  Clock, CheckCircle, AlertTriangle, Beaker 
+  Clock, CheckCircle, AlertTriangle, TestTubeDiagonal 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -538,7 +538,7 @@ export default function Policies() {
               className="gap-2 rounded-lg"
               data-testid="button-simulate-transaction"
             >
-              <Beaker className="w-4 h-4" />
+              <TestTubeDiagonal className="w-4 h-4" />
               Simulate Transaction
             </Button>
           </div>
