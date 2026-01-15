@@ -436,7 +436,7 @@ export default function Transfer() {
             <div className="relative">
               <Button
                 variant="outline"
-                className="w-full justify-between bg-card/50 border-border rounded-[16px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
+                className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
                 onClick={() => setShowSourceModal(true)}
                 data-testid="button-wallet-selector"
               >
@@ -480,7 +480,7 @@ export default function Transfer() {
             <div className="relative">
               <Button
                 variant="outline"
-                className="w-full justify-between bg-card/50 border-border rounded-[16px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
+                className="w-full justify-between bg-card/50 border-border rounded-[24px] h-auto min-h-[72px] py-4 px-4 hover-elevate transition-all"
                 onClick={() => setShowDestinationModal(true)} 
                 data-testid="button-destination-selector"
               >
