@@ -144,7 +144,7 @@ function MultiUserSelector({
 }) {
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-lg bg-background min-h-[42px]">
+      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-[14px] bg-background min-h-[42px]">
         {selected.map((user) => (
           <Badge key={user} variant="secondary" className="h-7 gap-1 pl-2 pr-1">
             <span className="text-xs font-medium">{user}</span>
@@ -203,7 +203,7 @@ function MultiWalletSelector({
 }) {
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-lg bg-background min-h-[42px]">
+      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-[14px] bg-background min-h-[42px]">
         {selected.map((address) => {
           const wallet = AVAILABLE_WALLETS.find(w => w.address === address);
           return (
@@ -327,7 +327,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 placeholder="e.g., Large Bitcoin Transfer Approval"
                 value={formData.name || ""}
                 onChange={(e) => updateField('name', e.target.value)}
-                className="rounded-lg"
+                className="rounded-[14px]"
                 data-testid="input-policy-name"
               />
             </div>
@@ -339,7 +339,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 placeholder="Describe what this policy does..."
                 value={formData.description || ""}
                 onChange={(e) => updateField('description', e.target.value)}
-                className="rounded-lg min-h-[80px] resize-none"
+                className="rounded-[14px] min-h-[80px] resize-none"
                 data-testid="input-policy-description"
               />
             </div>
@@ -350,7 +350,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 value={formData.action}
                 onValueChange={(value) => updateField('action', value)}
               >
-                <SelectTrigger className="rounded-lg" data-testid="select-policy-action">
+                <SelectTrigger className="rounded-[14px]" data-testid="select-policy-action">
                   <SelectValue placeholder="Select action" />
                 </SelectTrigger>
                 <SelectContent>
@@ -431,7 +431,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   value={formData.initiatorType || "any"}
                   onValueChange={(value) => updateField('initiatorType', value)}
                 >
-                  <SelectTrigger className="rounded-lg" data-testid="select-initiator-type">
+                  <SelectTrigger className="rounded-[14px]" data-testid="select-initiator-type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -462,7 +462,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   value={formData.sourceWalletType || "any"}
                   onValueChange={(value) => updateField('sourceWalletType', value)}
                 >
-                  <SelectTrigger className="rounded-lg" data-testid="select-source-type">
+                  <SelectTrigger className="rounded-[14px]" data-testid="select-source-type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -492,7 +492,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   value={formData.destinationType || "any"}
                   onValueChange={(value) => updateField('destinationType', value)}
                 >
-                  <SelectTrigger className="rounded-lg" data-testid="select-destination-type">
+                  <SelectTrigger className="rounded-[14px]" data-testid="select-destination-type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -525,7 +525,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   value={formData.amountCondition || "any"}
                   onValueChange={(value) => updateField('amountCondition', value)}
                 >
-                  <SelectTrigger className="rounded-lg" data-testid="select-amount-condition">
+                  <SelectTrigger className="rounded-[14px]" data-testid="select-amount-condition">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -543,7 +543,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       value={formData.amountMin || ""}
                       onChange={(e) => updateField('amountMin', e.target.value)}
                       placeholder="0"
-                      className="w-32 rounded-lg"
+                      className="w-32 rounded-[14px]"
                       data-testid="input-amount-min"
                     />
                   </div>
@@ -556,7 +556,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       value={formData.amountMin || ""}
                       onChange={(e) => updateField('amountMin', e.target.value)}
                       placeholder="0"
-                      className="w-32 rounded-lg"
+                      className="w-32 rounded-[14px]"
                       data-testid="input-amount-min"
                     />
                   </div>
@@ -578,7 +578,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       value={formData.amountMax || ""}
                       onChange={(e) => updateField('amountMax', e.target.value)}
                       placeholder="10000"
-                      className="w-28 rounded-lg"
+                      className="w-28 rounded-[14px]"
                       data-testid="input-amount-max"
                     />
                   </div>
@@ -598,7 +598,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   value={formData.assetType || "any"}
                   onValueChange={(value) => updateField('assetType', value)}
                 >
-                  <SelectTrigger className="rounded-lg" data-testid="select-asset-type">
+                  <SelectTrigger className="rounded-[14px]" data-testid="select-asset-type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -615,7 +615,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                           type="button"
                           variant={(formData.assetValues || []).includes(asset) ? "default" : "outline"}
                           size="sm"
-                          className="h-7 text-xs rounded-lg"
+                          className="h-7 text-xs rounded-[14px]"
                           onClick={() => {
                             const current = formData.assetValues || [];
                             if (current.includes(asset)) {
@@ -685,7 +685,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                         max={(formData.approvers || []).length || 1}
                         value={formData.quorumRequired || 1}
                         onChange={(e) => updateField('quorumRequired', parseInt(e.target.value) || 1)}
-                        className="w-20 rounded-lg"
+                        className="w-20 rounded-[14px]"
                         data-testid="input-quorum-required"
                       />
                       <span className="text-sm text-[#8a8a8a]">
@@ -738,7 +738,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                     max={(formData.changeApproversList || []).length || 1}
                     value={formData.changeApprovalsRequired || 1}
                     onChange={(e) => updateField('changeApprovalsRequired', parseInt(e.target.value) || 1)}
-                    className="w-20 rounded-lg"
+                    className="w-20 rounded-[14px]"
                     data-testid="input-change-approvals"
                   />
                   <span className="text-sm text-[#8a8a8a]">
@@ -755,7 +755,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="flex-1 rounded-lg"
+          className="flex-1 rounded-[14px]"
           data-testid="button-cancel"
         >
           Cancel
@@ -763,7 +763,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         <Button
           type="submit"
           disabled={!isValid || isSubmitting}
-          className="flex-1 rounded-lg"
+          className="flex-1 rounded-[14px]"
           data-testid="button-save-policy"
         >
           {isSubmitting ? 'Saving...' : submitLabel}
