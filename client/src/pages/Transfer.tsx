@@ -363,7 +363,7 @@ export default function Transfer() {
             </div>
             <div className="flex items-baseline gap-1.5 leading-none">
               <span className="text-[14px] font-normal text-[#ababab]">est. fee</span>
-              <span className="text-sm font-semibold text-foreground">$0.31</span>
+              <span className="text-sm text-foreground font-normal">$0.31</span>
             </div>
           </div>
 
