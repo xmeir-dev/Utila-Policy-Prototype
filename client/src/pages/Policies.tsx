@@ -492,9 +492,6 @@ export default function Policies() {
                       <span className="font-medium tracking-wide text-[14px] text-[#a8a8a8]">
                         Priority Order
                       </span>
-                      <Badge variant="outline" className="h-5 px-1.5 text-[10px]">
-                        First Match Wins
-                      </Badge>
                     </div>
                     <span className="text-xs text-muted-foreground">
                       Drag to reorder
