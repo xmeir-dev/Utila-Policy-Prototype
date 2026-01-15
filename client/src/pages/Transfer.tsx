@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send, Plus, X, User } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send, Plus, X, User, Lock, CornerUpRight } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -693,7 +693,8 @@ export default function Transfer() {
                         <div className="flex flex-col">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-semibold">{entry.label}</span>
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${entry.isInternal ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 ${entry.isInternal ? 'bg-emerald-500/10 text-emerald-600' : 'bg-orange-500/10 text-orange-600'}`}>
+                              {entry.isInternal ? <Lock className="w-2.5 h-2.5" /> : <CornerUpRight className="w-2.5 h-2.5" />}
                               {entry.isInternal ? 'Internal' : 'External'}
                             </span>
                           </div>
