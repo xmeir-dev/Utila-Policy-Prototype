@@ -536,7 +536,7 @@ export default function Transfer() {
                 <TooltipContent>
                   <p>
                     {selectedWallets.length === 0 
-                      ? "Select source wallets first"
+                      ? "Choose origin wallets"
                       : !hasValidRecipients 
                         ? "Select recipients and set amounts"
                         : `From ($${fromTotal.toLocaleString()}) and To ($${toTotal.toLocaleString()}) totals must match`}
