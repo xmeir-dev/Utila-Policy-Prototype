@@ -3,6 +3,8 @@ import { Wallet, Loader2 } from "lucide-react";
 import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
 
+import utilaLogo from "@assets/Utila-Logo-Horizontal-300x99_1768484509461.png";
+
 interface NavbarProps {
   walletState: ReturnType<typeof useWallet>;
 }
@@ -18,7 +20,11 @@ export function Navbar({ walletState }: NavbarProps) {
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-background">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 cursor-pointer">
-          <span className="text-2xl font-bold font-display tracking-tight text-foreground">Utila</span>
+          <img 
+            src={utilaLogo} 
+            alt="Utila" 
+            className="h-8 w-auto invert dark:invert-0" 
+          />
         </Link>
 
         <div>
