@@ -336,7 +336,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               <Label htmlFor="policy-description">Description</Label>
               <Textarea
                 id="policy-description"
-                placeholder="Describe what this policy does..."
+                placeholder="e.g., Transfers exceeding $1M in USDC to an external address must be approved by two members of the Finance team."
                 value={formData.description || ""}
                 onChange={(e) => updateField('description', e.target.value)}
                 className="rounded-[14px] min-h-[80px] resize-none"
