@@ -413,9 +413,22 @@ export default function Transfer() {
 
                 {/* Amount Inputs (Right) */}
                 <div 
-                  className="flex-1 flex flex-col justify-center px-6 gap-1 items-start cursor-text"
+                  className="flex-1 flex flex-col justify-center px-6 gap-1 items-start cursor-text relative"
                   onClick={() => amountInputRef.current?.focus()}
                 >
+                  <div className="absolute top-3 right-6 text-[12px]">
+                    <div 
+                      className="text-[#ababab] cursor-pointer hover:text-foreground transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const maxAmount = (parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toString();
+                        setAmount(maxAmount);
+                      }}
+                      data-testid="button-max"
+                    >
+                      Balance: {selectedAsset.balance} {selectedAsset.symbol}
+                    </div>
+                  </div>
                   <div className="flex items-center justify-start w-full">
                     <div className="flex items-center">
                       {!isTokenPrimary && (
@@ -458,9 +471,6 @@ export default function Transfer() {
                         <RefreshCw className="w-3 h-3" />
                       </Button>
                     </div>
-                    <span className="text-[#ababab]">
-                      Balance: {selectedAsset.balance} {selectedAsset.symbol}
-                    </span>
                   </div>
                 </div>
               </div>
