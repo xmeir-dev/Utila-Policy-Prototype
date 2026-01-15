@@ -673,7 +673,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       placeholder="Enter approver address or ID..."
                       testId="input-approvers"
                     />
-                    <p className="text-xs text-muted-foreground">Add wallet addresses or user IDs who can approve transactions matching this policy.</p>
                   </div>
 
                   <div className="space-y-2">
