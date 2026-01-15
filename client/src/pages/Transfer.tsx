@@ -374,25 +374,6 @@ export default function Transfer() {
           </div>
 
           <div className="space-y-1">
-            <div className="flex justify-between items-center text-sm">
-              <div className="flex items-center gap-1.5">
-                <span className="font-medium text-[#ababab]">Balance:</span>
-                <span className="text-foreground font-medium">{selectedAsset.balance} {selectedAsset.symbol}</span>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-7 px-2 hover:bg-primary/10 font-medium text-[14px] text-[#8f8f8f]"
-                onClick={() => {
-                  const maxAmount = (parseFloat(selectedAsset.balance.replace(/,/g, '')) * selectedAsset.price).toString();
-                  setAmount(maxAmount);
-                }}
-                data-testid="button-max"
-              >
-                Max
-              </Button>
-            </div>
-
             <div className="relative flex flex-col bg-card border border-border rounded-[24px] z-10">
               {/* Amount Row */}
               <div className="flex items-stretch h-20">
