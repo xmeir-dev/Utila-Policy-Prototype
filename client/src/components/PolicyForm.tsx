@@ -344,7 +344,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
       </div>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-[14px] text-[#8a8a8a]">Trigger conditions</Label>
+          <Label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-semibold text-[18px] text-[#171717]">Trigger conditions</Label>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Match</span>
             <Select
