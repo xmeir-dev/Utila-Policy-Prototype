@@ -182,6 +182,71 @@ function MultiUserSelector({
   );
 }
 
+const AVAILABLE_WALLETS = [
+  { name: 'Main Treasury', address: '0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1' },
+  { name: 'Operating Account', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
+  { name: 'Payroll Wallet', address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
+  { name: 'Escrow Account', address: '0x6B175474E89094C44Da98b954EesecdB6F8e5389' },
+  { name: 'Founder Reserve', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' }
+];
+
+function MultiWalletSelector({ 
+  selected, 
+  onChange, 
+  testId
+}: { 
+  selected: string[]; 
+  onChange: (values: string[]) => void; 
+  testId: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-lg bg-background min-h-[42px]">
+        {selected.map((address) => {
+          const wallet = AVAILABLE_WALLETS.find(w => w.address === address);
+          return (
+            <Badge key={address} variant="secondary" className="h-7 gap-1 pl-2 pr-1">
+              <span className="text-xs font-medium">{wallet ? wallet.name : `${address.slice(0, 6)}...${address.slice(-4)}`}</span>
+              <button
+                type="button"
+                onClick={() => onChange(selected.filter(a => a !== address))}
+                className="hover:bg-background/50 rounded p-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
+          );
+        })}
+        <Select
+          value=""
+          onValueChange={(address) => {
+            if (address && !selected.includes(address)) {
+              onChange([...selected, address]);
+            }
+          }}
+        >
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-md transition-colors">
+            <div className="flex items-center gap-1">
+              <Plus className="w-3 h-3" />
+              <span>Add Wallet</span>
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            {AVAILABLE_WALLETS.filter(w => !selected.includes(w.address)).map((wallet) => (
+              <SelectItem key={wallet.address} value={wallet.address}>
+                <div className="flex flex-col">
+                  <span className="font-medium">{wallet.name}</span>
+                  <span className="text-[10px] text-muted-foreground font-mono">{wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
 export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, submitLabel = "Save Policy" }: PolicyFormProps) {
   const [formData, setFormData] = useState<Partial<InsertPolicy>>({
     name: "",
@@ -350,11 +415,10 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               </SelectContent>
             </Select>
             {formData.sourceWalletType === 'specific' && (
-              <TagInput
-                values={formData.sourceWallets || []}
+              <MultiWalletSelector
+                selected={formData.sourceWallets || []}
                 onChange={(values) => updateField('sourceWallets', values)}
-                placeholder="Enter wallet address..."
-                testId="input-source-wallets"
+                testId="select-source-wallets"
               />
             )}
           </div>
