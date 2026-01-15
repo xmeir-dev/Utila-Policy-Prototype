@@ -386,7 +386,7 @@ export default function Transfer() {
                   <h3 className="text-sm font-bold dark:text-amber-200 text-[#d67424]">
                     Secure your account
                   </h3>
-                  <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                  <p className="text-xs dark:text-amber-400 font-medium text-[#8a8a8a]">
                     Create a policy to enable transactions.
                   </p>
                 </div>
