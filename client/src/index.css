@@ -5,41 +5,122 @@
 @tailwind utilities;
 
 :root {
-  /* Dark Crypto Theme Palette - HSL */
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
 
-  --card: 222 47% 14%;
-  --card-foreground: 210 40% 98%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --card-border: 0 0% 90%;
 
-  --popover: 222 47% 11%;
-  --popover-foreground: 210 40% 98%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --popover-border: 0 0% 90%;
 
-  /* Vibrant Purple/Blue for Primary */
-  --primary: 262 83% 58%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
 
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
 
-  --accent: 180 100% 50%; /* Cyan accent */
-  --accent-foreground: 222 47% 11%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
 
-  --destructive: 0 62% 30%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 0% 30%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 217 33% 20%;
-  --input: 217 33% 20%;
-  --ring: 262 83% 58%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 0 0% 9%;
 
-  --radius: 0.75rem;
+  --sidebar: 0 0% 98%;
+  --sidebar-foreground: 0 0% 9%;
+  --sidebar-border: 0 0% 90%;
+  --sidebar-primary: 0 0% 9%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 96%;
+  --sidebar-accent-foreground: 0 0% 9%;
+  --sidebar-ring: 0 0% 9%;
 
-  /* Font variables used in Tailwind config */
+  --chart-1: 0 0% 20%;
+  --chart-2: 0 0% 35%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 65%;
+  --chart-5: 0 0% 80%;
+
+  --radius: 0.5rem;
+
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
+
+  --button-outline: rgba(0,0,0, .10);
+  --badge-outline: rgba(0,0,0, .05);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(0,0,0, .03);
+  --elevate-2: rgba(0,0,0, .08);
+
+  --primary-border: hsl(var(--primary));
+  --secondary-border: hsl(var(--secondary));
+  --muted-border: hsl(var(--muted));
+  --accent-border: hsl(var(--accent));
+  --destructive-border: hsl(var(--destructive));
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+}
+
+.dark {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 98%;
+
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 98%;
+  --card-border: 0 0% 15%;
+
+  --popover: 0 0% 4%;
+  --popover-foreground: 0 0% 98%;
+  --popover-border: 0 0% 15%;
+
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 98%;
+
+  --destructive: 0 0% 70%;
+  --destructive-foreground: 0 0% 9%;
+
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 0 0% 98%;
+
+  --sidebar: 0 0% 7%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-border: 0 0% 15%;
+  --sidebar-primary: 0 0% 98%;
+  --sidebar-primary-foreground: 0 0% 9%;
+  --sidebar-accent: 0 0% 15%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-ring: 0 0% 98%;
+
+  --chart-1: 0 0% 80%;
+  --chart-2: 0 0% 65%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 35%;
+  --chart-5: 0 0% 20%;
+
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .09);
 }
 
 @layer base {
@@ -48,30 +129,10 @@
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
-    /* Subtle mesh gradient background */
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(262, 83%, 58%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(180, 100%, 50%, 0.1) 0px, transparent 50%);
-    background-attachment: fixed;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     @apply tracking-tight;
-  }
-}
-
-/* Custom Utilities */
-@layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-accent;
-  }
-  
-  .glass-card {
-    @apply bg-card/60 backdrop-blur-md border border-white/10 shadow-xl;
-  }
-
-  .glow-on-hover {
-    @apply transition-all duration-300 hover:shadow-[0_0_20px_rgba(124,58,237,0.5)];
   }
 }
