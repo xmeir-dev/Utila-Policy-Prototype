@@ -429,8 +429,14 @@ export default function Transfer() {
       setShowSimulationModal(true);
 
       if (result.action !== "deny") {
-        // In a real app, we'd create the transaction here
-        // If result.action === "require_approval", it would be created with status 'pending'
+        // Create the transaction in the database
+        await apiRequest("POST", "/api/transactions", {
+          userId: walletState.connectedUser?.id,
+          type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
+          amount: `${recipients[0]?.amount} ${selectedAsset.symbol}`,
+          status: result.action === "require_approval" ? "pending" : "completed",
+          initiatorName: walletState.connectedUser?.name
+        });
         queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
       }
     } catch (error) {

@@ -23,6 +23,7 @@ export const transactions = pgTable("transactions", {
   amount: text("amount").notNull(),
   status: text("status").notNull(), // 'pending', 'completed', 'failed'
   txHash: text("tx_hash"),
+  initiatorName: text("initiator_name"),
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true });

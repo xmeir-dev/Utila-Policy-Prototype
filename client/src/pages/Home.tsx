@@ -210,7 +210,7 @@ export default function Home() {
                               <span>Initiator:</span>
                               <div className="flex items-center gap-1 text-foreground font-medium">
                                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                                {walletState.connectedUser?.name || "Unknown"}
+                                {tx.initiatorName || walletState.connectedUser?.name || "Unknown"}
                               </div>
                             </div>
                             <span>Created at: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date().toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>
