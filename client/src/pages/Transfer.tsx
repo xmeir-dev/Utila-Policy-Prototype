@@ -338,6 +338,33 @@ export default function Transfer() {
 
   const AssetIcon = selectedAsset.icon;
 
+  const [showSimulationModal, setShowSimulationModal] = useState(false);
+  const [simulationResult, setSimulationResult] = useState<{ status: "approved" | "rejected"; message: string } | null>(null);
+
+  const handleSimulate = () => {
+    // Basic simulation logic based on selected wallets and recipients
+    const totalRequired = getTotalBudget();
+    const available = getAvailableBalance();
+    
+    if (totalRequired > available) {
+      setSimulationResult({
+        status: "rejected",
+        message: `Insufficient funds across selected wallets. Required: $${totalRequired.toLocaleString()}, Available: $${available.toLocaleString()}`
+      });
+    } else if (!amountsMatch) {
+       setSimulationResult({
+        status: "rejected",
+        message: `Source and destination totals do not match. Difference: $${Math.abs(fromTotal - toTotal).toLocaleString()}`
+      });
+    } else {
+      setSimulationResult({
+        status: "approved",
+        message: "Transaction parameters satisfy all organization policies and wallet constraints."
+      });
+    }
+    setShowSimulationModal(true);
+  };
+
   const handleContinue = () => {
     const totalAmount = getTotalRecipientAmount();
     const tokenAmount = totalAmount / selectedAsset.price;
@@ -652,7 +679,7 @@ export default function Transfer() {
               size="sm"
               className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
               disabled={!canSend || !hasPolicies}
-              onClick={() => console.log("Simulate Transfer")}
+              onClick={handleSimulate}
               data-testid="button-simulate"
             >
               Simulate Transfer
@@ -660,6 +687,30 @@ export default function Transfer() {
           </div>
         </motion.div>
       </main>
+
+      <Dialog open={showSimulationModal} onOpenChange={setShowSimulationModal}>
+        <DialogContent className="sm:max-w-[440px] rounded-[16px] p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Transfer Simulation</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className={`p-4 rounded-[12px] border ${simulationResult?.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-destructive/10 border-destructive/30'}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`w-2 h-2 rounded-full ${simulationResult?.status === 'approved' ? 'bg-emerald-500' : 'bg-destructive'}`} />
+                <span className={`font-bold uppercase tracking-tight text-xs ${simulationResult?.status === 'approved' ? 'text-emerald-600' : 'text-destructive'}`}>
+                  Status: Transfer {simulationResult?.status}
+                </span>
+              </div>
+              <p className="text-sm text-foreground leading-relaxed">
+                {simulationResult?.message}
+              </p>
+            </div>
+            <Button className="w-full rounded-[12px]" onClick={() => setShowSimulationModal(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
         <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
           <DialogContent className="sm:max-w-[440px] rounded-[16px] p-0 gap-0 overflow-hidden">
             <DialogHeader className="p-6 pb-4 border-b border-border">
