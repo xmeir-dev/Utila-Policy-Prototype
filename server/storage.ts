@@ -17,6 +17,7 @@ export interface IStorage {
   createPolicy(policy: InsertPolicy): Promise<Policy>;
   updatePolicy(id: number, policy: Partial<InsertPolicy>): Promise<Policy | undefined>;
   submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string): Promise<Policy | undefined>;
+  submitPolicyDeletion(id: number, submitter: string): Promise<Policy | undefined>;
   deletePolicy(id: number): Promise<boolean>;
   togglePolicy(id: number): Promise<Policy | undefined>;
   reorderPolicies(orderedIds: number[]): Promise<Policy[]>;
@@ -141,6 +142,35 @@ export class DatabaseStorage implements IStorage {
       .set({
         status: 'pending_approval',
         pendingChanges: JSON.stringify(changes),
+        changeApprovers: [],
+        changeApproversList: approversList,
+        changeApprovalsRequired: quorumRequired,
+        changeInitiator: submitter,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(policies.id, id))
+      .returning();
+    return updated;
+  }
+
+  async submitPolicyDeletion(id: number, submitter: string): Promise<Policy | undefined> {
+    const policy = await this.getPolicy(id);
+    if (!policy) return undefined;
+
+    // Get default approvers and quorum from existing require_approval policies
+    const allPolicies = await this.getPolicies();
+    const approvalPolicy = allPolicies.find(p => 
+      p.isActive && p.status === 'active' && p.action === 'require_approval'
+    );
+    
+    const approversList = approvalPolicy?.approvers || [];
+    const quorumRequired = approvalPolicy?.quorumRequired || 1;
+
+    const [updated] = await db
+      .update(policies)
+      .set({
+        status: 'pending_approval',
+        pendingChanges: JSON.stringify({ __delete: true }),
         changeApprovers: [],
         changeApproversList: approversList,
         changeApprovalsRequired: quorumRequired,
@@ -322,6 +352,13 @@ export class DatabaseStorage implements IStorage {
     if (newApprovals.length >= requiredApprovals) {
       // Apply pending changes and activate
       const pendingChanges = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
+      
+      // Check if this is a deletion request
+      if (pendingChanges.__delete === true) {
+        await db.delete(policies).where(eq(policies.id, id));
+        return { ...policy, status: 'deleted' } as Policy;
+      }
+      
       const [updated] = await db
         .update(policies)
         .set({

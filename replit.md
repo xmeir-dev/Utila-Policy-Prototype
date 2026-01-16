@@ -77,14 +77,23 @@ Run `npm run db:push` to sync schema to database.
 ## Key Features
 
 ### Policy Change Approval System
-When a policy is edited, the changes don't take effect immediately. Instead:
+When a policy is edited or deleted, the changes don't take effect immediately. Instead:
 1. Changes are saved with status `pending_approval` and stored in `pendingChanges` field as JSON
-2. The policy appears in the "Requires approval" section on the Home page
-3. Authorized users can approve the change via the Approve button
-4. Once the required number of approvals is reached (default 1), changes are applied automatically
-5. The policy status returns to `active` and pending fields are cleared
+2. For edits: the proposed changes are stored; for deletes: `{ "__delete": true }` is stored
+3. The policy shows a "Changes pending" or "Deletion pending" badge in the policies list
+4. Clicking the badge opens a review modal showing current vs. proposed values (or deletion notice)
+5. Authorized users can approve the change via the Approve button
+6. Once the required number of approvals is reached (default 1), changes are applied automatically
+7. For deletes: policy is permanently removed; for edits: changes are applied and status returns to `active`
 
 **API Endpoints:**
 - `GET /api/policies/pending?userName=<name>` - Fetch policies with pending changes
 - `PUT /api/policies/:id` - Submit policy changes for approval
-- `POST /api/policies/:id/approve-change` - Approve a pending policy change
+- `POST /api/policies/:id/request-deletion` - Submit policy deletion for approval
+- `POST /api/policies/:id/approve-change` - Approve a pending policy change or deletion
+
+**UI Elements:**
+- Delete button is at the bottom of the Edit Policy dialog (goes through same review process as edits)
+- Policies with pending edits show amber "Changes pending" badge
+- Policies with pending deletion show red "Deletion pending" badge
+- Both badges expand on hover to reveal a chevron and are clickable to view details

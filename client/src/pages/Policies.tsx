@@ -132,12 +132,10 @@ interface SortablePolicyItemProps {
   index: number;
   totalPolicies: number;
   onToggle: () => void;
-  onDelete: () => void;
   onEdit: () => void;
   onApprove: () => void;
   onShowPending?: (policy: Policy) => void;
   isToggling: boolean;
-  isDeleting: boolean;
 }
 
 function SortablePolicyItem({ 
@@ -145,12 +143,10 @@ function SortablePolicyItem({
   index, 
   totalPolicies,
   onToggle, 
-  onDelete, 
   onEdit,
   onApprove,
   onShowPending,
-  isToggling, 
-  isDeleting 
+  isToggling
 }: SortablePolicyItemProps) {
   const {
     attributes,
@@ -170,6 +166,8 @@ function SortablePolicyItem({
   const ActionIcon = getActionIcon(policy.action);
   const conditions = getConditionSummary(policy);
   const isPendingApproval = policy.status === 'pending_approval';
+  const pendingChanges = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
+  const isPendingDeletion = isPendingApproval && pendingChanges.__delete === true;
 
   return (
     <div
@@ -224,19 +222,31 @@ function SortablePolicyItem({
             <TooltipTrigger asChild>
               <button 
                 onClick={() => onShowPending?.(policy)}
-                className="group inline-flex items-center h-5 px-2 text-[14px] font-normal rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-200 cursor-default overflow-hidden whitespace-nowrap"
+                className={cn(
+                  "group inline-flex items-center h-5 px-2 text-[14px] font-normal rounded-md transition-all duration-200 cursor-default overflow-hidden whitespace-nowrap",
+                  isPendingDeletion 
+                    ? "bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20" 
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                )}
                 data-testid={`pending-label-policy-${policy.id}`}
               >
                 <div className="flex items-center gap-1">
-                  <ShieldEllipsis className="w-3.5 h-3.5 shrink-0" />
-                  <span>Changes pending</span>
+                  {isPendingDeletion ? (
+                    <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  ) : (
+                    <ShieldEllipsis className="w-3.5 h-3.5 shrink-0" />
+                  )}
+                  <span>{isPendingDeletion ? 'Deletion pending' : 'Changes pending'}</span>
                 </div>
                 <ChevronRight className="w-0 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-200 shrink-0 ml-0 group-hover:ml-1" />
               </button>
             </TooltipTrigger>
             <TooltipContent className="max-w-[280px]">
               <p>
-                This change was initiated by {policy.changeInitiator || 'a team member'}, and requires {Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval{((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be approved. For now the old rules apply.
+                {isPendingDeletion 
+                  ? `This deletion was requested by ${policy.changeInitiator || 'a team member'}, and requires ${Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval${((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be completed.`
+                  : `This change was initiated by ${policy.changeInitiator || 'a team member'}, and requires ${Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval${((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be approved. For now the old rules apply.`
+                }
               </p>
             </TooltipContent>
           </Tooltip>
@@ -328,6 +338,25 @@ export default function Policies() {
     },
     onError: () => {
       toast({ title: "Failed to delete policy", variant: "destructive" });
+    },
+  });
+
+  const requestDeletionMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('POST', `/api/policies/${id}/request-deletion`, {
+        submitter: walletState.walletAddress || 'anonymous'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+      setEditingPolicy(null);
+      toast({ 
+        title: "Deletion request submitted", 
+        description: "This deletion requires approval before taking effect." 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to submit deletion request", variant: "destructive" });
     },
   });
 
@@ -473,12 +502,10 @@ export default function Policies() {
                           index={index}
                           totalPolicies={policies.length}
                           onToggle={() => toggleMutation.mutate(policy.id)}
-                          onDelete={() => deleteMutation.mutate(policy.id)}
                           onEdit={() => setEditingPolicy(policy)}
                           onApprove={() => approveMutation.mutate(policy.id)}
                           onShowPending={setViewingPendingPolicy}
                           isToggling={toggleMutation.isPending}
-                          isDeleting={deleteMutation.isPending}
                         />
                       ))}
                     </SortableContext>
@@ -531,8 +558,11 @@ export default function Policies() {
                 initialData={editingPolicy}
                 onSubmit={(data) => updateMutation.mutate({ id: editingPolicy.id, data })}
                 onCancel={() => setEditingPolicy(null)}
+                onDelete={() => requestDeletionMutation.mutate(editingPolicy.id)}
                 isSubmitting={updateMutation.isPending}
+                isDeleting={requestDeletionMutation.isPending}
                 submitLabel="Save Changes"
+                isEditMode={true}
               />
             )}
           </div>
@@ -560,57 +590,83 @@ export default function Policies() {
           <div className="p-6">
             {viewingPendingPolicy && (
               <div className="space-y-6">
-                <div className="p-4 rounded-xl bg-muted/30 border border-border">
-                  <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                    <ShieldEllipsis className="w-4 h-4 text-amber-500" />
-                    Proposed Comparison
-                  </h4>
-                  <div className="space-y-4">
-                    {(() => {
-                      const pending = JSON.parse(viewingPendingPolicy.pendingChanges || '{}');
-                        const fields = [
-                          { key: 'name', label: 'Policy name' },
-                          { key: 'description', label: 'Description' },
-                          { key: 'action', label: 'Action' },
-                          { key: 'conditionLogic', label: 'Logic' },
-                          { key: 'initiatorType', label: 'Initiator type' },
-                          { key: 'amountCondition', label: 'Amount condition' },
-                          { key: 'approvers', label: 'Approvers' },
-                          { key: 'changeApproversList', label: 'Policy change approvers' },
-                        ];
-
-                      return fields.map(({ key, label }) => {
-                        const currentVal = (viewingPendingPolicy as any)[key];
-                        const pendingVal = pending[key];
-                        const isChanged = pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
-                        
-                        const displayVal = (val: any) => {
-                          if (val === undefined || val === null) return 'Not set';
-                          if (Array.isArray(val)) return val.length > 0 ? val.join(', ') : 'None';
-                          return String(val);
-                        };
-
-                        return (
-                          <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
-                            <div className="space-y-1">
-                              <span className="text-[14px] font-medium text-[#8a8a8a]">{label}</span>
-                              <div className="text-sm text-[#171717]">{displayVal(currentVal)}</div>
-                            </div>
-                            <div className="space-y-1">
-                              <span className="text-[14px] font-medium text-[#8a8a8a]">Proposed change</span>
-                              <div className={cn(
-                                "text-sm font-medium",
-                                isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
-                              )}>
-                                {isChanged ? displayVal(pendingVal) : "-"}
-                              </div>
-                            </div>
+                {(() => {
+                  const pending = JSON.parse(viewingPendingPolicy.pendingChanges || '{}');
+                  const isPendingDeletion = pending.__delete === true;
+                  
+                  if (isPendingDeletion) {
+                    return (
+                      <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+                        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-red-600 dark:text-red-400">
+                          <Trash2 className="w-4 h-4" />
+                          Deletion Pending
+                        </h4>
+                        <p className="text-sm text-foreground/70">
+                          This policy is scheduled for deletion. Once approved, the policy will be permanently removed.
+                        </p>
+                        <div className="mt-4 pt-4 border-t border-red-500/20">
+                          <div className="space-y-1">
+                            <span className="text-[14px] font-medium text-[#8a8a8a]">Policy name</span>
+                            <div className="text-sm text-[#171717] font-medium">{viewingPendingPolicy.name}</div>
                           </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                      <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                        <ShieldEllipsis className="w-4 h-4 text-amber-500" />
+                        Proposed Comparison
+                      </h4>
+                      <div className="space-y-4">
+                        {(() => {
+                          const fields = [
+                            { key: 'name', label: 'Policy name' },
+                            { key: 'description', label: 'Description' },
+                            { key: 'action', label: 'Action' },
+                            { key: 'conditionLogic', label: 'Logic' },
+                            { key: 'initiatorType', label: 'Initiator type' },
+                            { key: 'amountCondition', label: 'Amount condition' },
+                            { key: 'approvers', label: 'Approvers' },
+                            { key: 'changeApproversList', label: 'Policy change approvers' },
+                          ];
+
+                          return fields.map(({ key, label }) => {
+                            const currentVal = (viewingPendingPolicy as any)[key];
+                            const pendingVal = pending[key];
+                            const isChanged = pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
+                            
+                            const displayVal = (val: any) => {
+                              if (val === undefined || val === null) return 'Not set';
+                              if (Array.isArray(val)) return val.length > 0 ? val.join(', ') : 'None';
+                              return String(val);
+                            };
+
+                            return (
+                              <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
+                                <div className="space-y-1">
+                                  <span className="text-[14px] font-medium text-[#8a8a8a]">{label}</span>
+                                  <div className="text-sm text-[#171717]">{displayVal(currentVal)}</div>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className="text-[14px] font-medium text-[#8a8a8a]">Proposed change</span>
+                                  <div className={cn(
+                                    "text-sm font-medium",
+                                    isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
+                                  )}>
+                                    {isChanged ? displayVal(pendingVal) : "-"}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  );
+                })()}
                 <div className="flex justify-end">
                   <Button variant="outline" onClick={() => setViewingPendingPolicy(null)}>
                     Close Review

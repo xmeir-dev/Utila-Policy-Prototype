@@ -202,6 +202,23 @@ export async function registerRoutes(
     }
   });
 
+  app.post('/api/policies/:id/request-deletion', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      const submitter = req.body.submitter || 'anonymous';
+      const policy = await storage.submitPolicyDeletion(id, submitter);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found" });
+      }
+      res.status(200).json(policy);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to submit deletion request" });
+    }
+  });
+
   app.patch('/api/policies/:id/toggle', async (req, res) => {
     try {
       const id = parseInt(req.params.id);

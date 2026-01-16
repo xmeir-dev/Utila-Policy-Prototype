@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp, GitBranch } from "lucide-react";
+import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp, GitBranch, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Policy, InsertPolicy } from "@shared/schema";
@@ -19,8 +19,11 @@ interface PolicyFormProps {
   initialData?: Partial<InsertPolicy>;
   onSubmit: (data: InsertPolicy) => void;
   onCancel: () => void;
+  onDelete?: () => void;
   isSubmitting?: boolean;
+  isDeleting?: boolean;
   submitLabel?: string;
+  isEditMode?: boolean;
 }
 
 interface ConditionSectionProps {
@@ -260,7 +263,7 @@ function MultiWalletSelector({
   );
 }
 
-export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, submitLabel = "Save Policy" }: PolicyFormProps) {
+export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmitting, isDeleting, submitLabel = "Save Policy", isEditMode = false }: PolicyFormProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<InsertPolicy>>({
     name: "",
@@ -883,6 +886,22 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
           </Tooltip>
         </TooltipProvider>
       </div>
+      
+      {isEditMode && onDelete && (
+        <div className="pt-6 border-t border-border mt-6">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onDelete}
+            disabled={isDeleting}
+            className="w-full text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-[14px]"
+            data-testid="button-delete-policy"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            {isDeleting ? 'Submitting deletion request...' : 'Delete policy'}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }
