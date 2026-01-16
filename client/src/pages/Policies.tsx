@@ -262,17 +262,7 @@ function SortablePolicyItem({
             </TooltipContent>
           )}
         </Tooltip>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-[#8a8a8a] hover:text-red-500"
-          onClick={onDelete}
-          disabled={isDeleting}
-          data-testid={`button-delete-policy-${policy.id}`}
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
-      </div>
+        </div>
     </div>
   );
 }
