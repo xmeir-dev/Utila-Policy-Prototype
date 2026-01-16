@@ -345,7 +345,7 @@ export default function Home() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isInitiator ? (
-                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5 font-normal">Pending</Badge>
                                   ) : (
                                     <Button 
                                       size="sm" 
