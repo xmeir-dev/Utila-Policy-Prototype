@@ -505,9 +505,7 @@ export default function Policies() {
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0 hide-scrollbar">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
             <DialogTitle className="text-xl font-bold">Create a policy</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Define trigger conditions and actions for transaction approval.
-            </DialogDescription>
+            <DialogDescription className="text-sm text-[#8a8a8a]">Set conditions and actions for transaction approval</DialogDescription>
           </DialogHeader>
           <div className="p-6">
             <PolicyForm
