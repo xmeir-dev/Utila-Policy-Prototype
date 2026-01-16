@@ -11,7 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { api } from "@shared/routes";
 import type { Policy, SimulateTransactionRequest } from "@shared/schema";
 
-const SAMPLE_ASSETS = ['BTC', 'ETH', 'USDC', 'USDT', 'SOL'];
+const SAMPLE_ASSETS = ['ETH', 'USDT', 'USDC'];
 
 const AVAILABLE_USERS = [
   'Meir',

@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils";
 import type { Policy, InsertPolicy } from "@shared/schema";
 
-const COMMON_ASSETS = ['BTC', 'ETH', 'USDC', 'USDT', 'SOL', 'MATIC', 'AVAX', 'BNB'];
+const COMMON_ASSETS = ['ETH', 'USDT', 'USDC'];
 
 interface PolicyFormProps {
   initialData?: Partial<InsertPolicy>;
