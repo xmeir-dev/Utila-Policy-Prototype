@@ -189,7 +189,7 @@ export default function Home() {
                     className="gap-2 text-muted-foreground hover:text-foreground rounded-[12px] h-9"
                     asChild
                   >
-                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" data-testid="link-repo">
+                    <a href="https://github.com/xmeir-dev/Utila-Policy-Prototype" target="_blank" rel="noopener noreferrer" data-testid="link-repo">
                       <SiGithub className="w-5 h-5" />
                       <span>See Repo</span>
                     </a>
