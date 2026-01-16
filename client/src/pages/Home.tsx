@@ -251,7 +251,7 @@ export default function Home() {
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-[16px]">Pending transfers</h3>
+                    <h3 className="font-medium text-[16px]">Requires approval</h3>
                   </div>
                   <div className="space-y-4">
                     {filteredTransfers.length > 0 ? (
