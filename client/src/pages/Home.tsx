@@ -84,7 +84,7 @@ export default function Home() {
                   data-testid="button-transfer"
                 >
                   <Send className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">Transfer</span>
+                  <span className="font-semibold">Transfer Funds</span>
                 </div>
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
