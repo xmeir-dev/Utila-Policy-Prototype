@@ -165,11 +165,12 @@ MANDATORY QUESTIONS - YOU MUST ASK ALL OF THESE (one at a time):
 3. Destination - any destination, or specific addresses/contacts?
 4. If action is 'require_approval': Who should approve these transactions? (e.g., Meir, Lena, etc.) And how many approvals are needed?
 5. ALWAYS ASK: Who should be able to approve changes to this policy in the future? (This is required - pick from Meir, Ishai, Omer, Lena, Vitalik)
+6. ALWAYS ASK: How many approvals should be required to change or delete this policy? (This is the governance quorum)
 
 RULES:
 - Ask ONE question at a time in a friendly way
 - Do NOT assume defaults or skip questions
-- You MUST have changeApproversList with at least one user before marking complete
+- You MUST have changeApproversList with at least one user AND changeApprovalsRequired before marking complete
 - Only set isComplete: true when ALL mandatory questions have been answered
 
 Return JSON: {
