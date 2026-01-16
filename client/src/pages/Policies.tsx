@@ -234,15 +234,27 @@ function SortablePolicyItem({
             </TooltipContent>
           </Tooltip>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-[#8a8a8a]"
-          onClick={onEdit}
-          data-testid={`button-edit-policy-${policy.id}`}
-        >
-          <Settings className="w-4 h-4" />
-        </Button>
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <div className="inline-block">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-[#8a8a8a]"
+                onClick={onEdit}
+                disabled={isPendingApproval}
+                data-testid={`button-edit-policy-${policy.id}`}
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
+          </TooltipTrigger>
+          {isPendingApproval && (
+            <TooltipContent>
+              <p>Editing is disabled while changes are pending approval</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
         <Button
           variant="ghost"
           size="icon"

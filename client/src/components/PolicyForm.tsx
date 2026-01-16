@@ -287,6 +287,10 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['details', 'conditions', 'initiator']);
 
+  const pendingChanges = (formData as any).status === 'pending_approval' && (formData as any).pendingChanges 
+    ? JSON.parse((formData as any).pendingChanges) 
+    : null;
+
   const toggleSection = (section: string) => {
     setExpandedSections(prev => 
       prev.includes(section) 
@@ -344,6 +348,35 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {pendingChanges && (
+        <Card className="p-4 border-amber-500/30 bg-amber-500/5 space-y-3">
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+            <GitBranch className="w-4 h-4" />
+            <span className="text-sm font-semibold">Pending Changes</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            {Object.entries(pendingChanges).map(([key, value]) => {
+              if (key === 'status' || key === 'pendingChanges' || key === 'changeApprovers' || key === 'changeApproversList' || key === 'changeApprovalsRequired' || key === 'changeInitiator' || key === 'updatedAt' || key === 'id' || key === 'createdAt' || key === 'priority') return null;
+              
+              const oldValue = (formData as any)[key];
+              const displayValue = (val: any) => Array.isArray(val) ? val.join(', ') : String(val);
+              
+              if (JSON.stringify(oldValue) === JSON.stringify(value)) return null;
+
+              return (
+                <div key={key} className="space-y-1">
+                  <span className="text-[#8a8a8a] uppercase tracking-wider font-bold">{key.replace(/([A-Z])/g, ' $1')}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="line-through opacity-50">{displayValue(oldValue)}</span>
+                    <span className="text-foreground">→</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-medium">{displayValue(value)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
       <div className="space-y-4">
         <button
           type="button"
