@@ -141,7 +141,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
-      <Navbar walletState={walletState} openWalletDialog={() => setIsWalletDialogOpen(true)} />
+      <Navbar walletState={walletState} isDialogOpen={isWalletDialogOpen} setIsDialogOpen={setIsWalletDialogOpen} />
       <main className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[90vh]">
         
         <AnimatePresence mode="wait">
