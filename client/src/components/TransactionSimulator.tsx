@@ -294,7 +294,7 @@ export function TransactionSimulator() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="sim-amount">Amount (USD)</Label>
+              <Label htmlFor="sim-amount">Amount in USD</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                 <Input
@@ -337,7 +337,6 @@ export function TransactionSimulator() {
           {simulateMutation.isPending ? 'Simulating...' : 'Simulate Transaction'}
         </Button>
       </form>
-
       {result && (
         <div className={`p-4 rounded-lg border ${getActionColor(result.action)}`} data-testid="simulation-result">
           <div className="flex items-start gap-3">
