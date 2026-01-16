@@ -133,8 +133,28 @@
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+    cursor: default !important;
   }
   
+  *, *::before, *::after {
+    cursor: default !important;
+  }
+  
+  input, textarea, [contenteditable="true"] {
+    cursor: text !important;
+  }
+  
+  a, button, [role="button"], .cursor-pointer {
+    cursor: default !important;
+  }
+  
+  .cursor-grab {
+    cursor: default !important;
+  }
+  
+  .cursor-grabbing {
+    cursor: default !important;
+  }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     @apply tracking-tight;
