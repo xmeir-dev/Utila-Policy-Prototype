@@ -420,8 +420,8 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any User</SelectItem>
-                      <SelectItem value="user">Specific Users</SelectItem>
+                      <SelectItem value="any">Any user</SelectItem>
+                      <SelectItem value="user">Specific users</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -457,8 +457,8 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any Wallet</SelectItem>
-                      <SelectItem value="specific">Specific Wallets</SelectItem>
+                      <SelectItem value="any">Any wallet</SelectItem>
+                      <SelectItem value="specific">Specific wallets</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -493,10 +493,10 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any Destination</SelectItem>
-                      <SelectItem value="internal">Internal Only</SelectItem>
-                      <SelectItem value="external">External Only</SelectItem>
-                      <SelectItem value="whitelist">Whitelisted Addresses</SelectItem>
+                      <SelectItem value="any">Any destination</SelectItem>
+                      <SelectItem value="internal">Internal only</SelectItem>
+                      <SelectItem value="external">External only</SelectItem>
+                      <SelectItem value="whitelist">Whitelisted addresses</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -532,10 +532,10 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any Amount</SelectItem>
-                      <SelectItem value="above">Above Threshold</SelectItem>
-                      <SelectItem value="below">Below Threshold</SelectItem>
-                      <SelectItem value="between">Between Range</SelectItem>
+                      <SelectItem value="any">Any amount</SelectItem>
+                      <SelectItem value="above">Above threshold</SelectItem>
+                      <SelectItem value="below">Below threshold</SelectItem>
+                      <SelectItem value="between">Between range</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -608,8 +608,8 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any Asset</SelectItem>
-                      <SelectItem value="specific">Specific Assets</SelectItem>
+                      <SelectItem value="any">Any asset</SelectItem>
+                      <SelectItem value="specific">Specific assets</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
