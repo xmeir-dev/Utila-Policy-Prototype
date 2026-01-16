@@ -22,10 +22,12 @@ function isValidWalletUser(obj: unknown): obj is WalletUser {
   return (
     typeof obj === 'object' &&
     obj !== null &&
+    'id' in obj &&
     'name' in obj &&
     'address' in obj &&
     'avatarBg' in obj &&
     'avatarColor' in obj &&
+    typeof (obj as WalletUser).id === 'number' &&
     typeof (obj as WalletUser).name === 'string' &&
     typeof (obj as WalletUser).address === 'string'
   );

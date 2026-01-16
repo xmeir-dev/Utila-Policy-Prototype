@@ -402,6 +402,16 @@ export default function Transfer() {
   const handleContinue = async () => {
     setIsProcessing(true);
     try {
+      if (!walletState.connectedUser?.id) {
+        toast({
+          title: "Wallet not connected",
+          description: "Please connect your wallet to proceed with the transfer.",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+
       const totalAmount = getTotalRecipientAmount();
       const available = getAvailableBalance();
       
@@ -440,11 +450,11 @@ export default function Transfer() {
 
       // Create the transaction in the database
       await apiRequest("POST", "/api/transactions", {
-        userId: Number(walletState.connectedUser?.id),
+        userId: walletState.connectedUser.id,
         type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
         amount: `${recipients[0]?.amount} ${selectedAsset.symbol}`,
         status: result.action === "require_approval" ? "pending" : "completed",
-        initiatorName: walletState.connectedUser?.name
+        initiatorName: walletState.connectedUser.name
       });
 
       queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
