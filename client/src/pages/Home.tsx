@@ -4,6 +4,7 @@ import { useWallet } from "@/hooks/use-wallet";
 import { Send, Gavel, LibraryBig } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -74,7 +75,7 @@ export default function Home() {
                 Hi <span className="font-bold">{walletState.connectedUser?.name}</span>, welcome to your Waystar Royco workspace
               </h2>
 
-              <div className="grid grid-cols-3 gap-4 mb-12">
+              <div className="grid grid-cols-3 gap-4 mb-12 w-full">
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
@@ -97,7 +98,75 @@ export default function Home() {
                 </div>
               </div>
 
-              
+              <div className="grid grid-cols-2 gap-8 w-full">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Top Holdings</h3>
+                    <Button variant="link" className="text-xs text-muted-foreground p-0 h-auto">See All</Button>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { name: 'USDT', balance: '225,000', value: '$224,775', percent: 25, color: 'bg-emerald-500' },
+                      { name: 'ETH', balance: '64.17', value: '$180,000', percent: 20, color: 'bg-blue-500' },
+                    ].map((asset) => (
+                      <div key={asset.name} className="flex items-center gap-3">
+                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", asset.color + "/10")}>
+                          <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", asset.color)}>
+                            <span className="text-[10px] font-bold text-white">{asset.name[0]}</span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium">{asset.name}</span>
+                            <div className="text-right">
+                              <div className="text-sm font-medium">{asset.balance} {asset.name}</div>
+                              <div className="text-[10px] text-muted-foreground">{asset.value}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className={cn("h-full rounded-full", asset.color)} 
+                                style={{ width: `${asset.percent}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground w-6 text-right">{asset.percent}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Latest Transfers</h3>
+                  <div className="space-y-4">
+                    <div className="p-4 border border-border rounded-[14px] bg-card/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-bold">Outgoing Transfer</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
+                          <div className="w-3 h-3 rounded-full bg-blue-500" />
+                        </div>
+                        <span className="text-sm font-semibold">3,400 USD</span>
+                        <span className="text-[10px] text-muted-foreground">(= $3,396.6)</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">
+                        <div className="flex items-center gap-1">
+                          <span>Initiator:</span>
+                          <div className="flex items-center gap-1 text-foreground font-medium">
+                            <div className="w-3 h-3 rounded-full bg-orange-500" />
+                            Lucas Beach
+                          </div>
+                        </div>
+                        <span>Created at: 02:10 AM, March 8, 2024</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
