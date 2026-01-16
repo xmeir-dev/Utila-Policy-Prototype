@@ -31,7 +31,6 @@ interface SimulationResult {
 export function TransactionSimulator() {
   const [formData, setFormData] = useState<SimulateTransactionRequest>({
     initiator: "",
-    initiatorGroups: [],
     sourceWallet: "",
     destination: "",
     destinationIsInternal: false,
@@ -133,18 +132,6 @@ export function TransactionSimulator() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sim-groups">User Groups (comma-separated)</Label>
-            <Input
-              id="sim-groups"
-              value={formData.initiatorGroups?.join(', ') || ''}
-              onChange={(e) => updateField('initiatorGroups', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-              placeholder="admins, traders"
-              className="rounded-lg"
-              data-testid="input-sim-groups"
-            />
           </div>
 
           <div className="space-y-2">
