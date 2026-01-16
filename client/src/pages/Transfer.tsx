@@ -340,7 +340,7 @@ export default function Transfer() {
   const AssetIcon = selectedAsset.icon;
 
   const [showSimulationModal, setShowSimulationModal] = useState(false);
-  const [simulationResult, setSimulationResult] = useState<{ status: "approved" | "rejected"; message: string } | null>(null);
+  const [simulationResult, setSimulationResult] = useState<{ status: "approved" | "rejected" | "pending"; message: string } | null>(null);
 
   const handleSimulate = async () => {
     const totalAmount = getTotalRecipientAmount();
@@ -377,8 +377,12 @@ export default function Transfer() {
       const response = await apiRequest("POST", "/api/policies/simulate", simulationReq);
       const result = await response.json();
       
+      let status: "approved" | "rejected" | "pending" = "approved";
+      if (result.action === "deny") status = "rejected";
+      else if (result.action === "require_approval") status = "pending";
+
       setSimulationResult({
-        status: result.action === "deny" ? "rejected" : "approved",
+        status,
         message: result.reason
       });
       setShowSimulationModal(true);
@@ -422,8 +426,12 @@ export default function Transfer() {
       const response = await apiRequest("POST", "/api/policies/simulate", simulationReq);
       const result = await response.json();
       
+      let status: "approved" | "rejected" | "pending" = "approved";
+      if (result.action === "deny") status = "rejected";
+      else if (result.action === "require_approval") status = "pending";
+
       setSimulationResult({
-        status: result.action === "deny" ? "rejected" : "approved",
+        status,
         message: result.reason
       });
       setShowSimulationModal(true);
