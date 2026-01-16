@@ -73,6 +73,7 @@ export default function Transfer() {
   const [newAddress, setNewAddress] = useState("");
   const amountInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const userEnteredAmountRef = useRef<string>("");
   const { toast } = useToast();
 
   const getTotalBudget = () => {
