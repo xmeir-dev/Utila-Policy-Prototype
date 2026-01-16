@@ -175,7 +175,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <h3 className="text-[16px] font-medium">Latest Transfers</h3>
                   <div className="space-y-4">
-                    <div className="p-4 border border-border rounded-[14px] bg-card/50">
+                    <div className="p-4 rounded-[14px] bg-card/50">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-bold">Outgoing Transfer</span>
                       </div>
