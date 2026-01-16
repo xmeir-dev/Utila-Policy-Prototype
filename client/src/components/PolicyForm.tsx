@@ -365,7 +365,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
               return (
                 <div key={key} className="space-y-1">
-                  <span className="text-[#8a8a8a] uppercase tracking-wider font-bold">{key.replace(/([A-Z])/g, ' $1')}</span>
+                  <span className="text-[14px] font-medium text-[#8a8a8a]">{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
                   <div className="flex items-center gap-2">
                     <span className="line-through opacity-50">{displayValue(oldValue)}</span>
                     <span className="text-foreground">→</span>

@@ -580,16 +580,16 @@ export default function Policies() {
                   <div className="space-y-4">
                     {(() => {
                       const pending = JSON.parse(viewingPendingPolicy.pendingChanges || '{}');
-                      const fields = [
-                        { key: 'name', label: 'Policy Name' },
-                        { key: 'description', label: 'Description' },
-                        { key: 'action', label: 'Action' },
-                        { key: 'conditionLogic', label: 'Logic' },
-                        { key: 'initiatorType', label: 'Initiator Type' },
-                        { key: 'amountCondition', label: 'Amount Condition' },
-                        { key: 'approvers', label: 'Approvers' },
-                        { key: 'changeApproversList', label: 'Policy Change Approvers' },
-                      ];
+                        const fields = [
+                          { key: 'name', label: 'Policy name' },
+                          { key: 'description', label: 'Description' },
+                          { key: 'action', label: 'Action' },
+                          { key: 'conditionLogic', label: 'Logic' },
+                          { key: 'initiatorType', label: 'Initiator type' },
+                          { key: 'amountCondition', label: 'Amount condition' },
+                          { key: 'approvers', label: 'Approvers' },
+                          { key: 'changeApproversList', label: 'Policy change approvers' },
+                        ];
 
                       return fields.map(({ key, label }) => {
                         const currentVal = (viewingPendingPolicy as any)[key];
@@ -605,11 +605,11 @@ export default function Policies() {
                         return (
                           <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
                             <div className="space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{label}</span>
+                              <span className="text-[14px] font-medium text-[#8a8a8a]">{label}</span>
                               <div className="text-sm text-foreground/70">{displayVal(currentVal)}</div>
                             </div>
                             <div className="space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Proposed change</span>
+                              <span className="text-[14px] font-medium text-[#8a8a8a]">Proposed change</span>
                               <div className={cn(
                                 "text-sm font-medium",
                                 isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
