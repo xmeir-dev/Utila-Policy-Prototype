@@ -185,28 +185,38 @@ function MultiUserSelector({
   );
 }
 
-const AVAILABLE_WALLETS = [
-  { name: 'Main Treasury', address: '0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1' },
-  { name: 'Operating Account', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
-  { name: 'Payroll Wallet', address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
-  { name: 'Escrow Account', address: '0x6B175474E89094C44Da98b954EesecdB6F8e5389' },
-  { name: 'Founder Reserve', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' }
+const TRUSTED_WALLETS = [
+  { name: 'Finances', address: '0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F' },
+  { name: 'Treasury', address: '0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F' },
+  { name: 'Meir', address: '0xE1f2A3b4C5d6E7f8A9B0c1D2E3f4A5b6C7d8E9f0' },
+  { name: 'Ishai', address: '0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9' },
+];
+
+const CONTACTS = [
+  { name: 'Bank of America', address: '0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f' },
+  { name: 'Finances', address: '0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F' },
+  { name: 'Treasury', address: '0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F' },
+  { name: 'Vitalik Buterin', address: '0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F' },
+  { name: 'Meir', address: '0xE1f2A3b4C5d6E7f8A9B0c1D2E3f4A5b6C7d8E9f0' },
+  { name: 'Ishai', address: '0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9' },
 ];
 
 function MultiWalletSelector({ 
   selected, 
   onChange, 
-  testId
+  testId,
+  wallets = TRUSTED_WALLETS
 }: { 
   selected: string[]; 
   onChange: (values: string[]) => void; 
   testId: string;
+  wallets?: { name: string; address: string }[];
 }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2 p-2 border border-input rounded-[14px] bg-background min-h-[42px]">
         {selected.map((address) => {
-          const wallet = AVAILABLE_WALLETS.find(w => w.address === address);
+          const wallet = wallets.find(w => w.address === address);
           return (
             <Badge key={address} variant="secondary" className="h-7 gap-1 pl-2 pr-1">
               <span className="text-xs font-medium">{wallet ? wallet.name : `${address.slice(0, 6)}...${address.slice(-4)}`}</span>
@@ -235,7 +245,7 @@ function MultiWalletSelector({
             </div>
           </SelectTrigger>
           <SelectContent>
-            {AVAILABLE_WALLETS.filter(w => !selected.includes(w.address)).map((wallet) => (
+            {wallets.filter(w => !selected.includes(w.address)).map((wallet) => (
               <SelectItem key={wallet.address} value={wallet.address}>
                 <div className="flex flex-col">
                   <span className="font-medium">{wallet.name}</span>
@@ -471,7 +481,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
             </ConditionSection>
 
             <ConditionSection
-              title="Source Wallet"
+              title="From"
               icon={<Wallet className="w-4 h-4 text-muted-foreground" />}
               isExpanded={expandedSections.includes('source')}
               onToggle={() => toggleSection('source')}
@@ -507,7 +517,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
             </ConditionSection>
 
             <ConditionSection
-              title="Destination"
+              title="To"
               icon={<Target className="w-4 h-4 text-muted-foreground" />}
               isExpanded={expandedSections.includes('destination')}
               onToggle={() => toggleSection('destination')}
