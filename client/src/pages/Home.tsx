@@ -213,7 +213,7 @@ export default function Home() {
                         return (
                         <div key={tx.id} className="p-4 rounded-[14px] bg-card/50">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-bold">{tx.type || "Outgoing Transfer"}</span>
+                            <span className="text-sm font-bold">Sent {tx.amount || "Unknown"}</span>
                             {isInitiator ? (
                               <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
                             ) : (
