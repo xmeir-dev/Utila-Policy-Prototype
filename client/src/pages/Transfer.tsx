@@ -452,6 +452,10 @@ export default function Transfer() {
       const usdAmount = parseFloat((recipients[0]?.amount || "0").replace(/,/g, ''));
       const tokenAmount = (usdAmount / selectedAsset.price).toFixed(2);
       
+      // Get the source wallet name
+      const sourceWallet = availableWallets.find(w => w.id === selectedWallets[0]);
+      const sourceWalletName = sourceWallet?.name || "Unknown Wallet";
+      
       // Create the transaction in the database
       await apiRequest("POST", "/api/transactions", {
         userId: walletState.connectedUser.id,
@@ -460,10 +464,14 @@ export default function Transfer() {
         status: result.action === "require_approval" ? "pending" : "completed",
         initiatorName: walletState.connectedUser.name,
         approvals: [],
-        quorumRequired: result.matchedPolicy?.quorumRequired || 1
+        quorumRequired: result.matchedPolicy?.quorumRequired || 1,
+        fromWallet: sourceWalletName,
+        toAddress: recipients[0]?.address || "",
+        toLabel: recipients[0]?.label || ""
       });
 
       queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
 
       if (result.action === "require_approval") {
         toast({

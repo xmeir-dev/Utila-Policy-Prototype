@@ -1,6 +1,6 @@
 import { users, transactions, policies, type User, type InsertUser, type Transaction, type InsertTransaction, type Policy, type InsertPolicy, type SimulateTransactionRequest } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, asc, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -8,6 +8,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
   getPendingTransactions(userName: string): Promise<Transaction[]>;
+  getAllTransactions(userId: number): Promise<Transaction[]>;
   createTransaction(tx: InsertTransaction): Promise<Transaction>;
   getPolicies(): Promise<Policy[]>;
   getPolicy(id: number): Promise<Policy | undefined>;
@@ -72,8 +73,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTransaction(tx: InsertTransaction): Promise<Transaction> {
-    const [transaction] = await db.insert(transactions).values(tx).returning();
+    const [transaction] = await db.insert(transactions).values({
+      ...tx,
+      createdAt: new Date().toISOString(),
+    }).returning();
     return transaction;
+  }
+
+  async getAllTransactions(userId: number): Promise<Transaction[]> {
+    return await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.userId, userId))
+      .orderBy(desc(transactions.id));
   }
 
   async getPolicies(): Promise<Policy[]> {

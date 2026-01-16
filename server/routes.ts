@@ -64,6 +64,19 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/transactions", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Missing or invalid userId parameter" });
+      }
+      const transactions = await storage.getAllTransactions(userId);
+      res.status(200).json(transactions);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch transactions" });
+    }
+  });
+
   // Policies endpoints
   app.get(api.policies.list.path, async (req, res) => {
     try {

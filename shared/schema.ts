@@ -26,9 +26,13 @@ export const transactions = pgTable("transactions", {
   initiatorName: text("initiator_name"),
   approvals: text("approvals").array(), // names of approvers who have approved
   quorumRequired: integer("quorum_required").default(1), // number of approvals needed
+  fromWallet: text("from_wallet"),
+  toAddress: text("to_address"),
+  toLabel: text("to_label"),
+  createdAt: text("created_at").default("now()"),
 });
 
-export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true });
+export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, createdAt: true });
 
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
