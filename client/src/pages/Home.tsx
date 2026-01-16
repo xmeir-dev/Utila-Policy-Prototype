@@ -1,3 +1,17 @@
+/**
+ * Home.tsx
+ * 
+ * Main dashboard and landing page for the Utila platform.
+ * Displays different views based on wallet connection state:
+ * - Disconnected: Hero section with "Connect Wallet" CTA
+ * - Connected: Dashboard with quick actions and pending items requiring attention
+ * 
+ * The dashboard shows:
+ * - Top holdings (asset balances)
+ * - Pending transactions needing approval
+ * - Pending policy changes needing approval
+ */
+
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
@@ -18,6 +32,7 @@ import type { Policy } from "@shared/schema";
 import { Trash2, AlertCircle } from "lucide-react";
 import { api } from "@shared/routes";
 
+// Returns appropriate icon component based on asset type in amount string
 const getAssetIcon = (amount: string) => {
   if (amount.includes("ETH")) return <SiEthereum className="w-4 h-4 text-[#627EEA]" />;
   if (amount.includes("USDC")) return <MdOutlinePaid className="w-4 h-4 text-[#2775CA]" />;
@@ -25,6 +40,7 @@ const getAssetIcon = (amount: string) => {
   return <RiCoinFill className="w-4 h-4 text-muted-foreground" />;
 };
 
+// Formats amount strings with locale-aware number formatting
 const formatAmount = (amountStr: string) => {
   if (!amountStr) return "Unknown";
   const [val, symbol] = amountStr.split(" ");

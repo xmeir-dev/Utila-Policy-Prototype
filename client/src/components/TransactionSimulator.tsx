@@ -1,3 +1,16 @@
+/**
+ * TransactionSimulator.tsx
+ * 
+ * Testing tool for verifying policy configurations.
+ * Allows users to simulate hypothetical transactions and see which policy
+ * would apply and what action would be taken (allow/deny/require approval).
+ * 
+ * This is crucial for policy testing because:
+ * - Policies can have complex condition combinations
+ * - Priority order affects which policy matches first
+ * - Users need confidence policies work before real transactions
+ */
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,6 +34,7 @@ const AVAILABLE_USERS = [
   'Sam'
 ];
 
+// Sample data for the simulation form - matches what's used in policies
 const TRUSTED_WALLETS = [
   { name: 'Finances', address: '0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F', isInternal: true },
   { name: 'Treasury', address: '0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F', isInternal: true },
@@ -150,10 +164,11 @@ interface SimulationResult {
   reason: string;
 }
 
-// Update the type to support multiple wallets for simulation if needed, 
-// but the backend SimulateTransactionRequest currently expects single strings.
-// We will join them or just take the first one for now to avoid breaking the backend contract 
-// while updating the UI as requested.
+/**
+ * Form component for testing transactions against active policies.
+ * Sends simulation request to backend and displays the result with
+ * color-coded feedback (green=allow, red=deny, amber=approval needed).
+ */
 export function TransactionSimulator() {
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
@@ -167,6 +182,7 @@ export function TransactionSimulator() {
     asset: "ETH",
   });
 
+  // Format numbers with commas for better readability
   const formatAmountWithCommas = (value: string) => {
     const num = value.replace(/,/g, '');
     if (!num || isNaN(Number(num))) return value;
@@ -183,6 +199,7 @@ export function TransactionSimulator() {
 
   const [result, setResult] = useState<SimulationResult | null>(null);
 
+  // Calls the backend simulation endpoint to check which policy matches
   const simulateMutation = useMutation({
     mutationFn: async (data: SimulateTransactionRequest) => {
       const response = await apiRequest('POST', api.policies.simulate.path, data);
@@ -193,10 +210,10 @@ export function TransactionSimulator() {
     },
   });
 
+  // Submits the simulation - takes first wallet when multi-select is used
+  // since policies evaluate single transactions, not batches
   const handleSimulate = (e: React.FormEvent) => {
     e.preventDefault();
-    // For simulation, we'll use the first selected wallet if multiple are chosen, 
-    // or keep the backend call as is. Since policies usually check against a single transaction context.
     const dataToSimulate = {
       ...formData,
       sourceWallet: selectedSources[0] || "",
@@ -212,6 +229,7 @@ export function TransactionSimulator() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Visual feedback helpers - return appropriate icon/color for policy action
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'allow':

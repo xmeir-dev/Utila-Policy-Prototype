@@ -1,3 +1,11 @@
+/**
+ * Navbar.tsx
+ * 
+ * Global navigation component that handles wallet connection state.
+ * Supports both internal and externally-controlled dialog state to allow
+ * parent components to trigger the user selection dialog programmatically.
+ */
+
 import { Link } from "wouter";
 import { Wallet, Loader2, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -19,17 +27,25 @@ interface NavbarProps {
   setIsDialogOpen?: (open: boolean) => void;
 }
 
+/**
+ * Main navigation bar with wallet connection functionality.
+ * Dialog state can be controlled externally (e.g., from Home page's "Get Started" button)
+ * or managed internally when used standalone.
+ */
 export function Navbar({ walletState, isDialogOpen: externalDialogOpen, setIsDialogOpen: externalSetDialogOpen }: NavbarProps) {
   const { connect, disconnect, isConnecting, isConnected, walletAddress, connectedUser } = walletState;
   const [internalDialogOpen, setInternalDialogOpen] = useState(false);
 
+  // Support both controlled and uncontrolled dialog modes
   const isDialogOpen = externalDialogOpen !== undefined ? externalDialogOpen : internalDialogOpen;
   const setIsDialogOpen = externalSetDialogOpen || setInternalDialogOpen;
 
+  // Display truncated address for better UX (full address is too long)
   const formattedAddress = walletAddress
     ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
     : "";
 
+  // Connects selected user's wallet and closes the selection dialog
   const handleUserSelect = (address: string) => {
     connect(address);
     setIsDialogOpen(false);

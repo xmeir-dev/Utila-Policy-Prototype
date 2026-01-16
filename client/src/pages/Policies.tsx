@@ -1,3 +1,16 @@
+/**
+ * Policies.tsx
+ * 
+ * Policy management page with full CRUD functionality and drag-and-drop reordering.
+ * Policies are evaluated in priority order - the first matching policy determines
+ * the action for a transaction. Users can:
+ * - Create new policies (immediately active)
+ * - Edit existing policies (requires approval)
+ * - Request policy deletion (requires approval)
+ * - Reorder policies via drag-and-drop
+ * - Test policies using the transaction simulator
+ */
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
@@ -39,10 +52,11 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// Helper functions for policy action display
 const getActionIcon = (action: string) => {
   switch (action) {
     case 'allow':
-    case 'approve': // Legacy support
+    case 'approve': // Legacy support for old data
       return ShieldCheck;
     case 'deny':
       return ShieldX;
@@ -56,7 +70,7 @@ const getActionIcon = (action: string) => {
 const getActionColor = (action: string) => {
   switch (action) {
     case 'allow':
-    case 'approve': // Legacy support
+    case 'approve':
       return 'text-green-500';
     case 'deny':
       return 'text-red-500';
@@ -70,7 +84,7 @@ const getActionColor = (action: string) => {
 const getActionLabel = (action: string) => {
   switch (action) {
     case 'allow':
-    case 'approve': // Legacy support
+    case 'approve':
       return 'Allow';
     case 'deny':
       return 'Deny';
@@ -94,6 +108,10 @@ const getStatusBadge = (status: string | null) => {
   }
 };
 
+/**
+ * Generates a human-readable summary of a policy's conditions.
+ * Used to give users a quick overview without expanding the full policy.
+ */
 function getConditionSummary(policy: Policy): string[] {
   const conditions: string[] = [];
   
@@ -138,6 +156,11 @@ interface SortablePolicyItemProps {
   isToggling: boolean;
 }
 
+/**
+ * Individual policy row in the sortable list.
+ * Integrates with dnd-kit for drag-and-drop reordering.
+ * Shows pending change/deletion status with interactive tooltips.
+ */
 function SortablePolicyItem({ 
   policy, 
   index, 

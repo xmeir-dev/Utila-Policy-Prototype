@@ -1,3 +1,15 @@
+/**
+ * routes.ts
+ * 
+ * API route definitions for the Utila platform.
+ * Handles wallet authentication, transaction management, and policy CRUD operations.
+ * 
+ * Route organization:
+ * - /api/wallet/* - Authentication and session management
+ * - /api/transactions/* - Transfer creation and approval workflows
+ * - /api/policies/* - Policy CRUD, simulation, and change approval
+ */
+
 import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
@@ -6,20 +18,27 @@ import { z } from "zod";
 import { insertTransactionSchema } from "@shared/schema";
 import { openai } from "./replit_integrations/audio/client";
 
+/**
+ * Registers all API routes on the Express app.
+ * Returns the HTTP server for chaining with middleware setup.
+ */
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
 
+  /**
+   * Wallet connection endpoint - creates or updates user record.
+   * In production, this would verify a cryptographic signature from the wallet.
+   */
   app.post(api.wallet.connect.path, async (req, res) => {
     try {
-      // Validate input (though it's optional in schema)
       const input = api.wallet.connect.input.parse(req.body);
       
-      // Simulate a random wallet address if not provided
+      // Generate a mock address for demo if none provided
       const walletAddress = input.walletAddress || `0x${Math.random().toString(16).slice(2, 12)}...${Math.random().toString(16).slice(2, 6)}`;
       
-      // Check if user exists (mock logic, in a real app we'd verify signature)
+      // Upsert user - create if new, update connection status if existing
       let user = await storage.getUserByAddress(walletAddress);
       
       if (!user) {
@@ -31,7 +50,7 @@ export async function registerRoutes(
         user = await storage.updateUser(user.id, { isConnected: true });
       }
       
-      // Simulate network delay for effect
+      // Artificial delay to simulate blockchain network latency
       await new Promise(resolve => setTimeout(resolve, 800));
 
       res.status(200).json(user);
@@ -46,15 +65,17 @@ export async function registerRoutes(
     }
   });
 
+  // Disconnect just acknowledges - in production would invalidate session tokens
   app.post(api.wallet.disconnect.path, async (req, res) => {
-    // In a real app we'd handle session invalidation here
-    // For demo, we just acknowledge
     res.status(200).json({ success: true });
   });
 
+  /**
+   * Returns all transactions awaiting approval.
+   * Displayed on the Home dashboard for approvers to review.
+   */
   app.get("/api/transactions/pending", async (req, res) => {
     try {
-      // Show all pending transactions to everyone
       const transactions = await storage.getPendingTransactions();
       res.status(200).json(transactions);
     } catch (err) {
@@ -63,6 +84,7 @@ export async function registerRoutes(
     }
   });
 
+  // Returns all transactions for the activity/history view
   app.get("/api/transactions", async (req, res) => {
     try {
       const transactions = await storage.getTransactions();
@@ -72,7 +94,7 @@ export async function registerRoutes(
     }
   });
 
-  // Policies endpoints
+  // Returns all policies sorted by priority for the Policies management page
   app.get(api.policies.list.path, async (req, res) => {
     try {
       const policies = await storage.getPolicies();
@@ -82,7 +104,10 @@ export async function registerRoutes(
     }
   });
 
-  // This route must come before /api/policies/:id to avoid "pending" being parsed as an id
+  /**
+   * Returns policies with pending changes for a specific user.
+   * Must be defined before /:id route to avoid "pending" being parsed as an ID.
+   */
   app.get('/api/policies/pending', async (req, res) => {
     try {
       const userName = req.query.userName as string;
@@ -112,12 +137,18 @@ export async function registerRoutes(
     }
   });
 
+  /**
+   * AI-powered policy generation endpoint.
+   * Uses GPT-4 to interactively build a policy through conversation.
+   * Asks clarifying questions one at a time until all required fields are collected.
+   */
   app.post(api.policies.generate.path, async (req, res) => {
     try {
       const { prompt } = api.policies.generate.input.parse(req.body);
       const conversationHistory = req.body.conversationHistory as Array<{role: string, content: string}> | undefined;
       const currentPolicy = req.body.currentPolicy as Record<string, unknown> | undefined;
       
+      // Build conversation context for the AI including previous exchanges
       const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
         {
           role: "system",
@@ -201,11 +232,14 @@ Return JSON: {
     }
   });
 
+  /**
+   * Creates a new policy with the provided configuration.
+   * New policies are immediately active (no approval required for creation).
+   */
   app.post(api.policies.create.path, async (req, res) => {
     try {
       const input = api.policies.create.input.parse(req.body);
       
-      // Validate action field
       const validActions = ['allow', 'deny', 'require_approval'];
       if (!validActions.includes(input.action)) {
         return res.status(400).json({
@@ -227,6 +261,10 @@ Return JSON: {
     }
   });
 
+  /**
+   * Updates a policy - changes go into pending state requiring approval.
+   * This prevents single-point-of-failure security modifications.
+   */
   app.put('/api/policies/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -237,7 +275,6 @@ Return JSON: {
       const input = api.policies.update.input.parse(req.body);
       const submitter = req.query.submitter as string || 'anonymous';
       
-      // Validate action if provided
       if (input.action) {
         const validActions = ['allow', 'deny', 'require_approval'];
         if (!validActions.includes(input.action)) {
@@ -248,7 +285,7 @@ Return JSON: {
         }
       }
       
-      // Submit policy change for approval instead of applying directly
+      // Changes require multi-party approval before taking effect
       const policy = await storage.submitPolicyChange(id, input, submitter);
       if (!policy) {
         return res.status(404).json({ message: "Policy not found" });
@@ -281,6 +318,10 @@ Return JSON: {
     }
   });
 
+  /**
+   * Submits a deletion request for a policy.
+   * Like updates, deletions require approval to prevent accidental removal of security rules.
+   */
   app.post('/api/policies/:id/request-deletion', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -298,6 +339,7 @@ Return JSON: {
     }
   });
 
+  // Toggles policy active/inactive - allows temporarily disabling without deletion
   app.patch('/api/policies/:id/toggle', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -314,6 +356,10 @@ Return JSON: {
     }
   });
 
+  /**
+   * Updates policy priority order based on drag-and-drop reordering.
+   * Lower priority numbers are evaluated first during transaction matching.
+   */
   app.post(api.policies.reorder.path, async (req, res) => {
     try {
       const input = api.policies.reorder.input.parse(req.body);
@@ -330,6 +376,11 @@ Return JSON: {
     }
   });
 
+  /**
+   * Simulates a transaction against active policies.
+   * Returns which policy would match and what action would be taken.
+   * Useful for testing policy configurations before real transactions.
+   */
   app.post(api.policies.simulate.path, async (req, res) => {
     try {
       const input = api.policies.simulate.input.parse(req.body);
@@ -346,6 +397,10 @@ Return JSON: {
     }
   });
 
+  /**
+   * Records an approval for a pending policy change.
+   * When quorum is reached, the change is automatically applied.
+   */
   app.post('/api/policies/:id/approve-change', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -369,6 +424,10 @@ Return JSON: {
     }
   });
 
+  /**
+   * Creates a new transaction record.
+   * Status depends on policy simulation - 'pending' requires approval, 'completed' is immediate.
+   */
   app.post("/api/transactions", async (req, res) => {
     try {
       const input = insertTransactionSchema.parse(req.body);
@@ -385,6 +444,10 @@ Return JSON: {
     }
   });
 
+  /**
+   * Adds an approval to a pending transaction.
+   * When quorum is reached, transaction status changes to 'completed'.
+   */
   app.post("/api/transactions/:id/approve", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

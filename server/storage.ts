@@ -1,7 +1,24 @@
+/**
+ * storage.ts
+ * 
+ * Data access layer implementing all database operations.
+ * Abstracts Drizzle ORM queries behind a clean interface for testability.
+ * 
+ * Key responsibilities:
+ * - User authentication state management
+ * - Transaction CRUD with multi-sig approval tracking
+ * - Policy CRUD with change approval workflow
+ * - Transaction simulation against policy rules
+ */
+
 import { users, transactions, policies, type User, type InsertUser, type Transaction, type InsertTransaction, type Policy, type InsertPolicy, type SimulateTransactionRequest } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, asc, desc } from "drizzle-orm";
 
+/**
+ * Storage interface - defines all data operations.
+ * Enables swapping implementations (e.g., for testing with in-memory storage).
+ */
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByAddress(address: string): Promise<User | undefined>;
@@ -26,6 +43,9 @@ export interface IStorage {
   approveTransaction(id: number, approver: string): Promise<Transaction | undefined>;
 }
 
+/**
+ * PostgreSQL implementation of the storage interface using Drizzle ORM.
+ */
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -103,11 +123,16 @@ export class DatabaseStorage implements IStorage {
     return pendingPolicies;
   }
 
+  /**
+   * Queues a policy modification for approval.
+   * The original policy remains active until the change is fully approved.
+   * Uses approval settings from existing policies to determine quorum requirements.
+   */
   async submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string): Promise<Policy | undefined> {
     const policy = await this.getPolicy(id);
     if (!policy) return undefined;
 
-    // Get default approvers and quorum from existing require_approval policies
+    // Inherit approval settings from existing approval policies
     const allPolicies = await this.getPolicies();
     const approvalPolicy = allPolicies.find(p => 
       p.isActive && p.status === 'active' && p.action === 'require_approval'
@@ -132,11 +157,15 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  /**
+   * Queues a policy for deletion with approval workflow.
+   * Uses __delete flag in pendingChanges to indicate deletion intent.
+   * Prevents accidental or unauthorized removal of security policies.
+   */
   async submitPolicyDeletion(id: number, submitter: string): Promise<Policy | undefined> {
     const policy = await this.getPolicy(id);
     if (!policy) return undefined;
 
-    // Get default approvers and quorum from existing require_approval policies
     const allPolicies = await this.getPolicies();
     const approvalPolicy = allPolicies.find(p => 
       p.isActive && p.status === 'active' && p.action === 'require_approval'
@@ -211,11 +240,17 @@ export class DatabaseStorage implements IStorage {
     return await this.getPolicies();
   }
 
+  /**
+   * Evaluates a transaction against all active policies in priority order.
+   * Returns the first matching policy's action, or 'deny' if no match.
+   * This is the core policy engine that determines transaction fate.
+   */
   async simulateTransaction(request: SimulateTransactionRequest): Promise<{ matchedPolicy: Policy | null; action: string; reason: string }> {
     const allPolicies = await this.getPolicies();
-    // Include pending_approval policies because they are still active until change/deletion is approved
+    // Pending policies are still enforced - changes don't take effect until approved
     const activePolicies = allPolicies.filter(p => p.isActive && (p.status === 'active' || p.status === 'pending_approval'));
 
+    // Evaluate policies in priority order - first match wins
     for (const policy of activePolicies) {
       const matches = this.checkPolicyMatch(policy, request);
       if (matches.matched) {
@@ -227,7 +262,7 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // No policy matched - default to deny
+    // Fail-safe: deny by default if no policy matches
     return {
       matchedPolicy: null,
       action: 'deny',
@@ -235,6 +270,11 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
+  /**
+   * Checks if a transaction matches a policy's conditions.
+   * Supports AND/OR logic for combining multiple conditions.
+   * Returns detailed match info for debugging and user feedback.
+   */
   private checkPolicyMatch(policy: Policy, request: SimulateTransactionRequest): { matched: boolean; reason: string } {
     const conditions: { name: string; matched: boolean }[] = [];
     const logic = policy.conditionLogic || 'AND';
@@ -317,28 +357,35 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
+  /**
+   * Records an approval for a pending policy change.
+   * Automatically applies changes when quorum is reached.
+   * For deletions, removes the policy entirely once approved.
+   */
   async approvePolicyChange(id: number, approver: string): Promise<Policy | undefined> {
     const policy = await this.getPolicy(id);
     if (!policy || policy.status !== 'pending_approval') return undefined;
 
     const currentApprovals = policy.changeApprovers || [];
+    // Prevent duplicate approvals from same user
     if (currentApprovals.includes(approver)) {
-      return policy; // Already approved
+      return policy;
     }
 
     const newApprovals = [...currentApprovals, approver];
     const requiredApprovals = policy.changeApprovalsRequired || 1;
 
     if (newApprovals.length >= requiredApprovals) {
-      // Apply pending changes and activate
+      // Quorum reached - apply the pending changes
       const pendingChanges = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
       
-      // Check if this is a deletion request
+      // Handle deletion vs. modification
       if (pendingChanges.__delete === true) {
         await db.delete(policies).where(eq(policies.id, id));
         return { ...policy, status: 'deleted' } as Policy;
       }
       
+      // Apply modifications and reset approval tracking
       const [updated] = await db
         .update(policies)
         .set({
@@ -353,7 +400,7 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return updated;
     } else {
-      // Just add the approval
+      // Quorum not yet reached - just record the approval
       const [updated] = await db
         .update(policies)
         .set({ changeApprovers: newApprovals })
@@ -363,20 +410,25 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  /**
+   * Records an approval for a pending transaction.
+   * Completes the transaction when quorum is reached.
+   * In production, this would trigger the actual blockchain transaction.
+   */
   async approveTransaction(id: number, approver: string): Promise<Transaction | undefined> {
     const [tx] = await db.select().from(transactions).where(eq(transactions.id, id));
     if (!tx || tx.status !== 'pending') return undefined;
 
     const currentApprovals = tx.approvals || [];
     if (currentApprovals.includes(approver)) {
-      return tx; // Already approved
+      return tx; // Prevent duplicate approvals
     }
 
     const newApprovals = [...currentApprovals, approver];
     const requiredApprovals = tx.quorumRequired || 1;
 
     if (newApprovals.length >= requiredApprovals) {
-      // Fully approved - mark as completed
+      // All required approvals collected - execute transfer
       const [updated] = await db
         .update(transactions)
         .set({
@@ -387,7 +439,7 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return updated;
     } else {
-      // Just add the approval
+      // Still waiting for more approvals
       const [updated] = await db
         .update(transactions)
         .set({ approvals: newApprovals })

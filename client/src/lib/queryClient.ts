@@ -1,5 +1,21 @@
+/**
+ * queryClient.ts
+ * 
+ * Configures TanStack Query for data fetching throughout the app.
+ * Provides a centralized API request helper and default query behavior.
+ * 
+ * Key design decisions:
+ * - staleTime: Infinity prevents automatic refetching (data managed via invalidation)
+ * - retry: false avoids hammering the server on transient errors
+ * - credentials: "include" ensures auth cookies are sent with requests
+ */
+
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+/**
+ * Converts non-OK responses into thrown errors for consistent error handling.
+ * This allows mutations and queries to use try/catch or .onError callbacks.
+ */
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -7,6 +23,11 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+/**
+ * Centralized API request helper for mutations.
+ * Handles JSON serialization and error checking consistently.
+ * Returns the raw Response for flexibility (caller can .json() if needed).
+ */
 export async function apiRequest(
   method: string,
   url: string,
@@ -23,6 +44,10 @@ export async function apiRequest(
   return res;
 }
 
+/**
+ * Factory for creating query functions with configurable 401 handling.
+ * Uses queryKey as the URL - enables automatic cache invalidation by key.
+ */
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
@@ -33,6 +58,7 @@ export const getQueryFn: <T>(options: {
       credentials: "include",
     });
 
+    // Allow graceful handling of auth errors where needed
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;
     }
@@ -41,6 +67,10 @@ export const getQueryFn: <T>(options: {
     return await res.json();
   };
 
+/**
+ * Global query client with conservative defaults.
+ * Disables automatic refetching to give full control over cache invalidation.
+ */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

@@ -1,3 +1,11 @@
+/**
+ * ReviewDialog.tsx
+ * 
+ * Reusable approval dialog for reviewing pending changes.
+ * Used for both transaction approvals and policy change approvals,
+ * providing a consistent review experience across the application.
+ */
+
 import {
   Dialog,
   DialogContent,
@@ -20,7 +28,13 @@ interface ReviewDialogProps {
   alreadyApproved?: boolean;
 }
 
+/**
+ * Displays a visual diff between old and new values.
+ * Shows the change as "oldValue → newValue" for clarity.
+ * Returns null if values are unchanged to reduce visual noise.
+ */
 function ValueDiff({ label, oldVal, newVal, isDelete = false }: { label: string, oldVal?: any, newVal?: any, isDelete?: boolean }) {
+  // Normalize values for consistent comparison and display
   const formatVal = (v: any) => {
     if (Array.isArray(v)) return v.join(", ");
     if (v === null || v === undefined) return "None";
@@ -30,6 +44,7 @@ function ValueDiff({ label, oldVal, newVal, isDelete = false }: { label: string,
   const oldFormatted = formatVal(oldVal);
   const newFormatted = formatVal(newVal);
 
+  // Skip rendering if nothing changed (reduces clutter in review)
   if (oldFormatted === newFormatted && !isDelete) return null;
 
   return (
@@ -50,6 +65,10 @@ function ValueDiff({ label, oldVal, newVal, isDelete = false }: { label: string,
   );
 }
 
+/**
+ * Generic approval dialog for reviewing and approving pending changes.
+ * Handles the approve action and provides visual feedback for loading/disabled states.
+ */
 export function ReviewDialog({
   isOpen,
   onOpenChange,

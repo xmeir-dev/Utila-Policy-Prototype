@@ -1,3 +1,20 @@
+/**
+ * PolicyForm.tsx
+ * 
+ * Complex form for creating and editing transaction approval policies.
+ * Supports two modes:
+ * 1. AI-assisted: Uses GPT-4 to generate policy from natural language
+ * 2. Manual: Traditional form with expandable condition sections
+ * 
+ * Form sections handle various policy conditions:
+ * - Initiator restrictions (who can initiate transactions)
+ * - Source wallet restrictions
+ * - Destination restrictions (internal/external/whitelist)
+ * - Amount thresholds
+ * - Asset type restrictions
+ * - Approval requirements and quorum settings
+ */
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +54,11 @@ interface ConditionSectionProps {
   isConfigured?: boolean;
 }
 
+/**
+ * Collapsible section for grouping related condition fields.
+ * Shows "Configured" badge when conditions are set to help users
+ * quickly see which sections have been customized.
+ */
 function ConditionSection({ title, icon, isExpanded, onToggle, children, isConfigured }: ConditionSectionProps) {
   return (
     <div className="border border-border rounded-[14px] overflow-hidden">
@@ -64,6 +86,10 @@ function ConditionSection({ title, icon, isExpanded, onToggle, children, isConfi
   );
 }
 
+/**
+ * Reusable input for managing arrays of string values (e.g., wallet addresses).
+ * Supports keyboard-driven entry (Enter to add) with duplicate prevention.
+ */
 function TagInput({ 
   values, 
   onChange, 
@@ -137,6 +163,10 @@ const AVAILABLE_USERS = [
   'Sam'
 ];
 
+/**
+ * Dropdown-based multi-select for choosing team members.
+ * Pre-populated with available users list for quick selection.
+ */
 function MultiUserSelector({ 
   selected, 
   onChange, 
@@ -206,6 +236,10 @@ const CONTACTS = [
   { name: 'Ishai', address: '0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9' },
 ];
 
+/**
+ * Dropdown-based multi-select for choosing wallet addresses.
+ * Displays friendly wallet names alongside truncated addresses.
+ */
 function MultiWalletSelector({ 
   selected, 
   onChange, 
