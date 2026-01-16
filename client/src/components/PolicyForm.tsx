@@ -387,7 +387,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {!isEditMode && (
-        <Card className="p-4 border-primary/20 bg-primary/5 space-y-4">
+        <div className="space-y-4">
           <div className="flex items-center gap-2 text-primary">
             <Wand2 className="w-5 h-5" />
             <span className="text-sm font-semibold">Generate with AI</span>
@@ -424,7 +424,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
               </p>
             </div>
           )}
-        </Card>
+        </div>
       )}
 
       <div className="flex items-center justify-between">
