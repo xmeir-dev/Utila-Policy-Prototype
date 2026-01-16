@@ -410,25 +410,27 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
           <div className="text-primary">
             <span className="text-sm font-medium">Create your policy with AI</span>
           </div>
-          <div className="space-y-2">
-            <Textarea
-              placeholder="Describe your policy in plain English... (e.g., 'Any transfer over $10k needs approval from Meir')"
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              className="rounded-[14px] min-h-[100px] resize-none"
-              data-testid="input-ai-prompt"
-            />
-            <Button 
-              type="button" 
-              onClick={handleGenerateAI} 
-              disabled={isGenerating || !aiPrompt.trim()}
-              className="w-full gap-2 rounded-lg"
-              data-testid="button-ai-generate"
-            >
-              {isGenerating && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isGenerating ? "Generating..." : "Generate Policy"}
-            </Button>
-          </div>
+          {!aiQuestion && (
+            <div className="space-y-2">
+              <Textarea
+                placeholder="Describe your policy in plain English... (e.g., 'Any transfer over $10k needs approval from Meir')"
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                className="rounded-[14px] min-h-[100px] resize-none"
+                data-testid="input-ai-prompt"
+              />
+              <Button 
+                type="button" 
+                onClick={handleGenerateAI} 
+                disabled={isGenerating || !aiPrompt.trim()}
+                className="w-full gap-2 rounded-lg"
+                data-testid="button-ai-generate"
+              >
+                {isGenerating && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isGenerating ? "Generating..." : "Generate Policy"}
+              </Button>
+            </div>
+          )}
           
           {aiQuestion && (
             <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
