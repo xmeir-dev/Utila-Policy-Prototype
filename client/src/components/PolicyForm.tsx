@@ -537,7 +537,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectItem value="any">Any destination</SelectItem>
                       <SelectItem value="internal">Internal only</SelectItem>
                       <SelectItem value="external">External only</SelectItem>
-                      <SelectItem value="whitelist">Specific</SelectItem>
+                      <SelectItem value="whitelist">Specific wallets</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
