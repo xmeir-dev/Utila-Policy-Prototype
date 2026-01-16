@@ -213,7 +213,7 @@ export default function Home() {
                         return (
                           <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-bold">Sent {tx.amount || "Unknown"}</span>
+                              <span className="text-sm font-medium">Sent {tx.amount || "Unknown"}</span>
                               <div className="flex items-center gap-2">
                                 <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
                                 {isInitiator ? (
