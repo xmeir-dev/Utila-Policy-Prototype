@@ -314,10 +314,20 @@ export default function Home() {
                                 </div>
                               </div>
                               <p className="mb-3 text-[14px] text-[#8a8a8a]">
-                                {Object.keys(pendingChanges).length > 0 
-                                  ? `Changes to: ${Object.keys(pendingChanges).slice(0, 3).join(', ')}${Object.keys(pendingChanges).length > 3 ? '...' : ''}`
-                                  : 'Policy modification pending approval'
-                                }
+                                {(() => {
+                                  if (pendingChanges.__delete === true) return 'Pending deletion';
+                                  
+                                  const changedFields = Object.keys(pendingChanges).filter(key => {
+                                    const currentVal = (policy as any)[key];
+                                    const pendingVal = pendingChanges[key];
+                                    return pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
+                                  });
+
+                                  if (changedFields.length > 0) {
+                                    return `Changes to: ${changedFields.slice(0, 3).join(', ')}${changedFields.length > 3 ? '...' : ''}`;
+                                  }
+                                  return 'Policy modification pending approval';
+                                })()}
                               </p>
                               <div className="text-[10px] text-muted-foreground">
                                 <span className="text-[14px] text-[#8a8a8a]">Updated on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
