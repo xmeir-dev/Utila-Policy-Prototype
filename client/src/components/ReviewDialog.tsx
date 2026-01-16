@@ -71,17 +71,15 @@ export function ReviewDialog({
         <div className="py-2">
           {details}
         </div>
-        <DialogFooter className="flex gap-3 sm:justify-end mt-6">
+        <DialogFooter className="flex gap-2 sm:justify-end mt-4">
           <Button
             variant="outline"
-            size="lg"
             onClick={() => onOpenChange(false)}
             data-testid={`${dataTestId}-close`}
           >
             Close
           </Button>
           <Button
-            size="lg"
             onClick={() => {
               onApprove();
               onOpenChange(false);

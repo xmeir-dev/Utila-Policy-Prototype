@@ -171,23 +171,4 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
-
-  /* Hover elevation effect */
-  .hover-elevate {
-    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .hover-elevate:hover {
-    background-color: var(--elevate-1);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Active/pressed elevation effect */
-  .active-elevate-2 {
-    transition: background-color 0.1s ease, transform 0.1s ease;
-  }
-  .active-elevate-2:active {
-    background-color: var(--elevate-2);
-    transform: translateY(0);
-  }
 }
