@@ -674,7 +674,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         {expandedSections.includes('approvals') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
             <div className="space-y-2">
-              <Label>Action</Label>
+              <Label>If conditions are met</Label>
               <Select
                 value={formData.action}
                 onValueChange={(value) => updateField('action', value)}
