@@ -14,6 +14,14 @@ import type { Policy, SimulateTransactionRequest } from "@shared/schema";
 
 const SAMPLE_ASSETS = ['BTC', 'ETH', 'USDC', 'USDT', 'SOL'];
 
+const AVAILABLE_USERS = [
+  'Meir',
+  'Ishai',
+  'Omer',
+  'Lena',
+  'Vitalik'
+];
+
 interface SimulationResult {
   matchedPolicy: Policy | null;
   action: string;
@@ -111,15 +119,20 @@ export function TransactionSimulator() {
       <form onSubmit={handleSimulate} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="sim-initiator">Initiator (User ID)</Label>
-            <Input
-              id="sim-initiator"
+            <Label htmlFor="sim-initiator">Initiator</Label>
+            <Select
               value={formData.initiator}
-              onChange={(e) => updateField('initiator', e.target.value)}
-              placeholder="user-123"
-              className="rounded-lg"
-              data-testid="input-sim-initiator"
-            />
+              onValueChange={(value) => updateField('initiator', value)}
+            >
+              <SelectTrigger id="sim-initiator" className="rounded-lg" data-testid="select-sim-initiator">
+                <SelectValue placeholder="Select initiator" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_USERS.map((user) => (
+                  <SelectItem key={user} value={user}>{user}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
