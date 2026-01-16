@@ -32,7 +32,7 @@ const CONTACTS = [
   { name: 'Bank of America', address: '0xa1cE2f3B4C5d6E7F8A9b0C1D2e3F4a5B6c7D8E9f', isInternal: false },
   { name: 'Finances', address: '0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F', isInternal: true },
   { name: 'Treasury', address: '0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F', isInternal: true },
-  { name: 'Vitalik Buterin', address: '0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F', isInternal: false },
+  { name: 'Nyca Partners', address: '0xDef01a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F', isInternal: false },
   { name: 'Meir', address: '0xE1f2A3b4C5d6E7f8A9B0c1D2E3f4A5b6C7d8E9f0', isInternal: true },
   { name: 'Ishai', address: '0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9', isInternal: true },
 ];
