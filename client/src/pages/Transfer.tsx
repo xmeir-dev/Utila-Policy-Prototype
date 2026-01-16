@@ -343,6 +343,9 @@ export default function Transfer() {
 
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [simulationResult, setSimulationResult] = useState<{ status: "approved" | "rejected" | "pending"; message: string } | null>(null);
+  
+  // Policy review warning state - shown when a transfer is affected by a policy under review
+  // This alerts users that the policy governing their transfer may change soon
   const [showPolicyReviewWarning, setShowPolicyReviewWarning] = useState(false);
   const [policyReviewInfo, setPolicyReviewInfo] = useState<{ changeType: 'edit' | 'delete' | null; policyName: string | null } | null>(null);
   const [pendingTransferData, setPendingTransferData] = useState<any>(null);
@@ -455,6 +458,7 @@ export default function Transfer() {
     }
   };
 
+  // User confirmed they want to proceed with transfer despite policy being in review
   const handleConfirmPolicyReviewContinue = async () => {
     setShowPolicyReviewWarning(false);
     if (pendingTransferData) {
@@ -464,6 +468,7 @@ export default function Transfer() {
     }
   };
 
+  // User cancelled the transfer after seeing policy review warning
   const handleCancelPolicyReviewWarning = () => {
     setShowPolicyReviewWarning(false);
     setPendingTransferData(null);
@@ -521,7 +526,8 @@ export default function Transfer() {
         return;
       }
 
-      // Check if the matched policy is currently in review
+      // Check if the matched policy is currently in review (edit or delete pending)
+      // If so, show warning dialog to let user confirm before proceeding
       if (result.policyInReview?.isInReview) {
         setPolicyReviewInfo({
           changeType: result.policyInReview.changeType,

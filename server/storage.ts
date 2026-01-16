@@ -243,7 +243,8 @@ export class DatabaseStorage implements IStorage {
   /**
    * Evaluates a transaction against all active policies in priority order.
    * Returns the first matching policy's action, or 'deny' if no match.
-   * This is the core policy engine that determines transaction fate.
+   * Also returns policyInReview info to alert users when the matched policy
+   * has pending changes (edit or deletion) awaiting approval.
    */
   async simulateTransaction(request: SimulateTransactionRequest): Promise<{ 
     matchedPolicy: Policy | null; 
@@ -263,7 +264,8 @@ export class DatabaseStorage implements IStorage {
     for (const policy of activePolicies) {
       const matches = this.checkPolicyMatch(policy, request);
       if (matches.matched) {
-        // Check if this policy has pending changes
+        // Check if this policy has pending changes (edit or delete awaiting approval)
+        // This info is returned to the frontend to warn users before proceeding
         let policyInReview = {
           isInReview: false,
           changeType: null as 'edit' | 'delete' | null,
@@ -272,6 +274,7 @@ export class DatabaseStorage implements IStorage {
 
         if (policy.status === 'pending_approval' && policy.pendingChanges) {
           const pendingChanges = JSON.parse(policy.pendingChanges);
+          // __delete flag indicates deletion request, otherwise it's an edit
           policyInReview = {
             isInReview: true,
             changeType: pendingChanges.__delete === true ? 'delete' : 'edit',
