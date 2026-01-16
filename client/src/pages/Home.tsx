@@ -1,17 +1,29 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
-import { Send, Gavel } from "lucide-react";
+import { Send, Gavel, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { RiCoinFill } from "react-icons/ri";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
+
+  const { data: pendingTransactions = [] } = useQuery<any[]>({
+    queryKey: ["/api/transactions/pending"],
+    enabled: walletState.isConnected,
+  });
+
+  // Filter for transactions created by user that require approval
+  // For the demo, we'll assume status "pending" means "Pending Approval"
+  const filteredTransfers = pendingTransactions.filter(tx => 
+    tx.status === "pending"
+  );
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -173,31 +185,43 @@ export default function Home() {
                     <h3 className="font-medium text-[16px]">Pending transfers</h3>
                   </div>
                   <div className="space-y-4">
-                    {/* Mocked pending transfers that would come from a real API */}
-                    <div className="p-4 rounded-[14px] bg-card/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-bold">Outgoing Transfer</span>
-                        <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
-                          <div className="w-3 h-3 rounded-full bg-blue-500" />
-                        </div>
-                        <span className="text-sm font-semibold">3,400 USD</span>
-                        <span className="text-[10px] text-muted-foreground">(= $3,396.6)</span>
-                      </div>
-                      <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">
-                        <div className="flex items-center gap-1">
-                          <span>Initiator:</span>
-                          <div className="flex items-center gap-1 text-foreground font-medium">
-                            <div className="w-3 h-3 rounded-full bg-orange-500" />
-                            Lucas Beach
+                    {filteredTransfers.length > 0 ? (
+                      filteredTransfers.map((tx) => (
+                        <div key={tx.id} className="p-4 rounded-[14px] bg-card/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-bold">{tx.type || "Outgoing Transfer"}</span>
+                            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
+                              <div className="w-3 h-3 rounded-full bg-blue-500" />
+                            </div>
+                            <span className="text-sm font-semibold">{tx.amount}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">
+                            <div className="flex items-center gap-1">
+                              <span>Initiator:</span>
+                              <div className="flex items-center gap-1 text-foreground font-medium">
+                                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                                {walletState.connectedUser?.name}
+                              </div>
+                            </div>
+                            <span>Created at: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date().toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                           </div>
                         </div>
-                        <span>Created at: 02:10 AM, March 8, 2024</span>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed border-border rounded-[14px] bg-card/20 text-center">
+                        <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mb-4">
+                          <Inbox className="w-6 h-6 text-muted-foreground/50" />
+                        </div>
+                        <h4 className="text-sm font-medium text-foreground mb-1">No pending transfers</h4>
+                        <p className="text-xs text-muted-foreground max-w-[200px]">
+                          Transfers requiring approval will appear here.
+                        </p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
