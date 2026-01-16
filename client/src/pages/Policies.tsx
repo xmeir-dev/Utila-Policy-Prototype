@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, ShieldEllipsis,
-  Trash2, Scale, GripVertical, Pencil, TestTubeDiagonal 
+  Trash2, Scale, GripVertical, Settings, TestTubeDiagonal 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -241,7 +241,7 @@ function SortablePolicyItem({
           onClick={onEdit}
           data-testid={`button-edit-policy-${policy.id}`}
         >
-          <Pencil className="w-4 h-4" />
+          <Settings className="w-4 h-4" />
         </Button>
         <Button
           variant="ghost"
