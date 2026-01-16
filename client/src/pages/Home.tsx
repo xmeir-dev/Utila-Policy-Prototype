@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
-import { Send, Gavel, Inbox, History, Wallet, FileEdit } from "lucide-react";
+import { Send, Gavel, Inbox, History, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -296,7 +296,6 @@ export default function Home() {
                             <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]" data-testid={`pending-policy-${policy.id}`}>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <FileEdit className="w-4 h-4 text-primary" />
                                   <span className="text-sm font-medium">Policy Change: {policy.name}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
