@@ -15,6 +15,7 @@ import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 
 interface Recipient {
   id: string;
