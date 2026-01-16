@@ -82,7 +82,7 @@ export function Navbar({ walletState }: NavbarProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md rounded-[22px] sm:rounded-[22px]" data-testid="dialog-select-wallet">
           <DialogHeader>
-            <DialogTitle className="tracking-tight font-medium text-[18px]">Select a wallet</DialogTitle>
+            <DialogTitle className="tracking-tight font-medium text-[16px]">Select a user</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-2 mt-4">
             {WALLET_USERS.map((user) => (
