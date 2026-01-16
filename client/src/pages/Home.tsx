@@ -298,13 +298,13 @@ export default function Home() {
                             pendingChanges = {};
                           }
                           return (
-                            <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]" data-testid={`pending-policy-${policy.id}`}>
+                            <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 px-2 py-3" data-testid={`pending-policy-${policy.id}`}>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium">Policy change</span>
+                                  <span className="text-[12px] text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1} approvals</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1}</span>
                                   <Button 
                                     size="sm" 
                                     className="h-6 px-3 text-xs"
@@ -337,11 +337,13 @@ export default function Home() {
                         {filteredTransfers.map((tx) => {
                           const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
                           return (
-                            <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]">
+                            <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 px-2 py-3">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
+                                  <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
+                                  <span className="text-[12px] text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1} approvals</span>
+                                </div>
+                                <div className="flex items-center gap-2">
                                   {isInitiator ? (
                                     <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
                                   ) : (
