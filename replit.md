@@ -67,8 +67,24 @@ shared/           # Shared code between client and server
 - `vite`: Frontend development and bundling
 
 ### Database Schema
-Two tables defined:
+Key tables:
 1. `users`: id, walletAddress, isConnected
 2. `transactions`: id, userId, type, amount, status, txHash
+3. `policies`: id, name, description, status, conditions, approvers, pendingChanges, changeApprovers, etc.
 
 Run `npm run db:push` to sync schema to database.
+
+## Key Features
+
+### Policy Change Approval System
+When a policy is edited, the changes don't take effect immediately. Instead:
+1. Changes are saved with status `pending_approval` and stored in `pendingChanges` field as JSON
+2. The policy appears in the "Requires approval" section on the Home page
+3. Authorized users can approve the change via the Approve button
+4. Once the required number of approvals is reached (default 1), changes are applied automatically
+5. The policy status returns to `active` and pending fields are cleared
+
+**API Endpoints:**
+- `GET /api/policies/pending?userName=<name>` - Fetch policies with pending changes
+- `PUT /api/policies/:id` - Submit policy changes for approval
+- `POST /api/policies/:id/approve-change` - Approve a pending policy change
