@@ -8,6 +8,7 @@ import Home from "@/pages/Home";
 import Transfer from "@/pages/Transfer";
 import Policies from "@/pages/Policies";
 import TransferHistory from "@/pages/TransferHistory";
+import Wallets from "@/pages/Wallets";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/transfer" component={Transfer} />
       <Route path="/policies" component={Policies} />
       <Route path="/history" component={TransferHistory} />
+      <Route path="/wallets" component={Wallets} />
       <Route component={NotFound} />
     </Switch>
   );
