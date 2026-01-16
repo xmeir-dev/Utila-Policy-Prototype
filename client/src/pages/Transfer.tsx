@@ -458,7 +458,9 @@ export default function Transfer() {
         type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
         amount: `${tokenAmount} ${selectedAsset.symbol}`,
         status: result.action === "require_approval" ? "pending" : "completed",
-        initiatorName: walletState.connectedUser.name
+        initiatorName: walletState.connectedUser.name,
+        approvals: [],
+        quorumRequired: result.matchedPolicy?.quorumRequired || 1
       });
 
       queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });

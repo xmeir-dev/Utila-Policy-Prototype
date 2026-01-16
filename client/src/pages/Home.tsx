@@ -214,17 +214,20 @@ export default function Home() {
                         <div key={tx.id} className="p-4 rounded-[14px] bg-card/50">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-bold">Sent {tx.amount || "Unknown"}</span>
-                            {isInitiator ? (
-                              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
-                            ) : (
-                              <Button 
-                                size="sm" 
-                                className="h-6 px-3 text-xs"
-                                data-testid={`button-approve-${tx.id}`}
-                              >
-                                Approve
-                              </Button>
-                            )}
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
+                              {isInitiator ? (
+                                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                              ) : (
+                                <Button 
+                                  size="sm" 
+                                  className="h-6 px-3 text-xs"
+                                  data-testid={`button-approve-${tx.id}`}
+                                >
+                                  Approve
+                                </Button>
+                              )}
+                            </div>
                           </div>
                           <p className="text-xs text-muted-foreground mb-3">From {tx.initiatorName || "Wallet"} to Bank of America</p>
                           <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">

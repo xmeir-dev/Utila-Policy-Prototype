@@ -24,6 +24,8 @@ export const transactions = pgTable("transactions", {
   status: text("status").notNull(), // 'pending', 'completed', 'failed'
   txHash: text("tx_hash"),
   initiatorName: text("initiator_name"),
+  approvals: text("approvals").array(), // names of approvers who have approved
+  quorumRequired: integer("quorum_required").default(1), // number of approvals needed
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true });
