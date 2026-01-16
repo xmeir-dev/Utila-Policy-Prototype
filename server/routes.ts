@@ -66,9 +66,14 @@ export async function registerRoutes(
 
   app.get("/api/transactions", async (req, res) => {
     try {
+      const userName = req.query.userName as string;
+      if (userName) {
+        const transactions = await storage.getTransactionsByUserName(userName);
+        return res.status(200).json(transactions);
+      }
       const userId = parseInt(req.query.userId as string);
       if (isNaN(userId)) {
-        return res.status(400).json({ message: "Missing or invalid userId parameter" });
+        return res.status(400).json({ message: "Missing or invalid userId/userName parameter" });
       }
       const transactions = await storage.getAllTransactions(userId);
       res.status(200).json(transactions);

@@ -76,14 +76,14 @@ export default function TransferHistory() {
   const walletState = useWallet();
 
   const { data: transactions = [], isLoading } = useQuery<Transaction[]>({
-    queryKey: ["/api/transactions", walletState.connectedUser?.id],
+    queryKey: ["/api/transactions", walletState.connectedUser?.name],
     queryFn: async () => {
-      if (!walletState.connectedUser?.id) return [];
-      const res = await fetch(`/api/transactions?userId=${walletState.connectedUser.id}`);
+      if (!walletState.connectedUser?.name) return [];
+      const res = await fetch(`/api/transactions?userName=${encodeURIComponent(walletState.connectedUser.name)}`);
       if (!res.ok) throw new Error("Failed to fetch transactions");
       return res.json();
     },
-    enabled: !!walletState.connectedUser?.id,
+    enabled: !!walletState.connectedUser?.name,
   });
 
   return (
