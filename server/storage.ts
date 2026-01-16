@@ -234,7 +234,8 @@ export class DatabaseStorage implements IStorage {
 
   async simulateTransaction(request: SimulateTransactionRequest): Promise<{ matchedPolicy: Policy | null; action: string; reason: string }> {
     const allPolicies = await this.getPolicies();
-    const activePolicies = allPolicies.filter(p => p.isActive && p.status === 'active');
+    // Include pending_approval policies because they are still active until change/deletion is approved
+    const activePolicies = allPolicies.filter(p => p.isActive && (p.status === 'active' || p.status === 'pending_approval'));
 
     for (const policy of activePolicies) {
       const matches = this.checkPolicyMatch(policy, request);
