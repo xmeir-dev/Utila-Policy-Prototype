@@ -171,4 +171,23 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
+
+  /* Hover elevation utilities with scale and color shift */
+  .hover-elevate {
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out, filter 150ms ease-out;
+  }
+
+  .hover-elevate:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    filter: brightness(0.97);
+  }
+
+  .dark .hover-elevate:hover {
+    filter: brightness(1.15);
+  }
+
+  .active-elevate-2:active {
+    transform: scale(0.98);
+  }
 }
