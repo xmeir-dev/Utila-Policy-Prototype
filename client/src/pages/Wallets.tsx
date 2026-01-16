@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, User, Building2, Wallet, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
@@ -84,10 +83,7 @@ export default function Wallets() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-medium">{wallet.balance}</div>
-                      <Badge variant="outline" className="text-xs">Internal</Badge>
-                    </div>
+                    <div className="font-medium">{wallet.balance}</div>
                   </div>
                 ))}
               </div>
@@ -117,9 +113,6 @@ export default function Wallets() {
                         </div>
                       </div>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      External
-                    </Badge>
                   </div>
                 ))}
               </div>
