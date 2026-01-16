@@ -57,8 +57,13 @@ export async function registerRoutes(
       if (!userName) {
         return res.status(400).json({ message: "Missing userName parameter" });
       }
-      const transactions = await storage.getPendingTransactions(userName);
-      res.status(200).json(transactions);
+      const transactions = await storage.getTransactions();
+      // For the demo, we show pending transactions to everyone.
+      // The frontend will handle showing "Approve" button vs "Pending Approval" badge.
+      const pending = transactions.filter(tx => 
+        tx.status === "pending"
+      );
+      res.status(200).json(pending);
     } catch (err) {
       res.status(500).json({ message: "Failed to fetch pending transactions" });
     }
