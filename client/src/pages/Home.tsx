@@ -318,7 +318,7 @@ export default function Home() {
                                   if (pendingChanges.__delete === true) return 'Pending deletion';
                                   
                                   const changedFields = Object.keys(pendingChanges).filter(key => {
-                                    if (key === 'status' || key === 'pendingChanges' || key === 'updatedAt') return false;
+                                    if (key === 'status' || key === 'pendingChanges' || key === 'updatedAt' || key === 'changeApprovers' || key === 'changeApproversList' || key === 'changeApprovalsRequired' || key === 'changeInitiator') return false;
                                     const currentVal = (policy as any)[key];
                                     const pendingVal = pendingChanges[key];
                                     return pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
