@@ -927,7 +927,18 @@ export default function Transfer() {
                           </div>
                           <div className="flex flex-col">
                             <span className="text-sm font-semibold">{wallet.name}</span>
-                            <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground font-mono">{wallet.address}</span>
+                              <a 
+                                href={`https://etherscan.io/address/${wallet.address}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:opacity-80 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <img src={etherscanLogo} alt="Etherscan" className="w-3 h-3 grayscale opacity-70 hover:grayscale-0 hover:opacity-100" />
+                              </a>
+                            </div>
                           </div>
                         </div>
                         <div className="text-right">
