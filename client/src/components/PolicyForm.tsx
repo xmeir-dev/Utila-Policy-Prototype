@@ -326,6 +326,12 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
   const disabledReason = getDisabledReason();
 
+  const isInitiatorConfigured = formData.initiatorType !== 'any';
+  const isSourceConfigured = formData.sourceWalletType !== 'any';
+  const isDestinationConfigured = formData.destinationType !== 'any';
+  const isAmountConfigured = formData.amountCondition !== 'any';
+  const isAssetConfigured = formData.assetType !== 'any';
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
