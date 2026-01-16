@@ -15,7 +15,7 @@ export const WALLET_USERS: WalletUser[] = [
   { id: 2, name: "Ishai", address: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", avatarBg: "bg-emerald-500", avatarColor: "text-white" },
   { id: 3, name: "Omer", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", avatarBg: "bg-orange-500", avatarColor: "text-white" },
   { id: 4, name: "Lena", address: "0x6B175474E89094C44Da98b954EesecdB6F8e5389", avatarBg: "bg-purple-500", avatarColor: "text-white" },
-  { id: 5, name: "Vitalik", address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", avatarBg: "bg-rose-500", avatarColor: "text-white" },
+  { id: 5, name: "Sam", address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", avatarBg: "bg-rose-500", avatarColor: "text-white" },
 ];
 
 function isValidWalletUser(obj: unknown): obj is WalletUser {

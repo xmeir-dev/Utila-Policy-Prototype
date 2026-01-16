@@ -162,9 +162,7 @@ export default function Home() {
                   className="rounded-[16px] px-8 h-[56px] text-lg font-semibold hover-elevate active-elevate-2"
                   onClick={() => setIsDialogOpen(true)}
                   data-testid="button-get-started"
-                >
-                  Get Started
-                </Button>
+                >Start by Connecting Wallet</Button>
 
                 <div className="flex flex-col gap-2">
                   <Button 
