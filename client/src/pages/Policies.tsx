@@ -224,16 +224,9 @@ function SortablePolicyItem({
       </div>
       <div className="flex items-center gap-1 shrink-0">
         {isPendingApproval && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-500/10"
-            onClick={onApprove}
-            data-testid={`button-approve-policy-${policy.id}`}
-          >
-            <CheckCircle className="w-4 h-4 mr-1" />
-            Approve
-          </Button>
+          <span className="text-xs text-amber-600 dark:text-amber-400 px-2" data-testid={`pending-label-policy-${policy.id}`}>
+            Changes pending
+          </span>
         )}
         <Button
           variant="ghost"
