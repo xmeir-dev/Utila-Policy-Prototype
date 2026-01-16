@@ -200,7 +200,7 @@ function SortablePolicyItem({
           </span>
           <Badge 
             variant="outline" 
-            className={`h-5 px-1.5 text-[11px] ${
+            className={`h-5 px-1.5 text-[14px] font-normal ${
               policy.action === 'allow' 
                 ? 'text-green-600 border-green-600/30 bg-green-500/10' 
                 : policy.action === 'deny' 
