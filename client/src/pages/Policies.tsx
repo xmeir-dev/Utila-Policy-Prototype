@@ -224,12 +224,14 @@ function SortablePolicyItem({
             <TooltipTrigger asChild>
               <button 
                 onClick={() => onShowPending?.(policy)}
-                className="group inline-flex items-center gap-1 h-5 px-2 text-[14px] font-normal rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-default"
+                className="group inline-flex items-center h-5 px-2 text-[14px] font-normal rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-200 cursor-default overflow-hidden whitespace-nowrap"
                 data-testid={`pending-label-policy-${policy.id}`}
               >
-                <ShieldEllipsis className="w-3.5 h-3.5" />
-                <span>Changes pending</span>
-                <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-center gap-1">
+                  <ShieldEllipsis className="w-3.5 h-3.5 shrink-0" />
+                  <span>Changes pending</span>
+                </div>
+                <ChevronRight className="w-0 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-200 shrink-0 ml-0 group-hover:ml-1" />
               </button>
             </TooltipTrigger>
             <TooltipContent className="max-w-[280px]">
