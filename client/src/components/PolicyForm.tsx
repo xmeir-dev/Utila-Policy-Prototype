@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp, GitBranch, Trash2, Wand2, Loader2, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -294,6 +295,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
   const [conversationHistory, setConversationHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [aiGenerationComplete, setAiGenerationComplete] = useState(false);
+  const [reviewedAndApproved, setReviewedAndApproved] = useState(false);
   const [showManualFields, setShowManualFields] = useState(isEditMode);
   const [expandedSections, setExpandedSections] = useState<string[]>(['details', 'conditions', 'initiator']);
 
@@ -384,7 +386,8 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     formData.description?.trim() && 
     formData.changeApproversList && 
     formData.changeApproversList.length > 0 &&
-    (formData.action !== 'require_approval' || (formData.approvers && formData.approvers.length > 0));
+    (formData.action !== 'require_approval' || (formData.approvers && formData.approvers.length > 0)) &&
+    (!aiGenerationComplete || reviewedAndApproved);
 
   const getDisabledReason = () => {
     if (!formData.name?.trim()) return "Please enter a policy name";
@@ -394,6 +397,9 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     }
     if (formData.action === 'require_approval' && (!formData.approvers || formData.approvers.length === 0)) {
       return "Please select at least one user who can approve transactions";
+    }
+    if (aiGenerationComplete && !reviewedAndApproved) {
+      return "Please confirm you have reviewed and approved this policy";
     }
     return null;
   };
@@ -943,6 +949,19 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
               </div>
             )}
           </div>
+        </div>
+      )}
+      {aiGenerationComplete && (
+        <div className="flex items-center gap-2 py-4">
+          <Checkbox 
+            id="reviewed-approved"
+            checked={reviewedAndApproved}
+            onCheckedChange={(checked) => setReviewedAndApproved(checked === true)}
+            data-testid="checkbox-reviewed-approved"
+          />
+          <Label htmlFor="reviewed-approved" className="text-sm cursor-pointer">
+            I reviewed and approve this policy
+          </Label>
         </div>
       )}
       <div className="pt-6 flex items-center justify-between sticky bottom-0 bg-background py-4 border-t border-border mt-12">
