@@ -200,6 +200,18 @@ function SortablePolicyItem({
           <span className={`font-medium text-foreground text-[14px] ${!policy.isActive ? 'opacity-50' : ''}`}>
             {policy.name}
           </span>
+          <Badge 
+            variant="outline" 
+            className={`h-5 px-1.5 text-[11px] ${
+              policy.action === 'allow' 
+                ? 'text-green-600 border-green-600/30 bg-green-500/10' 
+                : policy.action === 'deny' 
+                  ? 'text-red-600 border-red-600/30 bg-red-500/10' 
+                  : 'text-amber-600 border-amber-600/30 bg-amber-500/10'
+            }`}
+          >
+            {policy.action === 'allow' ? 'Approved' : policy.action === 'deny' ? 'Denied' : 'Requires approval'}
+          </Badge>
           {!policy.isActive && (
             <Badge variant="secondary" className="h-5 px-1.5 text-[11px]">
               Disabled
