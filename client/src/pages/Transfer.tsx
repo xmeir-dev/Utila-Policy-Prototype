@@ -365,20 +365,51 @@ export default function Transfer() {
     setShowSimulationModal(true);
   };
 
-  const handleContinue = () => {
-    const totalAmount = getTotalRecipientAmount();
-    const tokenAmount = totalAmount / selectedAsset.price;
-    console.log("Transfer:", { 
-      totalUSD: totalAmount,
-      tokenAmount: tokenAmount.toFixed(4),
-      asset: selectedAsset.symbol, 
-      recipients: recipients.map(r => ({
-        address: r.address,
-        label: r.label,
-        amountUSD: parseFloat(r.amount),
-        tokenAmount: (parseFloat(r.amount) / selectedAsset.price).toFixed(4)
-      }))
-    });
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleContinue = async () => {
+    setIsProcessing(true);
+    try {
+      const totalAmount = getTotalRecipientAmount();
+      
+      // Call simulation logic internally to decide if it's approved or needs approval
+      const totalRequired = totalAmount;
+      const available = getAvailableBalance();
+      
+      let status: "pending" | "completed" | "failed" = "completed";
+      let message = "Transfer successful!";
+
+      if (totalRequired > available) {
+        status = "failed";
+        message = "Transfer failed: Insufficient funds.";
+      } else {
+        // Mocking policy check: if amount > 1000, it needs approval (pending)
+        if (totalRequired > 1000) {
+          status = "pending";
+          message = "Transfer initiated and pending approval based on organization policies.";
+        }
+      }
+
+      setSimulationResult({
+        status: status === "failed" ? "rejected" : "approved",
+        message: message
+      });
+      setShowSimulationModal(true);
+
+      if (status !== "failed") {
+        // Add to transactions via API if we had a real backend for this
+        // For now, we'll just invalidate the list query to show we're updated
+        queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
+      }
+    } catch (error) {
+      setSimulationResult({
+        status: "rejected",
+        message: "An error occurred while processing the transfer."
+      });
+      setShowSimulationModal(true);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
     const { data: policies = [], isLoading: isLoadingPolicies } = useQuery<any[]>({
@@ -667,11 +698,11 @@ export default function Transfer() {
               <Button
                 size="lg"
                 className="w-full text-lg font-semibold rounded-[16px] h-[48px]"
-                disabled={!canSend}
+                disabled={!canSend || isProcessing}
                 onClick={handleContinue}
                 data-testid="button-continue"
               >
-                Send
+                {isProcessing ? "Processing..." : "Send"}
               </Button>
             )}
             <Button

@@ -172,7 +172,12 @@ export default function Home() {
                     <h3 className="font-medium text-[16px]">Pending transfers</h3>
                   </div>
                   <div className="space-y-4">
+                    {/* Mocked pending transfers that would come from a real API */}
                     <div className="p-4 rounded-[14px] bg-card/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-bold">Outgoing Transfer</span>
+                        <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                      </div>
                       <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
