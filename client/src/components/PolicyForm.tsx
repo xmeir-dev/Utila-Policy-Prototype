@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -250,6 +251,7 @@ function MultiWalletSelector({
 }
 
 export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, submitLabel = "Save Policy" }: PolicyFormProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<InsertPolicy>>({
     name: "",
     description: "",
@@ -290,10 +292,24 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name?.trim() || !formData.description?.trim()) return;
+    
+    // Validate policy change approvers
+    if (!formData.changeApproversList || formData.changeApproversList.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please select at least one user who can approve changes to this policy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     onSubmit(formData as InsertPolicy);
   };
 
-  const isValid = formData.name?.trim() && formData.description?.trim();
+  const isValid = formData.name?.trim() && 
+    formData.description?.trim() && 
+    formData.changeApproversList && 
+    formData.changeApproversList.length > 0;
 
   const isInitiatorConfigured = formData.initiatorType !== 'any';
   const isSourceConfigured = formData.sourceWalletType !== 'any';
