@@ -229,7 +229,7 @@ export default function Home() {
                                 )}
                               </div>
                             </div>
-                            <p className="text-xs text-muted-foreground mb-3">From {tx.initiatorName || "Wallet"} to Bank of America</p>
+                            <p className="mb-3 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
                             <div className="text-[10px] text-muted-foreground">
                               <span>Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
                             </div>
