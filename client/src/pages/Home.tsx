@@ -100,7 +100,6 @@ export default function Home() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium text-[16px]">Top holdings</h3>
-                    <Button variant="link" className="text-xs text-muted-foreground p-0 h-auto">See all</Button>
                   </div>
                   <div className="space-y-3">
                     {(() => {
