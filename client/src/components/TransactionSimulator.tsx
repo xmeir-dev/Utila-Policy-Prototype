@@ -229,14 +229,14 @@ export function TransactionSimulator() {
   return (
     <div className="space-y-6">
       <form onSubmit={handleSimulate} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           <div className="space-y-2">
             <Label htmlFor="sim-initiator">Initiator</Label>
             <Select
               value={formData.initiator}
               onValueChange={(value) => updateField('initiator', value)}
             >
-              <SelectTrigger id="sim-initiator" className="rounded-lg" data-testid="select-sim-initiator">
+              <SelectTrigger id="sim-initiator" className="rounded-lg w-full" data-testid="select-sim-initiator">
                 <SelectValue placeholder="Select initiator" />
               </SelectTrigger>
               <SelectContent>
@@ -265,34 +265,36 @@ export function TransactionSimulator() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="sim-amount">Amount (USD)</Label>
-            <Input
-              id="sim-amount"
-              type="number"
-              value={formData.amountUsd || ''}
-              onChange={(e) => updateField('amountUsd', parseFloat(e.target.value) || 0)}
-              placeholder="1000"
-              className="rounded-lg"
-              data-testid="input-sim-amount"
-            />
-          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="sim-amount">Amount (USD)</Label>
+              <Input
+                id="sim-amount"
+                type="number"
+                value={formData.amountUsd || ''}
+                onChange={(e) => updateField('amountUsd', parseFloat(e.target.value) || 0)}
+                placeholder="1000"
+                className="rounded-lg"
+                data-testid="input-sim-amount"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="sim-asset">Asset</Label>
-            <Select
-              value={formData.asset}
-              onValueChange={(value) => updateField('asset', value)}
-            >
-              <SelectTrigger className="rounded-lg" data-testid="select-sim-asset">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SAMPLE_ASSETS.map((asset) => (
-                  <SelectItem key={asset} value={asset}>{asset}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="sim-asset">Asset</Label>
+              <Select
+                value={formData.asset}
+                onValueChange={(value) => updateField('asset', value)}
+              >
+                <SelectTrigger className="rounded-lg" data-testid="select-sim-asset">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SAMPLE_ASSETS.map((asset) => (
+                    <SelectItem key={asset} value={asset}>{asset}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
