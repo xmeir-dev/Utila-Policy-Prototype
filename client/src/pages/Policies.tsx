@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, 
+  ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, ShieldEllipsis,
   Trash2, Scale, GripVertical, Pencil, TestTubeDiagonal 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -217,13 +217,14 @@ function SortablePolicyItem({
       </div>
       <div className="flex items-center gap-1 shrink-0">
         {isPendingApproval && (
-          <Tooltip>
+          <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
               <Badge 
-                variant="outline" 
-                className="h-5 px-2 text-[14px] font-normal border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-default"
+                variant="secondary" 
+                className="h-5 px-2 text-[14px] font-normal gap-1 cursor-default"
                 data-testid={`pending-label-policy-${policy.id}`}
               >
+                <ShieldEllipsis className="w-3.5 h-3.5" />
                 Changes pending
               </Badge>
             </TooltipTrigger>
