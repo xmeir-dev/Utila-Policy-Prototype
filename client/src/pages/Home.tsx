@@ -132,7 +132,7 @@ export default function Home() {
                   data-testid="button-transfer"
                 >
                   <Send className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Transfer Funds</span>
+                  <span className="font-semibold text-center">Transfer</span>
                 </div>
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
@@ -140,7 +140,7 @@ export default function Home() {
                   data-testid="button-policies"
                 >
                   <Gavel className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Organization Policies</span>
+                  <span className="font-semibold text-center">Policies</span>
                 </div>
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
@@ -148,7 +148,7 @@ export default function Home() {
                   data-testid="button-history"
                 >
                   <History className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Transfer History</span>
+                  <span className="font-semibold text-center">Activity</span>
                 </div>
               </div>
 
