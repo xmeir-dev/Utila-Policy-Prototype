@@ -537,13 +537,13 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                       <SelectItem value="any">Any destination</SelectItem>
                       <SelectItem value="internal">Internal only</SelectItem>
                       <SelectItem value="external">External only</SelectItem>
-                      <SelectItem value="whitelist">Whitelisted addresses</SelectItem>
+                      <SelectItem value="whitelist">Specific</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 {formData.destinationType === 'whitelist' && (
                   <div className="space-y-2">
-                    <Label className="text-sm">Whitelisted addresses</Label>
+                    <Label className="text-sm">Specific wallets</Label>
                     <MultiWalletSelector
                       selected={formData.destinationValues || []}
                       onChange={(values) => updateField('destinationValues', values)}
