@@ -313,7 +313,7 @@ export default function Home() {
                               </div>
                               <p className="mb-3 text-[14px] text-[#8a8a8a]">
                                 {(() => {
-                                  if (pendingChanges.__delete === true) return 'Pending deletion';
+                                  if (pendingChanges.__delete === true) return `Pending deletion: ${policy.name}`;
                                   
                                   const changedFields = Object.keys(pendingChanges).filter(key => {
                                     if (key === 'status' || key === 'pendingChanges' || key === 'updatedAt' || key === 'changeApprovers' || key === 'changeApproversList' || key === 'changeApprovalsRequired' || key === 'changeInitiator') return false;
@@ -323,9 +323,9 @@ export default function Home() {
                                   });
 
                                   if (changedFields.length > 0) {
-                                    return `Changes to: ${changedFields.slice(0, 3).join(', ')}${changedFields.length > 3 ? '...' : ''}`;
+                                    return `Changes to: ${policy.name} (${changedFields.slice(0, 3).join(', ')}${changedFields.length > 3 ? '...' : ''})`;
                                   }
-                                  return 'Policy modification pending approval';
+                                  return `Policy modification pending approval: ${policy.name}`;
                                 })()}
                               </p>
                               <div className="text-[10px] text-muted-foreground">
