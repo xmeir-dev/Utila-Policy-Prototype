@@ -110,18 +110,6 @@ export function TransactionSimulator() {
 
   return (
     <Card className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-primary/10">
-          <Beaker className="w-5 h-5 text-primary" />
-        </div>
-        <div>
-          <h3 className="font-semibold">Transaction Simulator</h3>
-          <p className="text-sm text-muted-foreground">
-            Test which policy would trigger for a hypothetical transaction
-          </p>
-        </div>
-      </div>
-
       <form onSubmit={handleSimulate} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
