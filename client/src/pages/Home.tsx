@@ -208,11 +208,23 @@ export default function Home() {
                   </div>
                   <div className="space-y-4">
                     {filteredTransfers.length > 0 ? (
-                      filteredTransfers.map((tx) => (
+                      filteredTransfers.map((tx) => {
+                        const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
+                        return (
                         <div key={tx.id} className="p-4 rounded-[14px] bg-card/50">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-bold">{tx.type || "Outgoing Transfer"}</span>
-                            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                            {isInitiator ? (
+                              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                            ) : (
+                              <Button 
+                                size="sm" 
+                                className="h-6 px-3 text-xs"
+                                data-testid={`button-approve-${tx.id}`}
+                              >
+                                Approve
+                              </Button>
+                            )}
                           </div>
                           <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
                           <div className="flex items-center gap-2 mb-3">
@@ -230,7 +242,8 @@ export default function Home() {
                             <span>Created at: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date().toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                           </div>
                         </div>
-                      ))
+                      );
+                      })
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed border-border rounded-[14px] bg-card/20 text-center">
                         <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mb-4">
