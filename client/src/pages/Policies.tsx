@@ -299,7 +299,10 @@ export default function Policies() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
       setEditingPolicy(null);
-      toast({ title: "Policy updated successfully" });
+      toast({ 
+        title: "Policy change submitted", 
+        description: "Changes require approval before taking effect." 
+      });
     },
     onError: () => {
       toast({ title: "Failed to update policy", variant: "destructive" });

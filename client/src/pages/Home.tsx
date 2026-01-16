@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
-import { Send, Gavel, Inbox, History, Wallet } from "lucide-react";
+import { Send, Gavel, Inbox, History, Wallet, FileEdit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import type { Policy } from "@shared/schema";
+import { api } from "@shared/routes";
 
 const getAssetIcon = (amount: string) => {
   if (amount.includes("ETH")) return <SiEthereum className="w-4 h-4 text-[#627EEA]" />;
@@ -54,6 +56,22 @@ export default function Home() {
     },
   });
 
+  const approvePolicyMutation = useMutation({
+    mutationFn: async (policyId: number) => {
+      return await apiRequest('POST', `/api/policies/${policyId}/approve-change`, {
+        approver: walletState.connectedUser?.name || 'anonymous'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/policies/pending"] });
+      queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+      toast({ title: "Policy change approved" });
+    },
+    onError: () => {
+      toast({ title: "Failed to approve policy change", variant: "destructive" });
+    },
+  });
+
   const { data: pendingTransactions = [], refetch: refetchPending } = useQuery<any[]>({
     queryKey: ["/api/transactions/pending", walletState.connectedUser?.name],
     queryFn: async () => {
@@ -65,12 +83,24 @@ export default function Home() {
     enabled: !!walletState.connectedUser?.name,
   });
 
+  const { data: pendingPolicies = [], refetch: refetchPendingPolicies } = useQuery<Policy[]>({
+    queryKey: ["/api/policies/pending", walletState.connectedUser?.name],
+    queryFn: async () => {
+      if (!walletState.connectedUser?.name) return [];
+      const res = await fetch(`/api/policies/pending?userName=${encodeURIComponent(walletState.connectedUser.name)}`);
+      if (!res.ok) throw new Error("Failed to fetch pending policy changes");
+      return res.json();
+    },
+    enabled: !!walletState.connectedUser?.name,
+  });
+
   // Re-fetch when user changes
     useEffect(() => {
       if (walletState.connectedUser?.name) {
         refetchPending();
+        refetchPendingPolicies();
       }
-    }, [walletState.connectedUser?.name, refetchPending]);
+    }, [walletState.connectedUser?.name, refetchPending, refetchPendingPolicies]);
 
   // Filter for transactions that actually require approval
   // For the demo, we'll assume status "pending" means "Pending Approval"
@@ -254,37 +284,78 @@ export default function Home() {
                     <h3 className="font-medium text-[16px]">Requires approval</h3>
                   </div>
                   <div className="space-y-4">
-                    {filteredTransfers.length > 0 ? (
-                      filteredTransfers.map((tx) => {
-                        const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
-                        return (
-                          <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
-                                {isInitiator ? (
-                                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
-                                ) : (
+                    {(filteredTransfers.length > 0 || pendingPolicies.length > 0) ? (
+                      <>
+                        {pendingPolicies.map((policy) => {
+                          let pendingChanges: Record<string, unknown> = {};
+                          try {
+                            pendingChanges = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
+                          } catch {
+                            pendingChanges = {};
+                          }
+                          return (
+                            <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]" data-testid={`pending-policy-${policy.id}`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <FileEdit className="w-4 h-4 text-primary" />
+                                  <span className="text-sm font-medium">Policy Change: {policy.name}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1}</span>
                                   <Button 
                                     size="sm" 
                                     className="h-6 px-3 text-xs"
-                                    onClick={() => approveMutation.mutate(tx.id)}
-                                    disabled={approveMutation.isPending}
-                                    data-testid={`button-approve-${tx.id}`}
+                                    onClick={() => approvePolicyMutation.mutate(policy.id)}
+                                    disabled={approvePolicyMutation.isPending}
+                                    data-testid={`button-approve-policy-${policy.id}`}
                                   >
-                                    {approveMutation.isPending ? 'Approving...' : 'Approve'}
+                                    {approvePolicyMutation.isPending ? 'Approving...' : 'Approve'}
                                   </Button>
-                                )}
+                                </div>
+                              </div>
+                              <p className="mb-3 text-[14px] text-[#8a8a8a]">
+                                {Object.keys(pendingChanges).length > 0 
+                                  ? `Changes to: ${Object.keys(pendingChanges).slice(0, 3).join(', ')}${Object.keys(pendingChanges).length > 3 ? '...' : ''}`
+                                  : 'Policy modification pending approval'
+                                }
+                              </p>
+                              <div className="text-[10px] text-muted-foreground">
+                                <span className="text-[14px] text-[#8a8a8a]">Updated on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                               </div>
                             </div>
-                            <p className="mb-3 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
-                            <div className="text-[10px] text-muted-foreground">
-                              <span className="text-[14px] text-[#8a8a8a]">Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
+                          );
+                        })}
+                        {filteredTransfers.map((tx) => {
+                          const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
+                          return (
+                            <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
+                                  {isInitiator ? (
+                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                                  ) : (
+                                    <Button 
+                                      size="sm" 
+                                      className="h-6 px-3 text-xs"
+                                      onClick={() => approveMutation.mutate(tx.id)}
+                                      disabled={approveMutation.isPending}
+                                      data-testid={`button-approve-${tx.id}`}
+                                    >
+                                      {approveMutation.isPending ? 'Approving...' : 'Approve'}
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="mb-3 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
+                              <div className="text-[10px] text-muted-foreground">
+                                <span className="text-[14px] text-[#8a8a8a]">Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })
+                          );
+                        })}
+                      </>
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed border-border rounded-[14px] bg-card/20 text-center">
                         <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mb-4">

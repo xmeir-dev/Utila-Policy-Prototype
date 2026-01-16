@@ -13,8 +13,10 @@ export interface IStorage {
   createTransaction(tx: InsertTransaction): Promise<Transaction>;
   getPolicies(): Promise<Policy[]>;
   getPolicy(id: number): Promise<Policy | undefined>;
+  getPendingPolicyChanges(userName: string): Promise<Policy[]>;
   createPolicy(policy: InsertPolicy): Promise<Policy>;
   updatePolicy(id: number, policy: Partial<InsertPolicy>): Promise<Policy | undefined>;
+  submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string): Promise<Policy | undefined>;
   deletePolicy(id: number): Promise<boolean>;
   togglePolicy(id: number): Promise<Policy | undefined>;
   reorderPolicies(orderedIds: number[]): Promise<Policy[]>;
@@ -109,6 +111,44 @@ export class DatabaseStorage implements IStorage {
   async getPolicy(id: number): Promise<Policy | undefined> {
     const [policy] = await db.select().from(policies).where(eq(policies.id, id));
     return policy;
+  }
+
+  async getPendingPolicyChanges(userName: string): Promise<Policy[]> {
+    const allPolicies = await this.getPolicies();
+    const pendingPolicies = allPolicies.filter(p => p.status === 'pending_approval');
+    
+    // Return policies where user is an approver for policy changes
+    // For now, we return all pending policies (any user can approve)
+    // In production, you'd filter by changeApproversList
+    return pendingPolicies;
+  }
+
+  async submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string): Promise<Policy | undefined> {
+    const policy = await this.getPolicy(id);
+    if (!policy) return undefined;
+
+    // Get default approvers and quorum from existing require_approval policies
+    const allPolicies = await this.getPolicies();
+    const approvalPolicy = allPolicies.find(p => 
+      p.isActive && p.status === 'active' && p.action === 'require_approval'
+    );
+    
+    const approversList = approvalPolicy?.approvers || [];
+    const quorumRequired = approvalPolicy?.quorumRequired || 1;
+
+    const [updated] = await db
+      .update(policies)
+      .set({
+        status: 'pending_approval',
+        pendingChanges: JSON.stringify(changes),
+        changeApprovers: [],
+        changeApproversList: approversList,
+        changeApprovalsRequired: quorumRequired,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(policies.id, id))
+      .returning();
+    return updated;
   }
 
   async createPolicy(policy: InsertPolicy): Promise<Policy> {

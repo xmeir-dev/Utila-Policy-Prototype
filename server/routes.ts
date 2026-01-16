@@ -92,6 +92,20 @@ export async function registerRoutes(
     }
   });
 
+  // This route must come before /api/policies/:id to avoid "pending" being parsed as an id
+  app.get('/api/policies/pending', async (req, res) => {
+    try {
+      const userName = req.query.userName as string;
+      if (!userName) {
+        return res.status(400).json({ message: "Missing userName parameter" });
+      }
+      const pendingPolicies = await storage.getPendingPolicyChanges(userName);
+      res.status(200).json(pendingPolicies);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch pending policy changes" });
+    }
+  });
+
   app.get('/api/policies/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -142,6 +156,7 @@ export async function registerRoutes(
       }
       
       const input = api.policies.update.input.parse(req.body);
+      const submitter = req.query.submitter as string || 'anonymous';
       
       // Validate action if provided
       if (input.action) {
@@ -154,7 +169,8 @@ export async function registerRoutes(
         }
       }
       
-      const policy = await storage.updatePolicy(id, input);
+      // Submit policy change for approval instead of applying directly
+      const policy = await storage.submitPolicyChange(id, input, submitter);
       if (!policy) {
         return res.status(404).json({ message: "Policy not found" });
       }
