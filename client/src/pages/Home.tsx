@@ -316,7 +316,14 @@ export default function Home() {
                               </p>
                               <div className="text-[10px] text-muted-foreground">
                                 <span className="text-[14px] text-[#8a8a8a]">
-                                  Initiated by <span className="text-foreground font-medium">{policy.changeInitiator || "Unknown"}</span> on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {policy.updatedAt ? new Date(policy.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}
+                                  Initiated by <span className="text-foreground font-medium">{(() => {
+                                    if (policy.changeInitiator === "anonymous") return "Meir";
+                                    if (policy.changeInitiator?.startsWith("0x")) {
+                                      if (policy.changeInitiator === "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1") return "Omer";
+                                      return "Ishai";
+                                    }
+                                    return policy.changeInitiator || "Unknown";
+                                  })()}</span> on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {policy.updatedAt ? new Date(policy.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}
                                 </span>
                               </div>
                             </div>
