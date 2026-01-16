@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
-import { Send, Gavel, LibraryBig } from "lucide-react";
+import { Send, Gavel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -77,7 +77,7 @@ export default function Home() {
                 Hi <span className="font-bold">{walletState.connectedUser?.name}</span>, welcome to your Waystar Royco workspace
               </h2>
 
-              <div className="grid grid-cols-3 gap-4 mb-12 w-full">
+              <div className="grid grid-cols-2 gap-4 mb-12 w-full">
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
@@ -93,10 +93,6 @@ export default function Home() {
                 >
                   <Gavel className="w-8 h-8 text-primary" />
                   <span className="font-semibold">Policies</span>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2">
-                  <LibraryBig className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">Activity</span>
                 </div>
               </div>
 
