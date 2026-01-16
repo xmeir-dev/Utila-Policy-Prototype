@@ -189,7 +189,7 @@ export default function TransferHistory() {
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
                               <span className="text-sm">{date}</span>
-                              <span className="text-xs text-muted-foreground">{time}</span>
+                              <span className="text-xs text-[#8a8a8a]">{time}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4">
