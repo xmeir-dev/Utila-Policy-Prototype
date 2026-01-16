@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, CheckCircle2, Clock, XCircle, Users } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, XCircle, Users, ExternalLink } from "lucide-react";
+import etherscanLogo from "@assets/etherscan-logo-circle_1768521442428.png"
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
@@ -152,14 +153,38 @@ export default function TransferHistory() {
                             <span className="font-semibold text-sm">{formatAmount(tx.amount)}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm text-muted-foreground font-mono">
-                              {tx.fromWallet || "-"}
-                            </span>
+                            <div className="flex items-center gap-2 group">
+                              <span className="text-sm font-normal text-[#171717]">
+                                {tx.fromWallet || "-"}
+                              </span>
+                              {tx.fromWallet && (
+                                <a 
+                                  href={`https://etherscan.io/address/${walletState.walletAddress}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <img src={etherscanLogo} alt="Etherscan" className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm font-medium">
-                              {tx.toLabel || truncateAddress(tx.toAddress || "")}
-                            </span>
+                            <div className="flex items-center gap-2 group">
+                              <span className="text-sm font-normal text-[#171717]">
+                                {tx.toLabel || truncateAddress(tx.toAddress || "")}
+                              </span>
+                              {tx.toAddress && (
+                                <a 
+                                  href={`https://etherscan.io/address/${tx.toAddress}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <img src={etherscanLogo} alt="Etherscan" className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
