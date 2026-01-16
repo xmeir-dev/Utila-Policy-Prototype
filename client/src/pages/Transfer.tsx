@@ -440,7 +440,7 @@ export default function Transfer() {
 
       // Create the transaction in the database
       await apiRequest("POST", "/api/transactions", {
-        userId: walletState.connectedUser?.id,
+        userId: Number(walletState.connectedUser?.id),
         type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
         amount: `${recipients[0]?.amount} ${selectedAsset.symbol}`,
         status: result.action === "require_approval" ? "pending" : "completed",
