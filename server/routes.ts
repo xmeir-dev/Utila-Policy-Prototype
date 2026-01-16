@@ -157,11 +157,16 @@ Available users: Meir, Ishai, Omer, Lena, Vitalik
 Available wallets: Finances, Treasury
 Available assets: ETH, USDC, USDT
 
-Rules:
-1. Extract as much information as possible from what the user provides
-2. If critical information is missing, ask ONE simple question to get it
-3. Keep questions short and friendly
-4. Once you have enough info to create a sensible policy, mark it as complete
+IMPORTANT RULES - YOU MUST ASK QUESTIONS:
+1. Extract what the user explicitly provides
+2. YOU MUST ask about each of these if NOT explicitly specified by the user:
+   - Amount limits (should this apply to transfers of any amount, or only above/below a certain threshold?)
+   - Source wallet restrictions (should this apply from any wallet, or specific ones like Finances or Treasury?)
+   - Destination restrictions (any destination, or specific addresses/contacts?)
+   - How many approvals are needed if action is require_approval?
+3. Ask ONE question at a time, in a friendly conversational way
+4. Do NOT assume defaults - always ask the user to confirm
+5. Only mark isComplete: true after you have asked about amount, source, and destination
 
 Return JSON: {
   "policy": { ...partial or complete policy object... },
