@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { insertTransactionSchema } from "@shared/schema";
+import { openai } from "./replit_integrations/audio/client";
 
 export async function registerRoutes(
   httpServer: Server,
