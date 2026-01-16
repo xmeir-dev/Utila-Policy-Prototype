@@ -10,8 +10,9 @@ import { RiCoinFill } from "react-icons/ri";
 import { MdOutlinePaid } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { ReviewDialog } from "@/components/ReviewDialog";
 import { useToast } from "@/hooks/use-toast";
 import type { Policy } from "@shared/schema";
 import { api } from "@shared/routes";
@@ -92,6 +93,9 @@ export default function Home() {
     },
     enabled: !!walletState.connectedUser?.name,
   });
+
+  const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null);
+  const [selectedTx, setSelectedTx] = useState<any | null>(null);
 
   // Re-fetch when user changes
     useEffect(() => {
@@ -303,11 +307,11 @@ export default function Home() {
                                   <Button 
                                     size="sm" 
                                     className="h-6 px-3 text-xs"
-                                    onClick={() => approvePolicyMutation.mutate(policy.id)}
+                                    onClick={() => setSelectedPolicy(policy)}
                                     disabled={approvePolicyMutation.isPending}
-                                    data-testid={`button-approve-policy-${policy.id}`}
+                                    data-testid={`button-review-policy-${policy.id}`}
                                   >
-                                    {approvePolicyMutation.isPending ? 'Approving...' : 'Approve'}
+                                    Review
                                   </Button>
                                 </div>
                               </div>
@@ -343,11 +347,11 @@ export default function Home() {
                                     <Button 
                                       size="sm" 
                                       className="h-6 px-3 text-xs"
-                                      onClick={() => approveMutation.mutate(tx.id)}
+                                      onClick={() => setSelectedTx(tx)}
                                       disabled={approveMutation.isPending}
-                                      data-testid={`button-approve-${tx.id}`}
+                                      data-testid={`button-review-${tx.id}`}
                                     >
-                                      {approveMutation.isPending ? 'Approving...' : 'Approve'}
+                                      Review
                                     </Button>
                                   )}
                                 </div>
@@ -375,6 +379,88 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <ReviewDialog
+          isOpen={!!selectedPolicy}
+          onOpenChange={(open) => !open && setSelectedPolicy(null)}
+          title="Review Policy Change"
+          details={
+            selectedPolicy && (
+              <div className="space-y-4">
+                <div>
+                  <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Policy Name</div>
+                  <div className="text-sm font-medium">{selectedPolicy.name}</div>
+                </div>
+                <div>
+                  <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Description</div>
+                  <div className="text-sm">{selectedPolicy.description || "No description provided."}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Approvals</div>
+                    <div className="text-sm">{(selectedPolicy.changeApprovers?.length || 0)}/{selectedPolicy.changeApprovalsRequired || 1}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Initiated By</div>
+                    <div className="text-sm">{(() => {
+                      if (selectedPolicy.changeInitiator === "anonymous") return "Meir";
+                      if (selectedPolicy.changeInitiator?.startsWith("0x")) {
+                        if (selectedPolicy.changeInitiator === "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1") return "Omer";
+                        return "Ishai";
+                      }
+                      return selectedPolicy.changeInitiator || "Unknown";
+                    })()}</div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+          onApprove={() => selectedPolicy && approvePolicyMutation.mutate(selectedPolicy.id)}
+          isPending={approvePolicyMutation.isPending}
+          dataTestId={`dialog-policy-${selectedPolicy?.id}`}
+        />
+
+        <ReviewDialog
+          isOpen={!!selectedTx}
+          onOpenChange={(open) => !open && setSelectedTx(null)}
+          title="Review Transaction"
+          details={
+            selectedTx && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
+                  <div className="flex items-center gap-2">
+                    {getAssetIcon(selectedTx.amount)}
+                    <span className="text-lg font-bold">{formatAmount(selectedTx.amount)}</span>
+                  </div>
+                  <Badge variant="outline">Pending</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">From</div>
+                    <div className="text-sm font-medium">{selectedTx.initiatorName || "Wallet"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">To</div>
+                    <div className="text-sm font-medium">Bank of America</div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Approvals</div>
+                    <div className="text-sm">{selectedTx.approvals?.length || 0}/{selectedTx.quorumRequired || 1}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Initiator</div>
+                    <div className="text-sm">{selectedTx.initiatorName || "Unknown"}</div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+          onApprove={() => selectedTx && approveMutation.mutate(selectedTx.id)}
+          isPending={approveMutation.isPending}
+          dataTestId={`dialog-tx-${selectedTx?.id}`}
+        />
       </main>
       <footer className="w-full py-8 text-center text-sm text-muted-foreground">
         <p className="text-[#bdbdbd]">By Meir Rosenschein, January 15th 2026</p>
