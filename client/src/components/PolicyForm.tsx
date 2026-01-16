@@ -293,6 +293,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
   const [conversationHistory, setConversationHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [aiGenerationComplete, setAiGenerationComplete] = useState(false);
   const [showManualFields, setShowManualFields] = useState(isEditMode);
   const [expandedSections, setExpandedSections] = useState<string[]>(['details', 'conditions', 'initiator']);
 
@@ -341,6 +342,8 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
       
       if (isComplete) {
         setAiQuestion(null);
+        setAiGenerationComplete(true);
+        setShowManualFields(true);
         toast({
           title: "Policy generated",
           description: "AI has filled in all the fields based on your conversation."
@@ -405,7 +408,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {!isEditMode && (
+      {!isEditMode && !aiGenerationComplete && (
         <div className="space-y-4">
           <div className="text-primary">
             <span className="text-sm font-medium">Create your policy with AI</span>
@@ -463,17 +466,19 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
           )}
         </div>
       )}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Switch 
-            id="show-manual" 
-            checked={showManualFields} 
-            onCheckedChange={setShowManualFields} 
-            data-testid="switch-manual-fields"
-          />
-          <Label htmlFor="show-manual" className="text-sm font-medium">Configure manually</Label>
+      {!aiGenerationComplete && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Switch 
+              id="show-manual" 
+              checked={showManualFields} 
+              onCheckedChange={setShowManualFields} 
+              data-testid="switch-manual-fields"
+            />
+            <Label htmlFor="show-manual" className="text-sm font-medium">Configure manually</Label>
+          </div>
         </div>
-      </div>
+      )}
       {showManualFields && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {pendingChanges && (
