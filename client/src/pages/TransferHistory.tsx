@@ -44,6 +44,33 @@ const formatDateTime = (dateStr: string | null) => {
   }
 };
 
+// Format approval timestamp for tooltip display
+const formatApprovalTime = (timestamp: string) => {
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    }).toLowerCase();
+  } catch {
+    return "";
+  }
+};
+
+// Parse approval timestamps JSON into array of {approver, timestamp}
+const parseApprovalTimestamps = (timestampsJson: string | null): { approver: string; timestamp: string }[] => {
+  if (!timestampsJson) return [];
+  try {
+    return JSON.parse(timestampsJson);
+  } catch {
+    return [];
+  }
+};
+
 const StatusBadge = ({ status }: { status: string }) => {
   switch (status) {
     case "completed":
@@ -203,14 +230,24 @@ export default function TransferHistory() {
                                     <span className="text-sm">{approvalsCount}/{quorumRequired}</span>
                                   </div>
                                 </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-[200px]">
+                                <TooltipContent side="top" className="max-w-[250px]">
                                   {approvalsCount > 0 ? (
                                     <div className="text-xs">
                                       <p className="font-medium mb-1">Approved by:</p>
-                                      <ul className="space-y-0.5">
-                                        {tx.approvals?.map((approver, idx) => (
-                                          <li key={idx}>{approver}</li>
-                                        ))}
+                                      <ul className="space-y-1">
+                                        {(() => {
+                                          const timestamps = parseApprovalTimestamps(tx.approvalTimestamps);
+                                          return tx.approvals?.map((approver, idx) => {
+                                            const approvalRecord = timestamps.find(t => t.approver === approver);
+                                            const timeStr = approvalRecord ? formatApprovalTime(approvalRecord.timestamp) : "";
+                                            return (
+                                              <li key={idx} className="flex justify-between gap-3">
+                                                <span>{approver}</span>
+                                                {timeStr && <span className="text-muted-foreground">{timeStr}</span>}
+                                              </li>
+                                            );
+                                          });
+                                        })()}
                                       </ul>
                                     </div>
                                   ) : (

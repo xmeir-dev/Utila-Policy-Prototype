@@ -68,6 +68,9 @@ export const transactions = pgTable("transactions", {
   // Array of approver names who have signed off on this transaction
   // WHY array: Enables multi-signature approval workflows
   approvals: text("approvals").array(),
+  // JSON array storing when each approval was given (format: [{approver: string, timestamp: string}])
+  // Used to display approval history with timestamps in the UI
+  approvalTimestamps: text("approval_timestamps"),
   // Number of approvals needed before transaction can execute
   // WHY configurable: Different transaction types may need different approval thresholds
   quorumRequired: integer("quorum_required").default(1),

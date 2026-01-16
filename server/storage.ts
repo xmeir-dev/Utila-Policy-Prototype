@@ -460,6 +460,10 @@ export class DatabaseStorage implements IStorage {
 
     const newApprovals = [...currentApprovals, approver];
     const requiredApprovals = tx.quorumRequired || 1;
+    
+    // Track approval timestamps for audit trail
+    const currentTimestamps = tx.approvalTimestamps ? JSON.parse(tx.approvalTimestamps) : [];
+    const newTimestamps = [...currentTimestamps, { approver, timestamp: new Date().toISOString() }];
 
     if (newApprovals.length >= requiredApprovals) {
       // All required approvals collected - execute transfer
@@ -467,6 +471,7 @@ export class DatabaseStorage implements IStorage {
         .update(transactions)
         .set({
           approvals: newApprovals,
+          approvalTimestamps: JSON.stringify(newTimestamps),
           status: 'completed',
         })
         .where(eq(transactions.id, id))
@@ -476,7 +481,10 @@ export class DatabaseStorage implements IStorage {
       // Still waiting for more approvals
       const [updated] = await db
         .update(transactions)
-        .set({ approvals: newApprovals })
+        .set({ 
+          approvals: newApprovals,
+          approvalTimestamps: JSON.stringify(newTimestamps),
+        })
         .where(eq(transactions.id, id))
         .returning();
       return updated;
