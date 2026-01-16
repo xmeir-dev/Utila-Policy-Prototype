@@ -556,7 +556,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
             </ConditionSection>
 
             <ConditionSection
-              title="Amount Threshold (USD)"
+              title="Amount in USD"
               icon={<DollarSign className="w-4 h-4 text-muted-foreground" />}
               isExpanded={expandedSections.includes('amount')}
               onToggle={() => toggleSection('amount')}
