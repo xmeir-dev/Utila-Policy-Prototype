@@ -771,11 +771,23 @@ export default function Transfer() {
             <DialogTitle className="text-xl font-bold">Transfer Simulation</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <div className={`p-4 rounded-[12px] border ${simulationResult?.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-destructive/10 border-destructive/30'}`}>
+            <div className={`p-4 rounded-[12px] border ${
+              simulationResult?.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/30' : 
+              simulationResult?.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30' :
+              'bg-destructive/10 border-destructive/30'
+            }`}>
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-2 h-2 rounded-full ${simulationResult?.status === 'approved' ? 'bg-emerald-500' : 'bg-destructive'}`} />
-                <span className={`font-bold uppercase tracking-tight text-xs ${simulationResult?.status === 'approved' ? 'text-emerald-600' : 'text-destructive'}`}>
-                  Status: Transfer {simulationResult?.status}
+                <div className={`w-2 h-2 rounded-full ${
+                  simulationResult?.status === 'approved' ? 'bg-emerald-500' : 
+                  simulationResult?.status === 'pending' ? 'bg-amber-500' :
+                  'bg-destructive'
+                }`} />
+                <span className={`font-bold uppercase tracking-tight text-xs ${
+                  simulationResult?.status === 'approved' ? 'text-emerald-600' : 
+                  simulationResult?.status === 'pending' ? 'text-amber-600' :
+                  'text-destructive'
+                }`}>
+                  Status: {simulationResult?.status === 'pending' ? 'Requires Approval' : `Transfer ${simulationResult?.status}`}
                 </span>
               </div>
               <p className="text-sm text-foreground leading-relaxed">
