@@ -6,7 +6,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { formatAmount } from "@/lib/utils";
 
 interface ReviewDialogProps {
   isOpen: boolean;
@@ -16,6 +15,7 @@ interface ReviewDialogProps {
   onApprove: () => void;
   isPending: boolean;
   dataTestId?: string;
+  alreadyApproved?: boolean;
 }
 
 export function ReviewDialog({
@@ -26,6 +26,7 @@ export function ReviewDialog({
   onApprove,
   isPending,
   dataTestId,
+  alreadyApproved = false,
 }: ReviewDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -49,10 +50,10 @@ export function ReviewDialog({
               onApprove();
               onOpenChange(false);
             }}
-            disabled={isPending}
+            disabled={isPending || alreadyApproved}
             data-testid={`${dataTestId}-approve`}
           >
-            {isPending ? "Approving..." : "Approve"}
+            {alreadyApproved ? "Already Approved" : isPending ? "Approving..." : "Approve"}
           </Button>
         </DialogFooter>
       </DialogContent>

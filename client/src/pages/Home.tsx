@@ -418,6 +418,7 @@ export default function Home() {
           onApprove={() => selectedPolicy && approvePolicyMutation.mutate(selectedPolicy.id)}
           isPending={approvePolicyMutation.isPending}
           dataTestId={`dialog-policy-${selectedPolicy?.id}`}
+          alreadyApproved={selectedPolicy?.changeApprovers?.includes(walletState.connectedUser?.name || '')}
         />
 
         <ReviewDialog
@@ -460,6 +461,7 @@ export default function Home() {
           onApprove={() => selectedTx && approveMutation.mutate(selectedTx.id)}
           isPending={approveMutation.isPending}
           dataTestId={`dialog-tx-${selectedTx?.id}`}
+          alreadyApproved={selectedTx?.approvals?.includes(walletState.connectedUser?.name || '')}
         />
       </main>
       <footer className="w-full py-8 text-center text-sm text-muted-foreground">
