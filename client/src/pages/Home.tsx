@@ -225,9 +225,6 @@ export default function Home() {
                         const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
                         return (
                           <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]">
-                            <div className="text-[10px] text-muted-foreground mb-1">
-                              <span className="text-[14px] text-[#8a8a8a]">Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
-                            </div>
                             <div className="flex items-center justify-between mb-2">
                               <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
                               <div className="flex items-center gap-2">
@@ -246,6 +243,9 @@ export default function Home() {
                               </div>
                             </div>
                             <p className="mb-3 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
+                            <div className="text-[10px] text-muted-foreground">
+                              <span className="text-[14px] text-[#8a8a8a]">Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
+                            </div>
                           </div>
                         );
                       })
