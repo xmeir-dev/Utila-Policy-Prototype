@@ -117,10 +117,15 @@ export default function Wallets() {
                       </div>
                       <div>
                         <div className="font-medium">{wallet.name}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                        <a 
+                          href={`https://etherscan.io/address/${wallet.address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors"
+                        >
                           {truncateAddress(wallet.address)}
                           <ExternalLink className="w-3 h-3" />
-                        </div>
+                        </a>
                       </div>
                     </div>
                     <div className="text-right space-y-0.5">
@@ -161,10 +166,15 @@ export default function Wallets() {
                       </div>
                       <div>
                         <div className="font-medium">{contact.label}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                        <a 
+                          href={`https://etherscan.io/address/${contact.address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors"
+                        >
                           {truncateAddress(contact.address)}
                           <ExternalLink className="w-3 h-3" />
-                        </div>
+                        </a>
                       </div>
                     </div>
                   </div>
