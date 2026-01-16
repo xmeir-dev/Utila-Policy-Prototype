@@ -154,7 +154,7 @@ export default function Home() {
               <motion.h1 
                 variants={itemVariants} 
                 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 font-display text-foreground"
-              >Utila Condition Prototype</motion.h1>
+              >Utila Policy Prototype</motion.h1>
 
               <motion.p 
                 variants={itemVariants}
