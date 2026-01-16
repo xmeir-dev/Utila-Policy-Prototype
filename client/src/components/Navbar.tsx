@@ -15,11 +15,15 @@ import waystarRoycoLogo from "@assets/image_1768514730493.png";
 
 interface NavbarProps {
   walletState: ReturnType<typeof useWallet>;
+  openWalletDialog?: () => void;
 }
 
-export function Navbar({ walletState }: NavbarProps) {
+export function Navbar({ walletState, openWalletDialog }: NavbarProps) {
   const { connect, disconnect, isConnecting, isConnected, walletAddress, connectedUser } = walletState;
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [internalDialogOpen, setInternalDialogOpen] = useState(false);
+
+  const isDialogOpen = openWalletDialog ? (walletState.isConnected ? internalDialogOpen : false) : internalDialogOpen;
+  const setIsDialogOpen = openWalletDialog ? (walletState.isConnected ? setInternalDialogOpen : (open: boolean) => { if (open) openWalletDialog(); }) : setInternalDialogOpen;
 
   const formattedAddress = walletAddress
     ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
@@ -59,7 +63,7 @@ export function Navbar({ walletState }: NavbarProps) {
             ) : (
               <Button
                 data-testid="button-connect-wallet"
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => openWalletDialog ? openWalletDialog() : setIsDialogOpen(true)}
                 disabled={isConnecting}
                 className="rounded-[16px] h-[48px]"
               >

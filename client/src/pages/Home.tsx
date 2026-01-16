@@ -97,17 +97,20 @@ export default function Home() {
 
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null);
   const [selectedTx, setSelectedTx] = useState<any | null>(null);
+  const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
 
-  // Re-fetch when user changes
-    useEffect(() => {
-      if (walletState.connectedUser?.name) {
-        refetchPending();
-        refetchPendingPolicies();
-      }
-    }, [walletState.connectedUser?.name, refetchPending, refetchPendingPolicies]);
+  /**
+   * Effect to refresh pending transactions and policies whenever the connected user changes.
+   * This ensures the dashboard always displays relevant data for the current session.
+   */
+  useEffect(() => {
+    if (walletState.connectedUser?.name) {
+      refetchPending();
+      refetchPendingPolicies();
+    }
+  }, [walletState.connectedUser?.name, refetchPending, refetchPendingPolicies]);
 
-  // Filter for transactions that actually require approval
-  // For the demo, we'll assume status "pending" means "Pending Approval"
+  // Filter transactions to only show those needing attention (status "pending")
   const filteredTransfers = pendingTransactions.filter(tx => 
     tx.status === "pending"
   );
@@ -138,7 +141,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
-      <Navbar walletState={walletState} />
+      <Navbar walletState={walletState} openWalletDialog={() => setIsWalletDialogOpen(true)} />
       <main className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[90vh]">
         
         <AnimatePresence mode="wait">
@@ -160,7 +163,7 @@ export default function Home() {
                 <Button 
                   size="lg" 
                   className="rounded-[16px] px-8 h-[56px] text-lg font-semibold hover-elevate active-elevate-2"
-                  onClick={() => setIsDialogOpen(true)}
+                  onClick={() => setIsWalletDialogOpen(true)}
                   data-testid="button-get-started"
                 >Start by Connecting Wallet</Button>
 
