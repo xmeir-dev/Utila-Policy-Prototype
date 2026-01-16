@@ -177,38 +177,38 @@ export default function Home() {
                 Hi <span className="font-bold">{walletState.connectedUser?.name}</span>, welcome to your Waystar Royco workspace
               </h2>
 
-              <div className="grid grid-cols-4 gap-4 mb-12 w-full">
+              <div className="grid grid-cols-4 gap-6 mb-12 w-full">
                 <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
+                  className="flex flex-col items-center justify-center gap-4 p-10 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
                   data-testid="button-transfer"
                 >
-                  <Send className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Transfer</span>
+                  <Send className="w-10 h-10 text-primary" />
+                  <span className="font-bold text-center text-lg">Transfer</span>
                 </div>
                 <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
+                  className="flex flex-col items-center justify-center gap-4 p-10 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/policies")}
                   data-testid="button-policies"
                 >
-                  <Gavel className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Policies</span>
+                  <Gavel className="w-10 h-10 text-primary" />
+                  <span className="font-bold text-center text-lg">Policies</span>
                 </div>
                 <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
+                  className="flex flex-col items-center justify-center gap-4 p-10 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/history")}
                   data-testid="button-history"
                 >
-                  <History className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Activity</span>
+                  <History className="w-10 h-10 text-primary" />
+                  <span className="font-bold text-center text-lg">Activity</span>
                 </div>
                 <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
+                  className="flex flex-col items-center justify-center gap-4 p-10 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/wallets")}
                   data-testid="button-wallets"
                 >
-                  <Wallet className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Wallets</span>
+                  <Wallet className="w-10 h-10 text-primary" />
+                  <span className="font-bold text-center text-lg">Wallets</span>
                 </div>
               </div>
 
@@ -307,7 +307,7 @@ export default function Home() {
                                 <div className="flex items-center gap-2">
                                   <Button 
                                     size="sm" 
-                                    className="h-6 px-3 text-xs"
+                                    className="h-9 px-4 text-sm"
                                     onClick={() => setSelectedPolicy(policy)}
                                     disabled={approvePolicyMutation.isPending}
                                     data-testid={`button-review-policy-${policy.id}`}
@@ -345,11 +345,11 @@ export default function Home() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isInitiator ? (
-                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[11px] h-6 px-2">Pending Approval</Badge>
                                   ) : (
                                     <Button 
                                       size="sm" 
-                                      className="h-6 px-3 text-xs"
+                                      className="h-9 px-4 text-sm"
                                       onClick={() => setSelectedTx(tx)}
                                       disabled={approveMutation.isPending}
                                       data-testid={`button-review-${tx.id}`}
