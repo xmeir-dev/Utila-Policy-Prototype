@@ -150,7 +150,7 @@ export default function TransferHistory() {
                             <span className="text-sm font-normal">{tx.initiatorName || "-"}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="font-semibold text-sm">{formatAmount(tx.amount)}</span>
+                            <span className="text-sm font-normal">{formatAmount(tx.amount)}</span>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2 group">
