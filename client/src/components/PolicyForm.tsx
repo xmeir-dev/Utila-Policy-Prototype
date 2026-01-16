@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Plus, Users, Wallet, Target, DollarSign, Coins, ChevronDown, ChevronUp, GitBranch } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Policy, InsertPolicy } from "@shared/schema";
@@ -388,61 +388,63 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         )}
       </div>
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => toggleSection('conditions')}
-            className="flex items-center gap-2"
-          >
-            <ChevronDown 
-              className={cn(
-                "w-5 h-5 text-[#8a8a8a] transition-transform duration-200",
-                !expandedSections.includes('conditions') && "-rotate-90"
-              )} 
-            />
-            <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Conditions</Label>
-          </button>
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex bg-muted p-1 rounded-[14px] h-8 items-center">
-          <button
-            type="button"
-            onClick={() => updateField('conditionLogic', 'AND')}
+        <button
+          type="button"
+          onClick={() => toggleSection('conditions')}
+          className="flex items-center gap-2"
+        >
+          <ChevronDown 
             className={cn(
-              "px-3 h-6 text-xs font-medium rounded-[14px] transition-all",
-              formData.conditionLogic === 'AND' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            And
-          </button>
-          <button
-            type="button"
-            onClick={() => updateField('conditionLogic', 'OR')}
-            className={cn(
-              "px-3 h-6 text-xs font-medium rounded-[14px] transition-all",
-              formData.conditionLogic === 'OR' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Or
-          </button>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">
-                    {formData.conditionLogic === 'AND' 
-                      ? '"And" triggers when all conditions are true.' 
-                      : '"Or" triggers when at least one is true.'}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
+              "w-5 h-5 text-[#8a8a8a] transition-transform duration-200",
+              !expandedSections.includes('conditions') && "-rotate-90"
+            )} 
+          />
+          <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Conditions</Label>
+        </button>
 
         {expandedSections.includes('conditions') && (
           <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
+            <ConditionSection
+              title="Condition Logic"
+              icon={<GitBranch className="w-4 h-4 text-muted-foreground" />}
+              isExpanded={expandedSections.includes('logic')}
+              onToggle={() => toggleSection('logic')}
+              isConfigured={formData.conditionLogic === 'OR'}
+            >
+              <div className="space-y-3 pt-3">
+                <div className="space-y-2">
+                  <Label className="text-sm">How should conditions be evaluated?</Label>
+                  <div className="flex bg-muted p-1 rounded-[14px] h-9 items-center w-fit">
+                    <button
+                      type="button"
+                      onClick={() => updateField('conditionLogic', 'AND')}
+                      className={cn(
+                        "px-4 h-7 text-sm font-medium rounded-[10px] transition-all",
+                        formData.conditionLogic === 'AND' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      And
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateField('conditionLogic', 'OR')}
+                      className={cn(
+                        "px-4 h-7 text-sm font-medium rounded-[10px] transition-all",
+                        formData.conditionLogic === 'OR' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Or
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {formData.conditionLogic === 'AND' 
+                      ? 'All conditions must be true for this policy to trigger.' 
+                      : 'At least one condition must be true for this policy to trigger.'}
+                  </p>
+                </div>
+              </div>
+            </ConditionSection>
+
             <ConditionSection
               title="Initiator"
               icon={<Users className="w-4 h-4 text-muted-foreground" />}
