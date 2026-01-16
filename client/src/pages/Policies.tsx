@@ -2,12 +2,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, 
-  ToggleLeft, ToggleRight, Trash2, Scale, GripVertical, Pencil, 
-  Clock, CheckCircle, AlertTriangle, TestTubeDiagonal 
+  Trash2, Scale, GripVertical, Pencil, TestTubeDiagonal 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
@@ -217,9 +217,22 @@ function SortablePolicyItem({
       </div>
       <div className="flex items-center gap-1 shrink-0">
         {isPendingApproval && (
-          <span className="text-xs text-amber-600 dark:text-amber-400 px-2" data-testid={`pending-label-policy-${policy.id}`}>
-            Changes pending
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge 
+                variant="outline" 
+                className="h-5 px-2 text-[14px] font-normal border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-default"
+                data-testid={`pending-label-policy-${policy.id}`}
+              >
+                Changes pending
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-[280px]">
+              <p>
+                This change was initiated by {policy.changeInitiator || 'a team member'}, and requires {Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval{((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be approved. For now the old rules apply.
+              </p>
+            </TooltipContent>
+          </Tooltip>
         )}
         <Button
           variant="ghost"

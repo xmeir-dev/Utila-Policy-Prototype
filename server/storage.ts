@@ -144,6 +144,7 @@ export class DatabaseStorage implements IStorage {
         changeApprovers: [],
         changeApproversList: approversList,
         changeApprovalsRequired: quorumRequired,
+        changeInitiator: submitter,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(policies.id, id))
@@ -328,6 +329,7 @@ export class DatabaseStorage implements IStorage {
           status: 'active',
           pendingChanges: null,
           changeApprovers: null,
+          changeInitiator: null,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(policies.id, id))

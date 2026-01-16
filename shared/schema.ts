@@ -80,6 +80,7 @@ export const policies = pgTable("policies", {
   changeApprovers: text("change_approvals").array(), // approvers who approved the change
   changeApproversList: text("change_approvers_list").array(), // list of who CAN approve changes
   changeApprovalsRequired: integer("change_approvals_required").default(1),
+  changeInitiator: text("change_initiator"), // name of who initiated the pending change
   
   createdAt: text("created_at").default("now()"),
   updatedAt: text("updated_at"),
