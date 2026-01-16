@@ -14,6 +14,7 @@ import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 
 interface Recipient {
   id: string;

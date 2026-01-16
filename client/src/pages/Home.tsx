@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { RiCoinFill } from "react-icons/ri";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const [, setLocation] = useLocation();
