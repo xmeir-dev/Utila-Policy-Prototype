@@ -12,9 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { ReviewDialog } from "@/components/ReviewDialog";
+import { ReviewDialog, ValueDiff } from "@/components/ReviewDialog";
 import { useToast } from "@/hooks/use-toast";
 import type { Policy } from "@shared/schema";
+import { Trash2, AlertCircle } from "lucide-react";
 import { api } from "@shared/routes";
 
 const getAssetIcon = (amount: string) => {
@@ -383,37 +384,73 @@ export default function Home() {
         <ReviewDialog
           isOpen={!!selectedPolicy}
           onOpenChange={(open) => !open && setSelectedPolicy(null)}
-          title="Review Policy Change"
+          title={selectedPolicy?.pendingChanges?.includes("__delete") ? "Review Policy Deletion" : "Review Policy Change"}
           details={
-            selectedPolicy && (
-              <div className="space-y-4">
-                <div>
-                  <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Policy Name</div>
-                  <div className="text-sm font-medium">{selectedPolicy.name}</div>
-                </div>
-                <div>
-                  <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Description</div>
-                  <div className="text-sm">{selectedPolicy.description || "No description provided."}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Approvals</div>
-                    <div className="text-sm">{(selectedPolicy.changeApprovers?.length || 0)}/{selectedPolicy.changeApprovalsRequired || 1}</div>
+            selectedPolicy && (() => {
+              let pendingChanges: Record<string, any> = {};
+              try {
+                pendingChanges = selectedPolicy.pendingChanges ? JSON.parse(selectedPolicy.pendingChanges) : {};
+              } catch {
+                pendingChanges = {};
+              }
+              const isDelete = pendingChanges.__delete === true;
+
+              return (
+                <div className="space-y-6">
+                  {isDelete && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+                      <Trash2 className="w-4 h-4" />
+                      <span className="text-sm font-medium">This policy is scheduled for permanent deletion.</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border/50">
+                    <div>
+                      <div className="text-[10px] font-medium mb-1 uppercase tracking-wider text-muted-foreground">Initiated By</div>
+                      <div className="text-sm font-medium">{(() => {
+                        if (selectedPolicy.changeInitiator === "anonymous") return "Meir";
+                        if (selectedPolicy.changeInitiator?.startsWith("0x")) {
+                          if (selectedPolicy.changeInitiator === "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1") return "Omer";
+                          return "Ishai";
+                        }
+                        return selectedPolicy.changeInitiator || "Unknown";
+                      })()}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-medium mb-1 uppercase tracking-wider text-muted-foreground">Status</div>
+                      <div className="text-sm">
+                        <span className="font-medium">{(selectedPolicy.changeApprovers?.length || 0)}</span>
+                        <span className="text-muted-foreground">/{selectedPolicy.changeApprovalsRequired || 1} approvals</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-xs font-medium mb-1 uppercase tracking-wider text-muted-foreground">Initiated By</div>
-                    <div className="text-sm">{(() => {
-                      if (selectedPolicy.changeInitiator === "anonymous") return "Meir";
-                      if (selectedPolicy.changeInitiator?.startsWith("0x")) {
-                        if (selectedPolicy.changeInitiator === "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1") return "Omer";
-                        return "Ishai";
-                      }
-                      return selectedPolicy.changeInitiator || "Unknown";
-                    })()}</div>
+
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5 mb-2">
+                      {isDelete ? "Policy to be Deleted" : "Proposed Changes"}
+                    </h4>
+                    
+                    <ValueDiff label="Policy Name" oldVal={selectedPolicy.name} newVal={pendingChanges.name} isDelete={isDelete} />
+                    <ValueDiff label="Description" oldVal={selectedPolicy.description} newVal={pendingChanges.description} isDelete={isDelete} />
+                    <ValueDiff label="Action" oldVal={selectedPolicy.action} newVal={pendingChanges.action} isDelete={isDelete} />
+                    <ValueDiff label="Condition Logic" oldVal={selectedPolicy.conditionLogic} newVal={pendingChanges.conditionLogic} isDelete={isDelete} />
+                    <ValueDiff label="Initiator Type" oldVal={selectedPolicy.initiatorType} newVal={pendingChanges.initiatorType} isDelete={isDelete} />
+                    <ValueDiff label="Initiators" oldVal={selectedPolicy.initiatorValues} newVal={pendingChanges.initiatorValues} isDelete={isDelete} />
+                    <ValueDiff label="Asset Type" oldVal={selectedPolicy.assetType} newVal={pendingChanges.assetType} isDelete={isDelete} />
+                    <ValueDiff label="Assets" oldVal={selectedPolicy.assetValues} newVal={pendingChanges.assetValues} isDelete={isDelete} />
+                    <ValueDiff label="Amount Condition" oldVal={selectedPolicy.amountCondition} newVal={pendingChanges.amountCondition} isDelete={isDelete} />
+                    <ValueDiff label="Min Amount" oldVal={selectedPolicy.amountMin} newVal={pendingChanges.amountMin} isDelete={isDelete} />
+                    <ValueDiff label="Max Amount" oldVal={selectedPolicy.amountMax} newVal={pendingChanges.amountMax} isDelete={isDelete} />
+                    <ValueDiff label="Approvers" oldVal={selectedPolicy.approvers} newVal={pendingChanges.approvers} isDelete={isDelete} />
+                    <ValueDiff label="Quorum Required" oldVal={selectedPolicy.quorumRequired} newVal={pendingChanges.quorumRequired} isDelete={isDelete} />
+
+                    {!isDelete && Object.keys(pendingChanges).length === 0 && (
+                      <div className="text-sm text-muted-foreground italic py-2">No configuration changes detected.</div>
+                    )}
                   </div>
                 </div>
-              </div>
-            )
+              );
+            })()
           }
           onApprove={() => selectedPolicy && approvePolicyMutation.mutate(selectedPolicy.id)}
           isPending={approvePolicyMutation.isPending}
