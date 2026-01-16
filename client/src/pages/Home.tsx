@@ -296,7 +296,7 @@ export default function Home() {
                             <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]" data-testid={`pending-policy-${policy.id}`}>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium">Policy Change: {policy.name}</span>
+                                  <span className="text-sm font-medium">Policy change</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1}</span>
