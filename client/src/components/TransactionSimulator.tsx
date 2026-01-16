@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Beaker, AlertCircle, CheckCircle, XCircle, ShieldAlert } from "lucide-react";
+import { Beaker, AlertCircle, CheckCircle, XCircle, ShieldAlert, X, Plus } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { api } from "@shared/routes";
@@ -29,13 +29,76 @@ const AVAILABLE_WALLETS = [
   { name: 'Founder Reserve', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' }
 ];
 
+function MultiWalletSelector({ 
+  selected, 
+  onChange, 
+  testId
+}: { 
+  selected: string[]; 
+  onChange: (values: string[]) => void; 
+  testId: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 p-2 border border-input rounded-[14px] bg-background min-h-[42px]">
+        {selected.map((address) => {
+          const wallet = AVAILABLE_WALLETS.find(w => w.address === address);
+          return (
+            <Badge key={address} variant="secondary" className="h-7 gap-1 pl-2 pr-1">
+              <span className="text-xs font-medium">{wallet ? wallet.name : `${address.slice(0, 6)}...${address.slice(-4)}`}</span>
+              <button
+                type="button"
+                onClick={() => onChange(selected.filter(a => a !== address))}
+                className="hover:bg-background/50 rounded p-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
+          );
+        })}
+        <Select
+          value=""
+          onValueChange={(address) => {
+            if (address && !selected.includes(address)) {
+              onChange([...selected, address]);
+            }
+          }}
+        >
+          <SelectTrigger className="border-0 shadow-none focus:ring-0 w-auto h-7 p-0 px-2 text-xs text-muted-foreground hover:bg-muted rounded-[14px] transition-colors [&>svg]:hidden">
+            <div className="flex items-center gap-1">
+              <Plus className="w-3 h-3" />
+              <span>Add Wallet</span>
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            {AVAILABLE_WALLETS.filter(w => !selected.includes(w.address)).map((wallet) => (
+              <SelectItem key={wallet.address} value={wallet.address}>
+                <div className="flex flex-col">
+                  <span className="font-medium">{wallet.name}</span>
+                  <span className="text-[10px] text-muted-foreground font-mono">{wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
 interface SimulationResult {
   matchedPolicy: Policy | null;
   action: string;
   reason: string;
 }
 
+// Update the type to support multiple wallets for simulation if needed, 
+// but the backend SimulateTransactionRequest currently expects single strings.
+// We will join them or just take the first one for now to avoid breaking the backend contract 
+// while updating the UI as requested.
 export function TransactionSimulator() {
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
   const [formData, setFormData] = useState<SimulateTransactionRequest>({
     initiator: "",
     sourceWallet: "",
@@ -59,7 +122,14 @@ export function TransactionSimulator() {
 
   const handleSimulate = (e: React.FormEvent) => {
     e.preventDefault();
-    simulateMutation.mutate(formData);
+    // For simulation, we'll use the first selected wallet if multiple are chosen, 
+    // or keep the backend call as is. Since policies usually check against a single transaction context.
+    const dataToSimulate = {
+      ...formData,
+      sourceWallet: selectedSources[0] || "",
+      destination: selectedDestinations[0] || "",
+    };
+    simulateMutation.mutate(dataToSimulate);
   };
 
   const updateField = <K extends keyof SimulateTransactionRequest>(
@@ -131,46 +201,20 @@ export function TransactionSimulator() {
 
           <div className="space-y-2">
             <Label htmlFor="sim-source">From</Label>
-            <Select
-              value={formData.sourceWallet}
-              onValueChange={(value) => updateField('sourceWallet', value)}
-            >
-              <SelectTrigger id="sim-source" className="rounded-lg" data-testid="select-sim-source">
-                <SelectValue placeholder="Select wallet" />
-              </SelectTrigger>
-              <SelectContent>
-                {AVAILABLE_WALLETS.map((wallet) => (
-                  <SelectItem key={wallet.address} value={wallet.address}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{wallet.name}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono">{wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiWalletSelector
+              selected={selectedSources}
+              onChange={setSelectedSources}
+              testId="select-sim-source"
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="sim-destination">To</Label>
-            <Select
-              value={formData.destination}
-              onValueChange={(value) => updateField('destination', value)}
-            >
-              <SelectTrigger id="sim-destination" className="rounded-lg" data-testid="select-sim-destination">
-                <SelectValue placeholder="Select destination" />
-              </SelectTrigger>
-              <SelectContent>
-                {AVAILABLE_WALLETS.map((wallet) => (
-                  <SelectItem key={wallet.address} value={wallet.address}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{wallet.name}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono">{wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiWalletSelector
+              selected={selectedDestinations}
+              onChange={setSelectedDestinations}
+              testId="select-sim-destination"
+            />
           </div>
 
           <div className="space-y-2">
