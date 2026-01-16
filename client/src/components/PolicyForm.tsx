@@ -690,7 +690,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               </Select>
             </div>
 
-            {formData.action === 'require_approval' ? (
+            {formData.action === 'require_approval' && (
               <div className="space-y-4">
                 <div className="space-y-3">
                   <div className="space-y-2">
@@ -722,8 +722,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   </div>
                 </div>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No approvals required for this action.</p>
             )}
           </div>
         )}
