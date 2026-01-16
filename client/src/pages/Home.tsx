@@ -100,7 +100,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2">
                   <LibraryBig className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">History</span>
+                  <span className="font-semibold">Activity</span>
                 </div>
               </div>
 
