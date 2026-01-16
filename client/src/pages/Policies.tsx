@@ -614,7 +614,7 @@ export default function Policies() {
                                 "text-sm font-medium",
                                 isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
                               )}>
-                                {displayVal(isChanged ? pendingVal : currentVal)}
+                                {isChanged ? displayVal(pendingVal) : "-"}
                               </div>
                             </div>
                           </div>
