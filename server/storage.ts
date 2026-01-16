@@ -7,7 +7,7 @@ export interface IStorage {
   getUserByAddress(address: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
-  getPendingTransactions(userId: number): Promise<Transaction[]>;
+  getPendingTransactions(userName: string): Promise<Transaction[]>;
   createTransaction(tx: InsertTransaction): Promise<Transaction>;
   getPolicies(): Promise<Policy[]>;
   getPolicy(id: number): Promise<Policy | undefined>;
@@ -45,11 +45,30 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getPendingTransactions(userId: number): Promise<Transaction[]> {
-    return await db
+  async getPendingTransactions(userName: string): Promise<Transaction[]> {
+    // Get all pending transactions
+    const pendingTxs = await db
       .select()
       .from(transactions)
-      .where(and(eq(transactions.userId, userId), eq(transactions.status, "pending")));
+      .where(eq(transactions.status, "pending"));
+    
+    // Get all active policies that require approval
+    const allPolicies = await this.getPolicies();
+    const approvalPolicies = allPolicies.filter(
+      p => p.isActive && p.status === 'active' && p.action === 'require_approval'
+    );
+    
+    // Check if user is an approver in any of these policies
+    const isApprover = approvalPolicies.some(
+      policy => policy.approvers?.includes(userName)
+    );
+    
+    // Return transactions where:
+    // 1. User is the initiator (initiatorName matches), OR
+    // 2. User is an approver in any require_approval policy
+    return pendingTxs.filter(tx => 
+      tx.initiatorName === userName || isApprover
+    );
   }
 
   async createTransaction(tx: InsertTransaction): Promise<Transaction> {

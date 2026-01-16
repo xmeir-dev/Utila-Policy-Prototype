@@ -16,22 +16,22 @@ export default function Home() {
   const walletState = useWallet();
 
   const { data: pendingTransactions = [], refetch: refetchPending } = useQuery<any[]>({
-    queryKey: ["/api/transactions/pending", walletState.connectedUser?.address],
+    queryKey: ["/api/transactions/pending", walletState.connectedUser?.name],
     queryFn: async () => {
-      if (!walletState.connectedUser?.address) return [];
-      const res = await fetch(`/api/transactions/pending?userId=${walletState.connectedUser.id}`);
+      if (!walletState.connectedUser?.name) return [];
+      const res = await fetch(`/api/transactions/pending?userName=${encodeURIComponent(walletState.connectedUser.name)}`);
       if (!res.ok) throw new Error("Failed to fetch pending transactions");
       return res.json();
     },
-    enabled: !!walletState.connectedUser?.address,
+    enabled: !!walletState.connectedUser?.name,
   });
 
   // Re-fetch when user changes
     useEffect(() => {
-      if (walletState.connectedUser?.address) {
+      if (walletState.connectedUser?.name) {
         refetchPending();
       }
-    }, [walletState.connectedUser?.address, refetchPending]);
+    }, [walletState.connectedUser?.name, refetchPending]);
 
   // Filter for transactions that actually require approval
   // For the demo, we'll assume status "pending" means "Pending Approval"

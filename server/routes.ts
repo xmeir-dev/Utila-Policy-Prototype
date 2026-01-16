@@ -53,11 +53,11 @@ export async function registerRoutes(
 
   app.get("/api/transactions/pending", async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
-      if (isNaN(userId)) {
-        return res.status(400).json({ message: "Invalid userId" });
+      const userName = req.query.userName as string;
+      if (!userName) {
+        return res.status(400).json({ message: "Missing userName parameter" });
       }
-      const transactions = await storage.getPendingTransactions(userId);
+      const transactions = await storage.getPendingTransactions(userName);
       res.status(200).json(transactions);
     } catch (err) {
       res.status(500).json({ message: "Failed to fetch pending transactions" });
