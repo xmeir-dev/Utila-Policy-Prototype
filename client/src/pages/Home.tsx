@@ -5,6 +5,8 @@ import { Send, Gavel, LibraryBig } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import { SiEthereum, SiTether } from "react-icons/si";
+import { RiCoinFill } from "react-icons/ri";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -106,13 +108,35 @@ export default function Home() {
                   </div>
                   <div className="space-y-3">
                     {[
-                      { name: 'USDT', balance: '225,000', value: '$224,775', percent: 25, color: 'bg-emerald-500' },
-                      { name: 'ETH', balance: '64.17', value: '$180,000', percent: 20, color: 'bg-blue-500' },
+                      { 
+                        name: 'USDC', 
+                        balance: '1,059,505', 
+                        value: '$1,059,505', 
+                        percent: 45, 
+                        color: 'bg-blue-600',
+                        icon: <RiCoinFill className="w-5 h-5 text-white" />
+                      },
+                      { 
+                        name: 'USDT', 
+                        balance: '750,500', 
+                        value: '$750,500', 
+                        percent: 35, 
+                        color: 'bg-emerald-500',
+                        icon: <SiTether className="w-4 h-4 text-white" />
+                      },
+                      { 
+                        name: 'ETH', 
+                        balance: '1,255', 
+                        value: '$3,514,000', 
+                        percent: 20, 
+                        color: 'bg-slate-700',
+                        icon: <SiEthereum className="w-4 h-4 text-white" />
+                      },
                     ].map((asset) => (
                       <div key={asset.name} className="flex items-center gap-3">
                         <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", asset.color + "/10")}>
-                          <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", asset.color)}>
-                            <span className="text-[10px] font-bold text-white">{asset.name[0]}</span>
+                          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", asset.color)}>
+                            {asset.icon}
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
