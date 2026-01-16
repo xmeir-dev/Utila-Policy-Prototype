@@ -831,7 +831,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
               </div>
             </TooltipTrigger>
             {disabledReason && (
-              <TooltipContent>
+              <TooltipContent className="max-w-[300px] break-words">
                 <p>{disabledReason}</p>
               </TooltipContent>
             )}
