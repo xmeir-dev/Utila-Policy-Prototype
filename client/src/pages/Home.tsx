@@ -73,10 +73,9 @@ export default function Home() {
   });
 
   const { data: pendingTransactions = [], refetch: refetchPending } = useQuery<any[]>({
-    queryKey: ["/api/transactions/pending", walletState.connectedUser?.name],
+    queryKey: ["/api/transactions/pending"],
     queryFn: async () => {
-      if (!walletState.connectedUser?.name) return [];
-      const res = await fetch(`/api/transactions/pending?userName=${encodeURIComponent(walletState.connectedUser.name)}`);
+      const res = await fetch(`/api/transactions/pending`);
       if (!res.ok) throw new Error("Failed to fetch pending transactions");
       return res.json();
     },

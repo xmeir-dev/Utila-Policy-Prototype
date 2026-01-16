@@ -7,7 +7,7 @@ export interface IStorage {
   getUserByAddress(address: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
-  getPendingTransactions(userName: string): Promise<Transaction[]>;
+  getPendingTransactions(): Promise<Transaction[]>;
   getAllTransactions(userId: number): Promise<Transaction[]>;
   getTransactionsByUserName(userName: string): Promise<Transaction[]>;
   createTransaction(tx: InsertTransaction): Promise<Transaction>;
@@ -51,7 +51,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getPendingTransactions(userName: string): Promise<Transaction[]> {
+  async getPendingTransactions(): Promise<Transaction[]> {
     // Get all pending transactions - show to everyone
     const pendingTxs = await db
       .select()
