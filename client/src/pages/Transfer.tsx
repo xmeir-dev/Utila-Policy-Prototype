@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 
 interface Recipient {
   id: string;
@@ -342,28 +342,53 @@ export default function Transfer() {
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [simulationResult, setSimulationResult] = useState<{ status: "approved" | "rejected"; message: string } | null>(null);
 
-  const handleSimulate = () => {
-    // Basic simulation logic based on selected wallets and recipients
-    const totalRequired = getTotalBudget();
+  const handleSimulate = async () => {
+    const totalAmount = getTotalRecipientAmount();
     const available = getAvailableBalance();
-    
-    if (totalRequired > available) {
+
+    if (totalAmount > available) {
       setSimulationResult({
         status: "rejected",
-        message: `Insufficient funds across selected wallets. Required: $${totalRequired.toLocaleString()}, Available: $${available.toLocaleString()}`
+        message: `Insufficient funds. Required: $${totalAmount.toLocaleString()}, Available: $${available.toLocaleString()}`
       });
-    } else if (!amountsMatch) {
-       setSimulationResult({
+      setShowSimulationModal(true);
+      return;
+    }
+
+    if (!amountsMatch) {
+      setSimulationResult({
         status: "rejected",
         message: `Source and destination totals do not match. Difference: $${Math.abs(fromTotal - toTotal).toLocaleString()}`
       });
-    } else {
-      setSimulationResult({
-        status: "approved",
-        message: "Transaction parameters satisfy all organization policies and wallet constraints."
-      });
+      setShowSimulationModal(true);
+      return;
     }
-    setShowSimulationModal(true);
+
+    try {
+      const simulationReq = {
+        initiator: walletState.connectedUser?.name || "unknown",
+        sourceWallet: selectedWallets[0] || "unknown",
+        destination: recipients[0]?.address || "unknown",
+        destinationIsInternal: recipients[0]?.isFromAddressBook ?? false,
+        amountUsd: totalAmount,
+        asset: selectedAsset.symbol
+      };
+
+      const response = await apiRequest("POST", "/api/policies/simulate", simulationReq);
+      const result = await response.json();
+      
+      setSimulationResult({
+        status: result.action === "deny" ? "rejected" : "approved",
+        message: result.reason
+      });
+      setShowSimulationModal(true);
+    } catch (error) {
+      setSimulationResult({
+        status: "rejected",
+        message: "An error occurred while simulating the policy check."
+      });
+      setShowSimulationModal(true);
+    }
   };
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -372,40 +397,46 @@ export default function Transfer() {
     setIsProcessing(true);
     try {
       const totalAmount = getTotalRecipientAmount();
-      
-      // Call simulation logic internally to decide if it's approved or needs approval
-      const totalRequired = totalAmount;
       const available = getAvailableBalance();
       
-      let status: "pending" | "completed" | "failed" = "completed";
-      let message = "Transfer successful!";
-
-      if (totalRequired > available) {
-        status = "failed";
-        message = "Transfer failed: Insufficient funds.";
-      } else {
-        // Mocking policy check: if amount > 1000, it needs approval (pending)
-        if (totalRequired > 1000) {
-          status = "pending";
-          message = "Transfer initiated and pending approval based on organization policies.";
-        }
+      if (totalAmount > available) {
+        setSimulationResult({
+          status: "rejected",
+          message: `Insufficient funds. Required: $${totalAmount.toLocaleString()}, Available: $${available.toLocaleString()}`
+        });
+        setShowSimulationModal(true);
+        setIsProcessing(false);
+        return;
       }
 
+      // Perform real policy simulation via API
+      const simulationReq = {
+        initiator: walletState.connectedUser?.name || "unknown",
+        sourceWallet: selectedWallets[0] || "unknown",
+        destination: recipients[0]?.address || "unknown",
+        destinationIsInternal: recipients[0]?.isFromAddressBook ?? false,
+        amountUsd: totalAmount,
+        asset: selectedAsset.symbol
+      };
+
+      const response = await apiRequest("POST", "/api/policies/simulate", simulationReq);
+      const result = await response.json();
+      
       setSimulationResult({
-        status: status === "failed" ? "rejected" : "approved",
-        message: message
+        status: result.action === "deny" ? "rejected" : "approved",
+        message: result.reason
       });
       setShowSimulationModal(true);
 
-      if (status !== "failed") {
-        // Add to transactions via API if we had a real backend for this
-        // For now, we'll just invalidate the list query to show we're updated
+      if (result.action !== "deny") {
+        // In a real app, we'd create the transaction here
+        // If result.action === "require_approval", it would be created with status 'pending'
         queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
       }
     } catch (error) {
       setSimulationResult({
         status: "rejected",
-        message: "An error occurred while processing the transfer."
+        message: "An error occurred while simulating the policy check."
       });
       setShowSimulationModal(true);
     } finally {
