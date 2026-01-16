@@ -544,11 +544,11 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 {formData.destinationType === 'whitelist' && (
                   <div className="space-y-2">
                     <Label className="text-sm">Whitelisted addresses</Label>
-                    <TagInput
-                      values={formData.destinationValues || []}
+                    <MultiWalletSelector
+                      selected={formData.destinationValues || []}
                       onChange={(values) => updateField('destinationValues', values)}
-                      placeholder="Enter whitelisted address..."
-                      testId="input-destination-values"
+                      wallets={CONTACTS}
+                      testId="select-destination-wallets"
                     />
                   </div>
                 )}
