@@ -389,7 +389,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
       {!isEditMode && (
         <div className="space-y-4">
           <div className="text-primary">
-            <span className="text-sm font-semibold">Generate with AI</span>
+            <span className="text-sm font-medium">Create your policy with AI</span>
           </div>
           <div className="space-y-2">
             <Textarea
@@ -425,7 +425,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
           )}
         </div>
       )}
-
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Switch 
@@ -437,7 +436,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
           <Label htmlFor="show-manual" className="text-sm font-medium">Configure manually</Label>
         </div>
       </div>
-
       {showManualFields && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {pendingChanges && (
@@ -904,7 +902,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
           </div>
         </div>
       )}
-
       <div className="pt-6 flex items-center justify-between sticky bottom-0 bg-background py-4 border-t border-border mt-12">
         <div className="flex items-center gap-2">
           {onDelete && isEditMode && (
