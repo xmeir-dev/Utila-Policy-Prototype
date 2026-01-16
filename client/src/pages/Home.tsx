@@ -231,7 +231,6 @@ export default function Home() {
                             <div className="flex items-center gap-1">
                               <span>Initiator:</span>
                               <div className="flex items-center gap-1 text-foreground font-medium">
-                                <div className="w-3 h-3 rounded-full bg-blue-500" />
                                 {tx.initiatorName || walletState.connectedUser?.name || "Unknown"}
                               </div>
                             </div>
