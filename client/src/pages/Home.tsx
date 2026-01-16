@@ -499,9 +499,6 @@ export default function Home() {
           alreadyApproved={selectedTx?.approvals?.includes(walletState.connectedUser?.name || '')}
         />
       </main>
-      <footer className="w-full py-8 text-center text-sm text-muted-foreground">
-        <p className="text-[#bdbdbd]">By Meir Rosenschein, January 15th 2026</p>
-      </footer>
     </div>
   );
 }
