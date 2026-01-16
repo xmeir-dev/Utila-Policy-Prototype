@@ -15,11 +15,17 @@ export default function Home() {
   const walletState = useWallet();
 
   const { data: pendingTransactions = [] } = useQuery<any[]>({
-    queryKey: ["/api/transactions/pending"],
-    enabled: walletState.isConnected,
+    queryKey: ["/api/transactions/pending", walletState.connectedUser?.id],
+    queryFn: async () => {
+      if (!walletState.connectedUser?.id) return [];
+      const res = await fetch(`/api/transactions/pending?userId=${walletState.connectedUser.id}`);
+      if (!res.ok) throw new Error("Failed to fetch pending transactions");
+      return res.json();
+    },
+    enabled: !!walletState.connectedUser?.id,
   });
 
-  // Filter for transactions created by user that require approval
+  // Filter for transactions that actually require approval
   // For the demo, we'll assume status "pending" means "Pending Approval"
   const filteredTransfers = pendingTransactions.filter(tx => 
     tx.status === "pending"
@@ -204,7 +210,7 @@ export default function Home() {
                               <span>Initiator:</span>
                               <div className="flex items-center gap-1 text-foreground font-medium">
                                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                                {walletState.connectedUser?.name}
+                                {walletState.connectedUser?.name || "Unknown"}
                               </div>
                             </div>
                             <span>Created at: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date().toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>

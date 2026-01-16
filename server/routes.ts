@@ -50,14 +50,17 @@ export async function registerRoutes(
     res.status(200).json({ success: true });
   });
 
-  app.get(api.transactions.listPending.path, async (req, res) => {
-    // For demo, we'll just return some hardcoded pending transactions for any connected user
-    // In a real app, we'd use session/auth
-    const pendingTxs = [
-      { id: 1, type: "Send ETH", amount: "0.5 ETH", status: "pending", txHash: "0x123...abc" },
-      { id: 2, type: "Swap", amount: "100 USDC to 0.04 ETH", status: "pending", txHash: "0x456...def" }
-    ];
-    res.status(200).json(pendingTxs);
+  app.get("/api/transactions/pending", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid userId" });
+      }
+      const transactions = await storage.getPendingTransactions(userId);
+      res.status(200).json(transactions);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch pending transactions" });
+    }
   });
 
   // Policies endpoints
