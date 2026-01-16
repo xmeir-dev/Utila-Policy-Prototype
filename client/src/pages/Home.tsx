@@ -172,9 +172,6 @@ export default function Home() {
                   <h3 className="text-[16px] font-medium">Pending transfers</h3>
                   <div className="space-y-4">
                     <div className="p-4 rounded-[14px] bg-card/50 pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-bold">Outgoing Transfer</span>
-                      </div>
                       <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
