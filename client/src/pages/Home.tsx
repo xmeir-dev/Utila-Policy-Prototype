@@ -291,9 +291,7 @@ export default function Home() {
                           <Inbox className="w-6 h-6 text-muted-foreground/50" />
                         </div>
                         <h4 className="text-sm font-medium text-foreground mb-1">Nothing to approve</h4>
-                        <p className="text-xs text-muted-foreground max-w-[200px]">
-                          Transfers requiring approval will appear here.
-                        </p>
+                        <p className="text-xs max-w-[200px] text-[#8a8a8a]">Transfers and policy changes requiring approval will appear here.</p>
                       </div>
                     )}
                   </div>
