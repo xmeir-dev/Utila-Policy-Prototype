@@ -172,6 +172,25 @@
     display: none; /* Chrome, Safari and Opera */
   }
 
+  /* Global scrollbar styling for a cleaner look */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+
   /* Hover elevation utilities with scale and color shift */
   .hover-elevate {
     transition: transform 150ms ease-out, box-shadow 150ms ease-out, filter 150ms ease-out;

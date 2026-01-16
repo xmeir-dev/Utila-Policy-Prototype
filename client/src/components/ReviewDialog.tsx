@@ -62,7 +62,7 @@ export function ReviewDialog({
 }: ReviewDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto hide-scrollbar">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {title}
