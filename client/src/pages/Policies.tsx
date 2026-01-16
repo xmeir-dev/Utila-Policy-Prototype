@@ -82,13 +82,6 @@ const getActionLabel = (action: string) => {
 
 const getStatusBadge = (status: string | null) => {
   switch (status) {
-    case 'pending_approval':
-      return (
-        <Badge variant="outline" className="h-5 px-1.5 text-[10px] gap-1 border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-          <Clock className="w-3 h-3" />
-          Pending Approval
-        </Badge>
-      );
     case 'draft':
       return (
         <Badge variant="outline" className="h-5 px-1.5 text-[10px] gap-1">
@@ -400,22 +393,6 @@ export default function Policies() {
               </Button>
             )}
           </div>
-
-          {pendingPolicies.length > 0 && (
-            <Card className="p-4 border-amber-500/30 bg-amber-500/5">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                    {pendingPolicies.length} policy change{pendingPolicies.length > 1 ? 's' : ''} pending approval
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Review and approve to activate changes
-                  </p>
-                </div>
-              </div>
-            </Card>
-          )}
 
           <div className="space-y-4">
             {isLoading ? (
