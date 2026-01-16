@@ -104,7 +104,7 @@ export default function TransferHistory() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h2 className="font-bold font-display text-foreground text-[24px]">Transfer History</h2>
+            <h2 className="font-bold font-display text-foreground text-[24px]">Transfer history</h2>
           </div>
 
           <div className="border border-border rounded-[24px] bg-card overflow-hidden">
@@ -143,7 +143,7 @@ export default function TransferHistory() {
                       return (
                         <tr 
                           key={tx.id} 
-                          className="border-b border-border last:border-b-0 hover-elevate"
+                          className="border-b border-border last:border-b-0"
                           data-testid={`row-transaction-${tx.id}`}
                         >
                           <td className="px-6 py-4">
