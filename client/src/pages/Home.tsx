@@ -312,21 +312,7 @@ export default function Home() {
                                 </div>
                               </div>
                               <p className="mb-3 text-[14px] text-[#8a8a8a]">
-                                {(() => {
-                                  if (pendingChanges.__delete === true) return `Pending deletion: ${policy.name}`;
-                                  
-                                  const changedFields = Object.keys(pendingChanges).filter(key => {
-                                    if (key === 'status' || key === 'pendingChanges' || key === 'updatedAt' || key === 'changeApprovers' || key === 'changeApproversList' || key === 'changeApprovalsRequired' || key === 'changeInitiator') return false;
-                                    const currentVal = (policy as any)[key];
-                                    const pendingVal = pendingChanges[key];
-                                    return pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
-                                  });
-
-                                  if (changedFields.length > 0) {
-                                    return `Changes to: ${policy.name} (${changedFields.slice(0, 3).join(', ')}${changedFields.length > 3 ? '...' : ''})`;
-                                  }
-                                  return `Policy modification pending approval: ${policy.name}`;
-                                })()}
+                                {policy.name}
                               </p>
                               <div className="text-[10px] text-muted-foreground">
                                 <span className="text-[14px] text-[#8a8a8a]">Updated on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
