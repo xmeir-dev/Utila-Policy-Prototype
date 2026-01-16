@@ -99,19 +99,15 @@ export default function Wallets() {
                 Contacts
               </h3>
               <div className="space-y-3">
-                {contacts.map((contact) => (
+                {contacts.filter(contact => !contact.isInternal).map((contact) => (
                   <div
                     key={contact.id}
                     className="flex items-center justify-between p-4 border border-border rounded-[16px] bg-card hover-elevate"
                     data-testid={`contact-${contact.id}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${contact.isInternal ? 'bg-primary/10' : 'bg-blue-500/10'}`}>
-                        {contact.isInternal ? (
-                          <User className="w-5 h-5 text-primary" />
-                        ) : (
-                          <Building2 className="w-5 h-5 text-blue-500" />
-                        )}
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/10">
+                        <Building2 className="w-5 h-5 text-blue-500" />
                       </div>
                       <div>
                         <div className="font-medium">{contact.label}</div>
@@ -122,7 +118,7 @@ export default function Wallets() {
                       </div>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      {contact.isInternal ? "Internal" : "External"}
+                      External
                     </Badge>
                   </div>
                 ))}
