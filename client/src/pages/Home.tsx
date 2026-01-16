@@ -107,58 +107,69 @@ export default function Home() {
                     <Button variant="link" className="text-xs text-muted-foreground p-0 h-auto">See All</Button>
                   </div>
                   <div className="space-y-3">
-                    {[
-                      { 
-                        name: 'USDC', 
-                        balance: '1,059,505', 
-                        value: '$1,059,505', 
-                        percent: 45, 
-                        color: 'bg-blue-600',
-                        icon: <RiCoinFill className="w-5 h-5 text-white" />
-                      },
-                      { 
-                        name: 'USDT', 
-                        balance: '750,500', 
-                        value: '$750,500', 
-                        percent: 35, 
-                        color: 'bg-emerald-500',
-                        icon: <SiTether className="w-4 h-4 text-white" />
-                      },
-                      { 
-                        name: 'ETH', 
-                        balance: '1,255', 
-                        value: '$3,514,000', 
-                        percent: 20, 
-                        color: 'bg-slate-700',
-                        icon: <SiEthereum className="w-4 h-4 text-white" />
-                      },
-                    ].map((asset) => (
-                      <div key={asset.name} className="flex items-center gap-3">
-                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", asset.color + "/10")}>
-                          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", asset.color)}>
-                            {asset.icon}
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium">{asset.name}</span>
-                            <div className="text-right">
-                              <div className="text-sm font-medium">{asset.balance} {asset.name}</div>
-                              <div className="text-[10px] text-muted-foreground">{asset.value}</div>
+                    {(() => {
+                      const ethPrice = 2800; // Estimated price based on $3,514,000 / 1,255
+                      const assets = [
+                        { 
+                          name: 'ETH', 
+                          balance: 1255, 
+                          balanceStr: '1,255',
+                          usdValue: 1255 * ethPrice, 
+                          color: 'bg-slate-700',
+                          icon: <SiEthereum className="w-4 h-4 text-white" />
+                        },
+                        { 
+                          name: 'USDC', 
+                          balance: 1059505, 
+                          balanceStr: '1,059,505',
+                          usdValue: 1059505, 
+                          color: 'bg-blue-600',
+                          icon: <RiCoinFill className="w-5 h-5 text-white" />
+                        },
+                        { 
+                          name: 'USDT', 
+                          balance: 750500, 
+                          balanceStr: '750,500',
+                          usdValue: 750500, 
+                          color: 'bg-emerald-500',
+                          icon: <SiTether className="w-4 h-4 text-white" />
+                        },
+                      ];
+
+                      const totalValue = assets.reduce((acc, asset) => acc + asset.usdValue, 0);
+                      const sortedAssets = [...assets].sort((a, b) => b.usdValue - a.usdValue);
+
+                      return sortedAssets.map((asset) => {
+                        const percent = Math.round((asset.usdValue / totalValue) * 100);
+                        return (
+                          <div key={asset.name} className="flex items-center gap-3">
+                            <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", asset.color + "/10")}>
+                              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", asset.color)}>
+                                {asset.icon}
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium">{asset.name}</span>
+                                <div className="text-right">
+                                  <div className="text-sm font-medium">{asset.balanceStr} {asset.name}</div>
+                                  <div className="text-[10px] text-muted-foreground">${asset.usdValue.toLocaleString()}</div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                                  <div 
+                                    className={cn("h-full rounded-full", asset.color)} 
+                                    style={{ width: `${percent}%` }}
+                                  />
+                                </div>
+                                <span className="text-[10px] text-muted-foreground w-6 text-right">{percent}%</span>
+                              </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                              <div 
-                                className={cn("h-full rounded-full", asset.color)} 
-                                style={{ width: `${asset.percent}%` }}
-                              />
-                            </div>
-                            <span className="text-[10px] text-muted-foreground w-6 text-right">{asset.percent}%</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
 
