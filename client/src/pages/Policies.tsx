@@ -219,14 +219,13 @@ function SortablePolicyItem({
         {isPendingApproval && (
           <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
-              <Badge 
-                variant="secondary" 
-                className="h-5 px-2 text-[14px] font-normal gap-1 cursor-default"
+              <span 
+                className="inline-flex items-center gap-1 h-5 px-2 text-[14px] font-normal rounded-md bg-secondary text-secondary-foreground cursor-default"
                 data-testid={`pending-label-policy-${policy.id}`}
               >
                 <ShieldEllipsis className="w-3.5 h-3.5" />
                 Changes pending
-              </Badge>
+              </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-[280px]">
               <p>
