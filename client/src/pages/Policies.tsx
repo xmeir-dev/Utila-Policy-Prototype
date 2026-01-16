@@ -607,7 +607,7 @@ export default function Policies() {
                               <div className="text-sm text-foreground/70">{displayVal(currentVal)}</div>
                             </div>
                             <div className="space-y-1">
-                              <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Proposed</span>
+                              <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Proposed change</span>
                               <div className={cn(
                                 "text-sm font-medium",
                                 isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
