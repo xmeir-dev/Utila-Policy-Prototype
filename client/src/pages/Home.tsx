@@ -315,7 +315,9 @@ export default function Home() {
                                 {policy.name}
                               </p>
                               <div className="text-[10px] text-muted-foreground">
-                                <span className="text-[14px] text-[#8a8a8a]">Updated on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                <span className="text-[14px] text-[#8a8a8a]">
+                                  Initiated by <span className="text-foreground font-medium">{policy.changeInitiator || "Unknown"}</span> on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {policy.updatedAt ? new Date(policy.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}
+                                </span>
                               </div>
                             </div>
                           );
