@@ -246,6 +246,7 @@ export default function Home() {
                               </div>
                             </div>
                             <p className="mb-3 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
+                          </div>
                         );
                       })
                     ) : (
