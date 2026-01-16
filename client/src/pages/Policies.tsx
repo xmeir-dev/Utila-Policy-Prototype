@@ -2,13 +2,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, ShieldEllipsis,
-  Trash2, Scale, GripVertical, Settings, TestTubeDiagonal 
+  Trash2, Scale, GripVertical, Settings, TestTubeDiagonal, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
@@ -134,6 +135,7 @@ interface SortablePolicyItemProps {
   onDelete: () => void;
   onEdit: () => void;
   onApprove: () => void;
+  onShowPending?: (policy: Policy) => void;
   isToggling: boolean;
   isDeleting: boolean;
 }
@@ -146,6 +148,7 @@ function SortablePolicyItem({
   onDelete, 
   onEdit,
   onApprove,
+  onShowPending,
   isToggling, 
   isDeleting 
 }: SortablePolicyItemProps) {
@@ -219,13 +222,15 @@ function SortablePolicyItem({
         {isPendingApproval && (
           <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
-              <span 
-                className="inline-flex items-center gap-1 h-5 px-2 text-[14px] font-normal rounded-md bg-secondary text-secondary-foreground cursor-default"
+              <button 
+                onClick={() => onShowPending?.(policy)}
+                className="group inline-flex items-center gap-1 h-5 px-2 text-[14px] font-normal rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-default"
                 data-testid={`pending-label-policy-${policy.id}`}
               >
                 <ShieldEllipsis className="w-3.5 h-3.5" />
-                Changes pending
-              </span>
+                <span>Changes pending</span>
+                <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
             </TooltipTrigger>
             <TooltipContent className="max-w-[280px]">
               <p>
@@ -276,6 +281,7 @@ export default function Policies() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
   const [showSimulator, setShowSimulator] = useState(false);
+  const [viewingPendingPolicy, setViewingPendingPolicy] = useState<Policy | null>(null);
   const { toast } = useToast();
 
   const sensors = useSensors(
@@ -478,6 +484,7 @@ export default function Policies() {
                           onDelete={() => deleteMutation.mutate(policy.id)}
                           onEdit={() => setEditingPolicy(policy)}
                           onApprove={() => approveMutation.mutate(policy.id)}
+                          onShowPending={setViewingPendingPolicy}
                           isToggling={toggleMutation.isPending}
                           isDeleting={deleteMutation.isPending}
                         />
@@ -549,6 +556,78 @@ export default function Policies() {
           </DialogHeader>
           <div className="p-6">
             <TransactionSimulator />
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!viewingPendingPolicy} onOpenChange={(open) => !open && setViewingPendingPolicy(null)}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0 hide-scrollbar">
+          <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
+            <DialogTitle className="text-xl font-bold">Pending Changes Review</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Review current settings vs. proposed changes. No actions can be taken here.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            {viewingPendingPolicy && (
+              <div className="space-y-6">
+                <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                  <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <ShieldEllipsis className="w-4 h-4 text-amber-500" />
+                    Proposed Comparison
+                  </h4>
+                  <div className="space-y-4">
+                    {(() => {
+                      const pending = JSON.parse(viewingPendingPolicy.pendingChanges || '{}');
+                      const fields = [
+                        { key: 'name', label: 'Policy Name' },
+                        { key: 'description', label: 'Description' },
+                        { key: 'action', label: 'Action' },
+                        { key: 'conditionLogic', label: 'Logic' },
+                        { key: 'initiatorType', label: 'Initiator Type' },
+                        { key: 'amountCondition', label: 'Amount Condition' },
+                        { key: 'approvers', label: 'Approvers' },
+                        { key: 'changeApproversList', label: 'Policy Change Approvers' },
+                      ];
+
+                      return fields.map(({ key, label }) => {
+                        const currentVal = (viewingPendingPolicy as any)[key];
+                        const pendingVal = pending[key];
+                        const isChanged = pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
+                        
+                        const displayVal = (val: any) => {
+                          if (val === undefined || val === null) return 'Not set';
+                          if (Array.isArray(val)) return val.length > 0 ? val.join(', ') : 'None';
+                          return String(val);
+                        };
+
+                        return (
+                          <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
+                            <div className="space-y-1">
+                              <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{label}</span>
+                              <div className="text-sm text-foreground/70">{displayVal(currentVal)}</div>
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Proposed</span>
+                              <div className={cn(
+                                "text-sm font-medium",
+                                isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
+                              )}>
+                                {displayVal(isChanged ? pendingVal : currentVal)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button variant="outline" onClick={() => setViewingPendingPolicy(null)}>
+                    Close Review
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
