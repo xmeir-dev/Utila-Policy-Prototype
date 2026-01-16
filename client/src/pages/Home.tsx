@@ -148,7 +148,7 @@ export default function Home() {
                   data-testid="button-history"
                 >
                   <History className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">Transfer History</span>
+                  <span className="font-semibold text-center">Transfer History</span>
                 </div>
               </div>
 
