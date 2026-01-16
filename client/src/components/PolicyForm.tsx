@@ -888,7 +888,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
       </div>
       
       {isEditMode && onDelete && (
-        <div className="pt-6 border-t border-border mt-6">
+        <div className="pt-2">
           <Button
             type="button"
             variant="ghost"
