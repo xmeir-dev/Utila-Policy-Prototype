@@ -157,6 +157,7 @@ interface SimulationResult {
 export function TransactionSimulator() {
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+  const [amountDisplay, setAmountDisplay] = useState("");
   const [formData, setFormData] = useState<SimulateTransactionRequest>({
     initiator: "",
     sourceWallet: "",
@@ -165,6 +166,20 @@ export function TransactionSimulator() {
     amountUsd: 0,
     asset: "ETH",
   });
+
+  const formatAmountWithCommas = (value: string) => {
+    const num = value.replace(/,/g, '');
+    if (!num || isNaN(Number(num))) return value;
+    return Number(num).toLocaleString('en-US');
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/,/g, '');
+    if (raw === '' || /^\d*\.?\d*$/.test(raw)) {
+      setAmountDisplay(formatAmountWithCommas(raw));
+      setFormData(prev => ({ ...prev, amountUsd: parseFloat(raw) || 0 }));
+    }
+  };
 
   const [result, setResult] = useState<SimulationResult | null>(null);
 
@@ -280,15 +295,18 @@ export function TransactionSimulator() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="sim-amount">Amount (USD)</Label>
-              <Input
-                id="sim-amount"
-                type="number"
-                value={formData.amountUsd || ''}
-                onChange={(e) => updateField('amountUsd', parseFloat(e.target.value) || 0)}
-                placeholder="1000"
-                className="rounded-lg"
-                data-testid="input-sim-amount"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="sim-amount"
+                  type="text"
+                  value={amountDisplay}
+                  onChange={handleAmountChange}
+                  placeholder="1,000"
+                  className="rounded-lg pl-7"
+                  data-testid="input-sim-amount"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
