@@ -137,6 +137,20 @@ export const api = {
         404: errorSchemas.notFound,
       },
     },
+    generate: {
+      method: 'POST' as const,
+      path: '/api/policies/generate',
+      input: z.object({
+        prompt: z.string(),
+      }),
+      responses: {
+        200: z.object({
+          policy: insertPolicySchema,
+          missingInfo: z.array(z.string()),
+        }),
+        400: errorSchemas.validation,
+      },
+    },
   },
 };
 

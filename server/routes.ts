@@ -120,6 +120,53 @@ export async function registerRoutes(
     }
   });
 
+  app.post(api.policies.generate.path, async (req, res) => {
+    try {
+      const { prompt } = api.policies.generate.input.parse(req.body);
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert security policy generator for a crypto wallet infrastructure. 
+            Given a user's free-text request, generate a policy object that fits the schema.
+            Schema fields:
+            - name: Short descriptive name
+            - description: Full description
+            - action: 'allow', 'deny', or 'require_approval'
+            - priority: integer (default 0)
+            - conditionLogic: 'AND' or 'OR'
+            - initiatorType: 'any', 'user', 'group'
+            - initiatorValues: array of strings
+            - sourceWalletType: 'any', 'specific'
+            - sourceWallets: array of strings
+            - destinationType: 'any', 'internal', 'external', 'whitelist'
+            - destinationValues: array of strings
+            - amountCondition: 'any', 'above', 'below', 'between'
+            - amountMin: string
+            - amountMax: string
+            - assetType: 'any', 'specific'
+            - assetValues: array of strings
+            - approvers: array of strings (required if action is 'require_approval')
+            - quorumRequired: integer (default 1)
+
+            Also identify what information is missing from the user's prompt that would be needed for a complete policy.
+            Return a JSON object: { "policy": { ... }, "missingInfo": ["field1", "field2"] }`
+          },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" }
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || "{}");
+      res.status(200).json(result);
+    } catch (err) {
+      console.error("AI Generation error:", err);
+      res.status(500).json({ message: "Failed to generate policy via AI" });
+    }
+  });
+
   app.post(api.policies.create.path, async (req, res) => {
     try {
       const input = api.policies.create.input.parse(req.body);
