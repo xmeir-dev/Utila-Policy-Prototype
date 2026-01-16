@@ -103,7 +103,7 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-8 w-full">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Top Holdings</h3>
+                    <h3 className="font-medium text-[16px]">Top Holdings</h3>
                     <Button variant="link" className="text-xs text-muted-foreground p-0 h-auto">See All</Button>
                   </div>
                   <div className="space-y-3">
