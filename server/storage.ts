@@ -59,9 +59,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(transactions.status, "pending"));
     
     // Get all active policies that require approval
+    // Include policies with pending_approval status since they're still active until change/deletion is approved
     const allPolicies = await this.getPolicies();
     const approvalPolicies = allPolicies.filter(
-      p => p.isActive && p.status === 'active' && p.action === 'require_approval'
+      p => p.isActive && (p.status === 'active' || p.status === 'pending_approval') && p.action === 'require_approval'
     );
     
     // Check if user is an approver in any of these policies
