@@ -294,22 +294,6 @@ export function TransactionSimulator() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="sim-amount">Amount in USD</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                <Input
-                  id="sim-amount"
-                  type="text"
-                  value={amountDisplay}
-                  onChange={handleAmountChange}
-                  placeholder="1,000"
-                  className="rounded-lg pl-7"
-                  data-testid="input-sim-amount"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="sim-asset">Asset</Label>
               <Select
                 value={formData.asset}
@@ -324,6 +308,22 @@ export function TransactionSimulator() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sim-amount">Amount in USD</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="sim-amount"
+                  type="text"
+                  value={amountDisplay}
+                  onChange={handleAmountChange}
+                  placeholder="1,000"
+                  className="rounded-lg pl-7"
+                  data-testid="input-sim-amount"
+                />
+              </div>
             </div>
           </div>
         </div>
