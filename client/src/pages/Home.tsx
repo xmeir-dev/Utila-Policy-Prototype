@@ -5,7 +5,7 @@ import { Send, Gavel, Inbox, History, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { SiEthereum, SiTether } from "react-icons/si";
+import { SiEthereum, SiTether, SiGithub, SiNotion } from "react-icons/si";
 import { RiCoinFill } from "react-icons/ri";
 import { MdOutlinePaid } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
@@ -156,10 +156,40 @@ export default function Home() {
                 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 font-display text-foreground"
               >Utila Policy Prototype</motion.h1>
 
-              <motion.p 
-                variants={itemVariants}
-                className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
-              >By Meir Rosenschein, January 16, 2026</motion.p>
+              <motion.div variants={itemVariants} className="flex flex-col items-center gap-6">
+                <Button 
+                  size="lg" 
+                  className="rounded-[16px] px-8 h-[56px] text-lg font-semibold hover-elevate active-elevate-2"
+                  onClick={() => setIsDialogOpen(true)}
+                  data-testid="button-get-started"
+                >
+                  Get Started
+                </Button>
+
+                <div className="flex flex-col gap-2">
+                  <Button 
+                    variant="ghost" 
+                    className="gap-2 text-muted-foreground hover:text-foreground rounded-[12px] h-9"
+                    asChild
+                  >
+                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" data-testid="link-repo">
+                      <SiGithub className="w-5 h-5" />
+                      <span>See Repo</span>
+                    </a>
+                  </Button>
+
+                  <Button 
+                    variant="ghost" 
+                    className="gap-2 text-muted-foreground hover:text-foreground rounded-[12px] h-9"
+                    asChild
+                  >
+                    <a href="https://notion.so" target="_blank" rel="noopener noreferrer" data-testid="link-specs">
+                      <SiNotion className="w-5 h-5" />
+                      <span>Specs and explanation</span>
+                    </a>
+                  </Button>
+                </div>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
