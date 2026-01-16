@@ -388,8 +388,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     <form onSubmit={handleSubmit} className="space-y-6">
       {!isEditMode && (
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-primary">
-            <Wand2 className="w-5 h-5" />
+          <div className="text-primary">
             <span className="text-sm font-semibold">Generate with AI</span>
           </div>
           <div className="space-y-2">
@@ -407,7 +406,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
               className="w-full gap-2 rounded-lg"
               data-testid="button-ai-generate"
             >
-              {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+              {isGenerating && <Loader2 className="w-4 h-4 animate-spin" />}
               {isGenerating ? "Generating..." : "Generate Policy"}
             </Button>
           </div>
