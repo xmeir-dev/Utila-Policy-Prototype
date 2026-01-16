@@ -190,11 +190,9 @@ function SortablePolicyItem({
       >
         <GripVertical className="w-4 h-4" />
       </button>
-      
       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-medium text-muted-foreground shrink-0">
         {index + 1}
       </div>
-      
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className={`font-medium text-foreground text-[14px] ${!policy.isActive ? 'opacity-50' : ''}`}>
@@ -202,13 +200,7 @@ function SortablePolicyItem({
           </span>
           <Badge 
             variant="outline" 
-            className={`h-5 px-1.5 text-[11px] ${
-              policy.action === 'allow' 
-                ? 'text-green-600 border-green-600/30 bg-green-500/10' 
-                : policy.action === 'deny' 
-                  ? 'text-red-600 border-red-600/30 bg-red-500/10' 
-                  : 'text-amber-600 border-amber-600/30 bg-amber-500/10'
-            }`}
+            className="whitespace-nowrap inline-flex items-center rounded-md py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover-elevate border [border-color:var(--badge-outline)] shadow-xs h-5 px-1.5 text-amber-600 border-amber-600/30 bg-amber-500/10 font-normal text-[14px]"
           >
             {policy.action === 'allow' ? 'Approved' : policy.action === 'deny' ? 'Denied' : 'Requires approval'}
           </Badge>
@@ -224,7 +216,6 @@ function SortablePolicyItem({
           {policy.description}
         </p>
       </div>
-      
       <div className="flex items-center gap-1 shrink-0">
         {isPendingApproval && (
           <Button
