@@ -75,7 +75,7 @@ export default function Wallets() {
                 {trustedWallets.map((wallet) => (
                   <div
                     key={wallet.id}
-                    className="flex items-center justify-between p-4 border border-border rounded-[16px] bg-card hover-elevate"
+                    className="flex items-center justify-between p-4 border border-border rounded-[16px] bg-card"
                     data-testid={`wallet-${wallet.id}`}
                   >
                     <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export default function Wallets() {
                 {contacts.filter(contact => !contact.isInternal).map((contact) => (
                   <div
                     key={contact.id}
-                    className="flex items-center justify-between p-4 border border-border rounded-[16px] bg-card hover-elevate"
+                    className="flex items-center justify-between p-4 border border-border rounded-[16px] bg-card"
                     data-testid={`contact-${contact.id}`}
                   >
                     <div className="flex items-center gap-3">
