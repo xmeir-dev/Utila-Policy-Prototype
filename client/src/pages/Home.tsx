@@ -10,29 +10,28 @@ import { RiCoinFill } from "react-icons/ri";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useEffect } from "react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
 
   const { data: pendingTransactions = [], refetch: refetchPending } = useQuery<any[]>({
-    queryKey: ["/api/transactions/pending", walletState.connectedUser?.id],
+    queryKey: ["/api/transactions/pending", walletState.connectedUser?.address],
     queryFn: async () => {
-      if (!walletState.connectedUser?.id) return [];
+      if (!walletState.connectedUser?.address) return [];
       const res = await fetch(`/api/transactions/pending?userId=${walletState.connectedUser.id}`);
       if (!res.ok) throw new Error("Failed to fetch pending transactions");
       return res.json();
     },
-    enabled: !!walletState.connectedUser?.id,
+    enabled: !!walletState.connectedUser?.address,
   });
 
   // Re-fetch when user changes
-  useEffect(() => {
-    if (walletState.connectedUser?.id) {
-      refetchPending();
-    }
-  }, [walletState.connectedUser?.id, refetchPending]);
+    useEffect(() => {
+      if (walletState.connectedUser?.address) {
+        refetchPending();
+      }
+    }, [walletState.connectedUser?.address, refetchPending]);
 
   // Filter for transactions that actually require approval
   // For the demo, we'll assume status "pending" means "Pending Approval"
