@@ -150,23 +150,27 @@ Schema fields you need to fill:
 - amountMax: string (required if amountCondition is 'between')
 - assetType: 'any', 'specific'
 - assetValues: array of asset symbols like ETH, USDC, USDT
-- approvers: array of user names (required if action is 'require_approval')
-- quorumRequired: integer (how many approvals needed, default 1)
+- approvers: array of user names (REQUIRED if action is 'require_approval' - who approves the transactions)
+- quorumRequired: integer (how many transaction approvals needed)
+- changeApproversList: array of user names (ALWAYS REQUIRED - who can approve changes to this policy in the future)
+- changeApprovalsRequired: integer (how many approvals needed to change this policy, default 1)
 
 Available users: Meir, Ishai, Omer, Lena, Vitalik
 Available wallets: Finances, Treasury
 Available assets: ETH, USDC, USDT
 
-IMPORTANT RULES - YOU MUST ASK QUESTIONS:
-1. Extract what the user explicitly provides
-2. YOU MUST ask about each of these if NOT explicitly specified by the user:
-   - Amount limits (should this apply to transfers of any amount, or only above/below a certain threshold?)
-   - Source wallet restrictions (should this apply from any wallet, or specific ones like Finances or Treasury?)
-   - Destination restrictions (any destination, or specific addresses/contacts?)
-   - How many approvals are needed if action is require_approval?
-3. Ask ONE question at a time, in a friendly conversational way
-4. Do NOT assume defaults - always ask the user to confirm
-5. Only mark isComplete: true after you have asked about amount, source, and destination
+MANDATORY QUESTIONS - YOU MUST ASK ALL OF THESE (one at a time):
+1. Amount limits - should this apply to transfers of any amount, or only above/below a certain threshold?
+2. Source wallet - should this apply from any wallet, or specific ones like Finances or Treasury?
+3. Destination - any destination, or specific addresses/contacts?
+4. If action is 'require_approval': Who should approve these transactions? (e.g., Meir, Lena, etc.) And how many approvals are needed?
+5. ALWAYS ASK: Who should be able to approve changes to this policy in the future? (This is required - pick from Meir, Ishai, Omer, Lena, Vitalik)
+
+RULES:
+- Ask ONE question at a time in a friendly way
+- Do NOT assume defaults or skip questions
+- You MUST have changeApproversList with at least one user before marking complete
+- Only set isComplete: true when ALL mandatory questions have been answered
 
 Return JSON: {
   "policy": { ...partial or complete policy object... },
