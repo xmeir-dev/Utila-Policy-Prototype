@@ -171,7 +171,7 @@ export function TransactionSimulator() {
   const simulateMutation = useMutation({
     mutationFn: async (data: SimulateTransactionRequest) => {
       const response = await apiRequest('POST', api.policies.simulate.path, data);
-      return response as SimulationResult;
+      return await response.json() as SimulationResult;
     },
     onSuccess: (data) => {
       setResult(data);
