@@ -8,8 +8,8 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
   getPendingTransactions(): Promise<Transaction[]>;
+  getTransactions(): Promise<Transaction[]>;
   getAllTransactions(userId: number): Promise<Transaction[]>;
-  getTransactionsByUserName(userName: string): Promise<Transaction[]>;
   createTransaction(tx: InsertTransaction): Promise<Transaction>;
   getPolicies(): Promise<Policy[]>;
   getPolicy(id: number): Promise<Policy | undefined>;
@@ -69,24 +69,19 @@ export class DatabaseStorage implements IStorage {
     return transaction;
   }
 
+  async getTransactions(): Promise<Transaction[]> {
+    return await db
+      .select()
+      .from(transactions)
+      .orderBy(desc(transactions.id));
+  }
+
   async getAllTransactions(userId: number): Promise<Transaction[]> {
     return await db
       .select()
       .from(transactions)
       .where(eq(transactions.userId, userId))
       .orderBy(desc(transactions.id));
-  }
-
-  async getTransactionsByUserName(userName: string): Promise<Transaction[]> {
-    const allTxs = await db
-      .select()
-      .from(transactions)
-      .orderBy(desc(transactions.id));
-    
-    return allTxs.filter(tx => 
-      tx.initiatorName === userName || 
-      (tx.approvals && tx.approvals.includes(userName))
-    );
   }
 
   async getPolicies(): Promise<Policy[]> {
