@@ -18,7 +18,7 @@ const AVAILABLE_USERS = [
   'Ishai',
   'Omer',
   'Lena',
-  'Vitalik'
+  'Sam'
 ];
 
 const TRUSTED_WALLETS = [

@@ -146,7 +146,7 @@ Schema fields you need to fill:
 - changeApproversList: array of user names (ALWAYS REQUIRED - who can approve changes to this policy in the future)
 - changeApprovalsRequired: integer (how many approvals needed to change this policy, default 1)
 
-Available users: Meir, Ishai, Omer, Lena, Vitalik
+Available users: Meir, Ishai, Omer, Lena, Sam
 Available wallets: Finances, Treasury
 Available assets: ETH, USDC, USDT
 
@@ -155,7 +155,7 @@ MANDATORY QUESTIONS - YOU MUST ASK ALL OF THESE (one at a time):
 2. Source wallet - should this apply from any wallet, or specific ones like Finances or Treasury?
 3. Destination - any destination, or specific addresses/contacts?
 4. If action is 'require_approval': Who should approve these transactions? (e.g., Meir, Lena, etc.) And how many approvals are needed?
-5. ALWAYS ASK: Who should be able to approve changes to this policy in the future? (This is required - pick from Meir, Ishai, Omer, Lena, Vitalik)
+5. ALWAYS ASK: Who should be able to approve changes to this policy in the future? (This is required - pick from Meir, Ishai, Omer, Lena, Sam)
 6. AFTER getting the changeApproversList, ALWAYS ASK AS A SEPARATE QUESTION: "How many of these [X] people need to approve before a change to this policy takes effect?" where X is the number of people they selected. Do NOT default to 1 - you must explicitly ask this.
 
 RULES:
