@@ -19,6 +19,19 @@ const getAssetIcon = (amount: string) => {
   return <RiCoinFill className="w-4 h-4 text-muted-foreground" />;
 };
 
+const formatAmount = (amountStr: string) => {
+  if (!amountStr) return "Unknown";
+  const [val, symbol] = amountStr.split(" ");
+  const num = parseFloat(val.replace(/,/g, ""));
+  if (isNaN(num)) return amountStr;
+  
+  const formattedNum = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: num % 1 === 0 ? 0 : 2,
+  }).format(num);
+  
+  return `${formattedNum}${symbol ? ` ${symbol}` : ""}`;
+};
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -213,7 +226,7 @@ export default function Home() {
                         return (
                           <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[8px] pr-[8px] pt-[0px] pb-[0px]">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium">Sent {tx.amount || "Unknown"}</span>
+                              <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
                               <div className="flex items-center gap-2">
                                 <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
                                 {isInitiator ? (
