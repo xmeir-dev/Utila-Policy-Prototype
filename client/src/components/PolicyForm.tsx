@@ -291,7 +291,8 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
 
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [missingInfo, setMissingInfo] = useState<string[]>([]);
+  const [aiQuestion, setAiQuestion] = useState<string | null>(null);
+  const [conversationHistory, setConversationHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [showManualFields, setShowManualFields] = useState(isEditMode);
   const [expandedSections, setExpandedSections] = useState<string[]>(['details', 'conditions', 'initiator']);
 
@@ -314,23 +315,41 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
   const handleGenerateAI = async () => {
     if (!aiPrompt.trim()) return;
     setIsGenerating(true);
-    setMissingInfo([]);
     try {
-      const res = await apiRequest('POST', '/api/policies/generate', { prompt: aiPrompt });
-      const { policy, missingInfo: missing } = await res.json();
-      
-      setFormData(prev => ({
-        ...prev,
-        ...policy,
-        approvers: policy.approvers || prev.approvers || [],
-        changeApproversList: policy.changeApproversList || prev.changeApproversList || []
-      }));
-      setMissingInfo(missing);
-      
-      toast({
-        title: "Policy generated",
-        description: "AI has filled in the fields based on your request."
+      const res = await apiRequest('POST', '/api/policies/generate', { 
+        prompt: aiPrompt,
+        conversationHistory,
+        currentPolicy: formData
       });
+      const { policy, isComplete, question } = await res.json();
+      
+      const newHistory = [
+        ...conversationHistory,
+        { role: 'user' as const, content: aiPrompt },
+        { role: 'assistant' as const, content: question || 'Policy created successfully!' }
+      ];
+      setConversationHistory(newHistory);
+      
+      if (policy) {
+        setFormData(prev => ({
+          ...prev,
+          ...policy,
+          approvers: policy.approvers || prev.approvers || [],
+          changeApproversList: policy.changeApproversList || prev.changeApproversList || []
+        }));
+      }
+      
+      if (isComplete) {
+        setAiQuestion(null);
+        toast({
+          title: "Policy generated",
+          description: "AI has filled in all the fields based on your conversation."
+        });
+      } else if (question) {
+        setAiQuestion(question);
+      }
+      
+      setAiPrompt("");
     } catch (err) {
       toast({
         title: "AI Generation failed",
@@ -411,16 +430,33 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
             </Button>
           </div>
           
-          {missingInfo.length > 0 && (
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg space-y-2">
-              <div className="flex items-center gap-2 text-amber-600">
-                <Info className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Missing Information</span>
+          {aiQuestion && (
+            <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
+              <p className="text-sm text-foreground">{aiQuestion}</p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Type your answer..."
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleGenerateAI();
+                    }
+                  }}
+                  className="flex-1 rounded-lg"
+                  data-testid="input-ai-answer"
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleGenerateAI} 
+                  disabled={isGenerating || !aiPrompt.trim()}
+                  size="sm"
+                  data-testid="button-ai-answer"
+                >
+                  {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send"}
+                </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                I couldn't find details for: <span className="text-foreground font-medium">{missingInfo.join(", ")}</span>. 
-                Please update the prompt or fill them in below.
-              </p>
             </div>
           )}
         </div>

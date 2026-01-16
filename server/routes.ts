@@ -124,39 +124,71 @@ export async function registerRoutes(
   app.post(api.policies.generate.path, async (req, res) => {
     try {
       const { prompt } = api.policies.generate.input.parse(req.body);
+      const conversationHistory = req.body.conversationHistory as Array<{role: string, content: string}> | undefined;
+      const currentPolicy = req.body.currentPolicy as Record<string, unknown> | undefined;
+      
+      const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
+        {
+          role: "system",
+          content: `You are an expert security policy generator for a crypto wallet infrastructure.
+Your goal is to help the user create a complete policy by asking ONE clarifying question at a time.
+
+Schema fields you need to fill:
+- name: Short descriptive name
+- description: Full description  
+- action: 'allow', 'deny', or 'require_approval'
+- priority: integer (default 0)
+- conditionLogic: 'AND' or 'OR'
+- initiatorType: 'any', 'user', 'group'
+- initiatorValues: array of user names (required if initiatorType is 'user' or 'group')
+- sourceWalletType: 'any', 'specific'
+- sourceWallets: array of wallet names
+- destinationType: 'any', 'internal', 'external', 'whitelist'
+- destinationValues: array of addresses/names
+- amountCondition: 'any', 'above', 'below', 'between'
+- amountMin: string (required if amountCondition is 'above', 'below', or 'between')
+- amountMax: string (required if amountCondition is 'between')
+- assetType: 'any', 'specific'
+- assetValues: array of asset symbols like ETH, USDC, USDT
+- approvers: array of user names (required if action is 'require_approval')
+- quorumRequired: integer (how many approvals needed, default 1)
+
+Available users: Meir, Ishai, Omer, Lena, Vitalik
+Available wallets: Finances, Treasury
+Available assets: ETH, USDC, USDT
+
+Rules:
+1. Extract as much information as possible from what the user provides
+2. If critical information is missing, ask ONE simple question to get it
+3. Keep questions short and friendly
+4. Once you have enough info to create a sensible policy, mark it as complete
+
+Return JSON: {
+  "policy": { ...partial or complete policy object... },
+  "isComplete": boolean,
+  "question": "Your single clarifying question" or null if complete
+}`
+        }
+      ];
+
+      if (conversationHistory && conversationHistory.length > 0) {
+        for (const msg of conversationHistory) {
+          messages.push({ role: msg.role, content: msg.content });
+        }
+      }
+
+      if (currentPolicy) {
+        messages.push({
+          role: "assistant",
+          content: `Current policy state: ${JSON.stringify(currentPolicy)}`
+        });
+      }
+
+      messages.push({ role: "user", content: prompt });
       
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert security policy generator for a crypto wallet infrastructure. 
-            Given a user's free-text request, generate a policy object that fits the schema.
-            Schema fields:
-            - name: Short descriptive name
-            - description: Full description
-            - action: 'allow', 'deny', or 'require_approval'
-            - priority: integer (default 0)
-            - conditionLogic: 'AND' or 'OR'
-            - initiatorType: 'any', 'user', 'group'
-            - initiatorValues: array of strings
-            - sourceWalletType: 'any', 'specific'
-            - sourceWallets: array of strings
-            - destinationType: 'any', 'internal', 'external', 'whitelist'
-            - destinationValues: array of strings
-            - amountCondition: 'any', 'above', 'below', 'between'
-            - amountMin: string
-            - amountMax: string
-            - assetType: 'any', 'specific'
-            - assetValues: array of strings
-            - approvers: array of strings (required if action is 'require_approval')
-            - quorumRequired: integer (default 1)
-
-            Also identify what information is missing from the user's prompt that would be needed for a complete policy.
-            Return a JSON object: { "policy": { ... }, "missingInfo": ["field1", "field2"] }`
-          },
-          { role: "user", content: prompt }
-        ],
+        messages,
         response_format: { type: "json_object" }
       });
 
