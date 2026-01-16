@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 import { useQuery } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Recipient {
   id: string;
@@ -73,7 +73,7 @@ export default function Transfer() {
   const [newAddress, setNewAddress] = useState("");
   const amountInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const userEnteredAmountRef = useRef<string>("");
+  const { toast } = useToast();
 
   const getTotalBudget = () => {
     const amountToUse = userEnteredAmountRef.current || amount;
@@ -404,11 +404,11 @@ export default function Transfer() {
       const available = getAvailableBalance();
       
       if (totalAmount > available) {
-        setSimulationResult({
-          status: "rejected",
-          message: `Insufficient funds. Required: $${totalAmount.toLocaleString()}, Available: $${available.toLocaleString()}`
+        toast({
+          title: "Insufficient funds",
+          description: `Required: $${totalAmount.toLocaleString()}, Available: $${available.toLocaleString()}`,
+          variant: "destructive"
         });
-        setShowSimulationModal(true);
         setIsProcessing(false);
         return;
       }
@@ -426,33 +426,46 @@ export default function Transfer() {
       const response = await apiRequest("POST", "/api/policies/simulate", simulationReq);
       const result = await response.json();
       
-      let status: "approved" | "rejected" | "pending" = "approved";
-      if (result.action === "deny") status = "rejected";
-      else if (result.action === "require_approval") status = "pending";
-
-      setSimulationResult({
-        status,
-        message: result.reason
-      });
-      setShowSimulationModal(true);
-
-      if (result.action !== "deny") {
-        // Create the transaction in the database
-        await apiRequest("POST", "/api/transactions", {
-          userId: walletState.connectedUser?.id,
-          type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
-          amount: `${recipients[0]?.amount} ${selectedAsset.symbol}`,
-          status: result.action === "require_approval" ? "pending" : "completed",
-          initiatorName: walletState.connectedUser?.name
+      if (result.action === "deny") {
+        toast({
+          title: "Transfer Rejected",
+          description: result.reason,
+          variant: "destructive"
         });
-        queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
+        setLocation("/");
+        return;
       }
-    } catch (error) {
-      setSimulationResult({
-        status: "rejected",
-        message: "An error occurred while simulating the policy check."
+
+      // Create the transaction in the database
+      await apiRequest("POST", "/api/transactions", {
+        userId: walletState.connectedUser?.id,
+        type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
+        amount: `${recipients[0]?.amount} ${selectedAsset.symbol}`,
+        status: result.action === "require_approval" ? "pending" : "completed",
+        initiatorName: walletState.connectedUser?.name
       });
-      setShowSimulationModal(true);
+
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
+
+      if (result.action === "require_approval") {
+        toast({
+          title: "Transfer Pending",
+          description: "This transaction requires approval based on active policies.",
+        });
+      } else {
+        toast({
+          title: "Transfer Successful",
+          description: `Successfully sent ${recipients[0]?.amount} ${selectedAsset.symbol}`,
+        });
+      }
+      
+      setLocation("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while processing the transfer.",
+        variant: "destructive"
+      });
     } finally {
       setIsProcessing(false);
     }
