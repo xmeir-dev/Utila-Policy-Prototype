@@ -230,14 +230,8 @@ export default function Home() {
                             </div>
                           </div>
                           <p className="text-xs text-muted-foreground mb-3">From {tx.initiatorName || "Wallet"} to Bank of America</p>
-                          <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">
-                            <div className="flex items-center gap-1">
-                              <span>Initiator:</span>
-                              <div className="flex items-center gap-1 text-foreground font-medium">
-                                {tx.initiatorName || walletState.connectedUser?.name || "Unknown"}
-                              </div>
-                            </div>
-                            <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
+                          <div className="text-[10px] text-muted-foreground border-t border-border/50 pt-2">
+                            <span>Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
                           </div>
                         </div>
                       );
