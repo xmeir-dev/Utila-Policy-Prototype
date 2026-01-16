@@ -606,7 +606,7 @@ export default function Policies() {
                           <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
                             <div className="space-y-1">
                               <span className="text-[14px] font-medium text-[#8a8a8a]">{label}</span>
-                              <div className="text-sm text-foreground/70">{displayVal(currentVal)}</div>
+                              <div className="text-sm text-[#171717]">{displayVal(currentVal)}</div>
                             </div>
                             <div className="space-y-1">
                               <span className="text-[14px] font-medium text-[#8a8a8a]">Proposed change</span>
