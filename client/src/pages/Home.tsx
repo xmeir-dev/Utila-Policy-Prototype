@@ -1,20 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
-import { Clock, ExternalLink, Send, Gavel, LibraryBig } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@shared/routes";
-import { type Transaction } from "@shared/schema";
+import { Send, Gavel, LibraryBig } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
-  const { data: pendingTransactions } = useQuery<Transaction[]>({
-    queryKey: [api.transactions.listPending.path],
-    enabled: walletState.isConnected,
-  });
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -104,27 +97,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="font-bold font-display text-[24px]">Pending Transactions</h2>
-              </div>
-
-              <div className="space-y-4">
-                {pendingTransactions?.map((tx: any) => (
-                  <div key={tx.id} className="p-6 border border-border rounded-md bg-card flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <p className="font-semibold text-foreground whitespace-nowrap">{tx.type}</p>
-                      <p className="text-sm text-muted-foreground truncate">{tx.amount}</p>
-                    </div>
-                    <div className="flex items-center gap-4 shrink-0">
-                      <span className="text-xs font-mono text-muted-foreground">{tx.txHash}</span>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
-                    </div>
-                  </div>
-                ))}
-                {!pendingTransactions?.length && (
-                  <p className="text-center text-muted-foreground py-12">No pending transactions found.</p>
-                )}
-              </div>
+              
             </motion.div>
           )}
         </AnimatePresence>
