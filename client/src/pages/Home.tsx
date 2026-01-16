@@ -226,7 +226,7 @@ export default function Home() {
                               </Button>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
+                          <p className="text-xs text-muted-foreground mb-3">From {tx.initiatorName || "Wallet"} to Bank of America</p>
                           <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">
                             <div className="flex items-center gap-1">
                               <span>Initiator:</span>
