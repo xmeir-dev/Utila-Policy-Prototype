@@ -150,10 +150,9 @@ export default function Home() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-medium">{asset.name}</span>
+                                <span className="text-sm font-medium">{asset.balanceStr} {asset.name}</span>
                                 <div className="text-right">
-                                  <div className="text-sm font-medium">{asset.balanceStr} {asset.name}</div>
-                                  <div className="text-[10px] text-muted-foreground">${asset.usdValue.toLocaleString()}</div>
+                                  <div className="text-sm font-medium">${asset.usdValue.toLocaleString()}</div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
