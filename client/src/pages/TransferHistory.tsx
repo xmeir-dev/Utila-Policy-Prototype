@@ -147,7 +147,7 @@ export default function TransferHistory() {
                           data-testid={`row-transaction-${tx.id}`}
                         >
                           <td className="px-6 py-4">
-                            <span className="font-medium text-sm">{tx.initiatorName || "-"}</span>
+                            <span className="text-sm font-normal">{tx.initiatorName || "-"}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className="font-semibold text-sm">{formatAmount(tx.amount)}</span>
