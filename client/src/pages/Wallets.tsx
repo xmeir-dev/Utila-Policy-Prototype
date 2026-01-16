@@ -24,10 +24,43 @@ const contacts: Contact[] = [
 ];
 
 const trustedWallets = [
-  { id: "w1", name: "Finances", address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", balance: "502 ETH" },
-  { id: "w2", name: "Treasury", address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F", balance: "421 ETH" },
-  { id: "w3", name: "Meir", address: "0xE1f2A3b4C5d6E7f8A9B0c1D2E3f4A5b6C7d8E9f0", balance: "198 ETH" },
-  { id: "w4", name: "Ishai", address: "0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9", balance: "134 ETH" },
+  { 
+    id: "w1", 
+    name: "Finances", 
+    address: "0xb0bF1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7E8F", 
+    balances: [
+      { amount: "502", symbol: "ETH" },
+      { amount: "1,250,000", symbol: "USDC" },
+      { amount: "800,000", symbol: "USDT" }
+    ] 
+  },
+  { 
+    id: "w2", 
+    name: "Treasury", 
+    address: "0xcAfE9a8B7c6D5e4F3a2B1c0D9e8F7a6B5c4D3E2F", 
+    balances: [
+      { amount: "421", symbol: "ETH" },
+      { amount: "850,000", symbol: "USDC" }
+    ] 
+  },
+  { 
+    id: "w3", 
+    name: "Meir", 
+    address: "0xE1f2A3b4C5d6E7f8A9B0c1D2E3f4A5b6C7d8E9f0", 
+    balances: [
+      { amount: "198", symbol: "ETH" },
+      { amount: "15,000", symbol: "USDC" }
+    ] 
+  },
+  { 
+    id: "w4", 
+    name: "Ishai", 
+    address: "0xF0e1D2c3B4a5F6e7D8c9B0a1E2f3D4c5B6a7E8f9", 
+    balances: [
+      { amount: "134", symbol: "ETH" },
+      { amount: "12,500", symbol: "USDC" }
+    ] 
+  },
 ];
 
 const truncateAddress = (address: string): string => {
@@ -90,7 +123,13 @@ export default function Wallets() {
                         </div>
                       </div>
                     </div>
-                    <div className="font-medium">{wallet.balance}</div>
+                    <div className="text-right space-y-0.5">
+                      {wallet.balances.map((balance, idx) => (
+                        <div key={idx} className="text-[14px] font-medium leading-tight">
+                          {balance.amount} {balance.symbol}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
