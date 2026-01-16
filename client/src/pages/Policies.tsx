@@ -504,7 +504,7 @@ export default function Policies() {
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0 hide-scrollbar">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
-            <DialogTitle className="text-xl font-bold">Create New Policy</DialogTitle>
+            <DialogTitle className="text-xl font-bold">Create a policy</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               Define trigger conditions and actions for transaction approval.
             </DialogDescription>
