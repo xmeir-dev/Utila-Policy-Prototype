@@ -38,6 +38,18 @@ function MultiWalletSelector({
   onChange: (values: string[]) => void; 
   testId: string;
 }) {
+  const [newWalletAddress, setNewWalletAddress] = useState("");
+  const [showAddAddress, setShowAddAddress] = useState(false);
+
+  const addAddress = () => {
+    const trimmed = newWalletAddress.trim();
+    if (trimmed && !selected.includes(trimmed)) {
+      onChange([...selected, trimmed]);
+      setNewWalletAddress("");
+      setShowAddAddress(false);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2 p-2 border border-input rounded-[14px] bg-background min-h-[42px]">
@@ -59,6 +71,10 @@ function MultiWalletSelector({
         <Select
           value=""
           onValueChange={(address) => {
+            if (address === "custom") {
+              setShowAddAddress(true);
+              return;
+            }
             if (address && !selected.includes(address)) {
               onChange([...selected, address]);
             }
@@ -79,9 +95,41 @@ function MultiWalletSelector({
                 </div>
               </SelectItem>
             ))}
+            <SelectItem value="custom" className="text-primary font-medium border-t mt-1 pt-2">
+              <div className="flex items-center gap-2">
+                <Plus className="w-3 h-3" />
+                <span>Enter custom address...</span>
+              </div>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
+      {showAddAddress && (
+        <div className="flex gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+          <Input
+            value={newWalletAddress}
+            onChange={(e) => setNewWalletAddress(e.target.value)}
+            placeholder="0x..."
+            className="h-8 text-xs rounded-lg"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addAddress();
+              }
+              if (e.key === 'Escape') {
+                setShowAddAddress(false);
+              }
+            }}
+          />
+          <Button type="button" size="sm" className="h-8 text-xs px-3 rounded-lg" onClick={addAddress}>
+            Add
+          </Button>
+          <Button type="button" size="sm" variant="ghost" className="h-8 text-xs px-2 rounded-lg" onClick={() => setShowAddAddress(false)}>
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
