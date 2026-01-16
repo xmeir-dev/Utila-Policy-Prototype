@@ -683,9 +683,9 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                   <SelectValue placeholder="Select action" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="allow">Allow Transaction</SelectItem>
-                  <SelectItem value="deny">Deny Transaction</SelectItem>
-                  <SelectItem value="require_approval">Require Approval</SelectItem>
+                  <SelectItem value="require_approval">Require approval</SelectItem>
+                  <SelectItem value="deny">Deny transaction</SelectItem>
+                  <SelectItem value="allow">Allow transaction</SelectItem>
                 </SelectContent>
               </Select>
             </div>
