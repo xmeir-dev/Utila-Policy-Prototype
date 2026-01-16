@@ -202,18 +202,6 @@ export function TransactionSimulator() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Switch
-            id="sim-internal"
-            checked={formData.destinationIsInternal}
-            onCheckedChange={(checked) => updateField('destinationIsInternal', checked)}
-            data-testid="switch-sim-internal"
-          />
-          <Label htmlFor="sim-internal" className="cursor-pointer">
-            Destination is an internal wallet
-          </Label>
-        </div>
-
         <Button
           type="submit"
           disabled={simulateMutation.isPending}
