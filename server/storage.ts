@@ -52,30 +52,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPendingTransactions(userName: string): Promise<Transaction[]> {
-    // Get all pending transactions
+    // Get all pending transactions - show to everyone
     const pendingTxs = await db
       .select()
       .from(transactions)
       .where(eq(transactions.status, "pending"));
     
-    // Get all active policies that require approval
-    // Include policies with pending_approval status since they're still active until change/deletion is approved
-    const allPolicies = await this.getPolicies();
-    const approvalPolicies = allPolicies.filter(
-      p => p.isActive && (p.status === 'active' || p.status === 'pending_approval') && p.action === 'require_approval'
-    );
-    
-    // Check if user is an approver in any of these policies
-    const isApprover = approvalPolicies.some(
-      policy => policy.approvers?.includes(userName)
-    );
-    
-    // Return transactions where:
-    // 1. User is the initiator (initiatorName matches), OR
-    // 2. User is an approver in any require_approval policy
-    return pendingTxs.filter(tx => 
-      tx.initiatorName === userName || isApprover
-    );
+    return pendingTxs;
   }
 
   async createTransaction(tx: InsertTransaction): Promise<Transaction> {
