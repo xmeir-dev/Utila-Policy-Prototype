@@ -112,13 +112,13 @@ export default function TransferHistory() {
               <table className="w-full" data-testid="table-transactions">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Initiator</th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Amount</th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">From</th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">To</th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Date & Time</th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Status</th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Approvals</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Initiator</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Amount</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">From</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">To</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Date & Time</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Status</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Approvals</th>
                   </tr>
                 </thead>
                 <tbody>
