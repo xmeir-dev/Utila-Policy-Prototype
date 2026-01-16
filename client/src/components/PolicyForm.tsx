@@ -309,13 +309,22 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
   const isValid = formData.name?.trim() && 
     formData.description?.trim() && 
     formData.changeApproversList && 
-    formData.changeApproversList.length > 0;
+    formData.changeApproversList.length > 0 &&
+    (formData.action !== 'require_approval' || (formData.approvers && formData.approvers.length > 0));
 
-  const isInitiatorConfigured = formData.initiatorType !== 'any';
-  const isSourceConfigured = formData.sourceWalletType !== 'any';
-  const isDestinationConfigured = formData.destinationType !== 'any';
-  const isAmountConfigured = formData.amountCondition !== 'any';
-  const isAssetConfigured = formData.assetType !== 'any';
+  const getDisabledReason = () => {
+    if (!formData.name?.trim()) return "Please enter a policy name";
+    if (!formData.description?.trim()) return "Please enter a description";
+    if (!formData.changeApproversList || formData.changeApproversList.length === 0) {
+      return "Please select at least one user who can approve policy changes";
+    }
+    if (formData.action === 'require_approval' && (!formData.approvers || formData.approvers.length === 0)) {
+      return "Please select at least one user who can approve transactions";
+    }
+    return null;
+  };
+
+  const disabledReason = getDisabledReason();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -801,14 +810,27 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
         >
           Cancel
         </Button>
-        <Button
-          type="submit"
-          disabled={!isValid || isSubmitting}
-          className="flex-1 rounded-[14px]"
-          data-testid="button-save-policy"
-        >
-          {isSubmitting ? 'Saving...' : submitLabel}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex-1">
+                <Button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="w-full rounded-[14px]"
+                  data-testid="button-save-policy"
+                >
+                  {isSubmitting ? 'Saving...' : submitLabel}
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {disabledReason && (
+              <TooltipContent>
+                <p>{disabledReason}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </form>
   );
