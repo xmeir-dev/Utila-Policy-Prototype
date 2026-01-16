@@ -157,17 +157,9 @@ export default function TransferHistory() {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex flex-col">
-                              {tx.toLabel && (
-                                <span className="text-sm font-medium">{tx.toLabel}</span>
-                              )}
-                              <span className={cn(
-                                "text-sm font-mono",
-                                tx.toLabel ? "text-muted-foreground text-xs" : ""
-                              )}>
-                                {truncateAddress(tx.toAddress || "")}
-                              </span>
-                            </div>
+                            <span className="text-sm font-medium">
+                              {tx.toLabel || truncateAddress(tx.toAddress || "")}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
