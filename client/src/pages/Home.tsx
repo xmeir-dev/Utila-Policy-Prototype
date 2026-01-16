@@ -92,7 +92,7 @@ export default function Home() {
                   data-testid="button-policies"
                 >
                   <Gavel className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">Policies</span>
+                  <span className="font-semibold">Organization Policies</span>
                 </div>
               </div>
 
