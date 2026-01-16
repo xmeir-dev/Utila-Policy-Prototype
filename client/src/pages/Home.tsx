@@ -211,30 +211,30 @@ export default function Home() {
                       filteredTransfers.map((tx) => {
                         const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
                         return (
-                        <div key={tx.id} className="p-4 rounded-[14px] bg-card/50">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-bold">Sent {tx.amount || "Unknown"}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
-                              {isInitiator ? (
-                                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
-                              ) : (
-                                <Button 
-                                  size="sm" 
-                                  className="h-6 px-3 text-xs"
-                                  data-testid={`button-approve-${tx.id}`}
-                                >
-                                  Approve
-                                </Button>
-                              )}
+                          <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-bold">Sent {tx.amount || "Unknown"}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1}</span>
+                                {isInitiator ? (
+                                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5">Pending Approval</Badge>
+                                ) : (
+                                  <Button 
+                                    size="sm" 
+                                    className="h-6 px-3 text-xs"
+                                    data-testid={`button-approve-${tx.id}`}
+                                  >
+                                    Approve
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-3">From {tx.initiatorName || "Wallet"} to Bank of America</p>
+                            <div className="text-[10px] text-muted-foreground">
+                              <span>Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
                             </div>
                           </div>
-                          <p className="text-xs text-muted-foreground mb-3">From {tx.initiatorName || "Wallet"} to Bank of America</p>
-                          <div className="text-[10px] text-muted-foreground">
-                            <span>Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
-                          </div>
-                        </div>
-                      );
+                        );
                       })
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed border-border rounded-[14px] bg-card/20 text-center">
