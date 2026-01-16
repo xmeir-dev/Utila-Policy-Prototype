@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { useWallet } from "@/hooks/use-wallet";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Transaction } from "@shared/schema";
 
@@ -195,10 +196,28 @@ export default function TransferHistory() {
                           </td>
                           <td className="px-6 py-4">
                             {tx.status === "pending" || approvalsCount > 0 ? (
-                              <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm">{approvalsCount}/{quorumRequired}</span>
-                              </div>
+                              <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center gap-2 cursor-help" data-testid={`approvals-${tx.id}`}>
+                                    <Users className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-sm">{approvalsCount}/{quorumRequired}</span>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="max-w-[200px]">
+                                  {approvalsCount > 0 ? (
+                                    <div className="text-xs">
+                                      <p className="font-medium mb-1">Approved by:</p>
+                                      <ul className="space-y-0.5">
+                                        {tx.approvals?.map((approver, idx) => (
+                                          <li key={idx}>{approver}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs">No approvals yet</p>
+                                  )}
+                                </TooltipContent>
+                              </Tooltip>
                             ) : (
                               <span className="text-sm text-muted-foreground">-</span>
                             )}
