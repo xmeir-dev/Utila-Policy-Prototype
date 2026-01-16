@@ -211,12 +211,6 @@ function SortablePolicyItem({
         <p className={`text-[13px] text-muted-foreground ${!policy.isActive ? 'opacity-50' : ''}`}>
           {policy.description}
         </p>
-        
-        {policy.action === 'require_approval' && policy.approvers && policy.approvers.length > 0 && (
-          <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-            <span>Quorum: {policy.quorumRequired} of {policy.approvers.length}</span>
-          </div>
-        )}
       </div>
       
       <div className="flex items-center gap-1 shrink-0">
