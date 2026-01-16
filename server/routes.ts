@@ -165,7 +165,7 @@ MANDATORY QUESTIONS - YOU MUST ASK ALL OF THESE (one at a time):
 3. Destination - any destination, or specific addresses/contacts?
 4. If action is 'require_approval': Who should approve these transactions? (e.g., Meir, Lena, etc.) And how many approvals are needed?
 5. ALWAYS ASK: Who should be able to approve changes to this policy in the future? (This is required - pick from Meir, Ishai, Omer, Lena, Vitalik)
-6. ALWAYS ASK: How many approvals should be required to change or delete this policy? (This is the governance quorum)
+6. AFTER getting the changeApproversList, ALWAYS ASK AS A SEPARATE QUESTION: "How many of these [X] people need to approve before a change to this policy takes effect?" where X is the number of people they selected. Do NOT default to 1 - you must explicitly ask this.
 
 RULES:
 - Ask ONE question at a time in a friendly way
