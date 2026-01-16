@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Beaker, AlertCircle, CheckCircle, XCircle, ShieldAlert } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -20,6 +19,14 @@ const AVAILABLE_USERS = [
   'Omer',
   'Lena',
   'Vitalik'
+];
+
+const AVAILABLE_WALLETS = [
+  { name: 'Main Treasury', address: '0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1' },
+  { name: 'Operating Account', address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' },
+  { name: 'Payroll Wallet', address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
+  { name: 'Escrow Account', address: '0x6B175474E89094C44Da98b954EesecdB6F8e5389' },
+  { name: 'Founder Reserve', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' }
 ];
 
 interface SimulationResult {
@@ -135,27 +142,47 @@ export function TransactionSimulator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sim-source">Source Wallet</Label>
-            <Input
-              id="sim-source"
+            <Label htmlFor="sim-source">From</Label>
+            <Select
               value={formData.sourceWallet}
-              onChange={(e) => updateField('sourceWallet', e.target.value)}
-              placeholder="0x1234...5678"
-              className="rounded-lg font-mono text-sm"
-              data-testid="input-sim-source"
-            />
+              onValueChange={(value) => updateField('sourceWallet', value)}
+            >
+              <SelectTrigger id="sim-source" className="rounded-lg" data-testid="select-sim-source">
+                <SelectValue placeholder="Select wallet" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_WALLETS.map((wallet) => (
+                  <SelectItem key={wallet.address} value={wallet.address}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{wallet.name}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">{wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sim-destination">Destination Address</Label>
-            <Input
-              id="sim-destination"
+            <Label htmlFor="sim-destination">To</Label>
+            <Select
               value={formData.destination}
-              onChange={(e) => updateField('destination', e.target.value)}
-              placeholder="0xabcd...efgh"
-              className="rounded-lg font-mono text-sm"
-              data-testid="input-sim-destination"
-            />
+              onValueChange={(value) => updateField('destination', value)}
+            >
+              <SelectTrigger id="sim-destination" className="rounded-lg" data-testid="select-sim-destination">
+                <SelectValue placeholder="Select destination" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_WALLETS.map((wallet) => (
+                  <SelectItem key={wallet.address} value={wallet.address}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{wallet.name}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">{wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
