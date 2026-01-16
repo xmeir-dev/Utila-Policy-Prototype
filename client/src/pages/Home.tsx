@@ -340,7 +340,7 @@ export default function Home() {
                             <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 px-2 py-3">
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium">Sent {formatAmount(tx.amount)}</span>
+                                  <span className="text-sm font-medium">Transfer of {tx.amount.split(' ').pop()} token</span>
                                   <span className="text-[12px] text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1} approvals</span>
                                 </div>
                                 <div className="flex items-center gap-2">
