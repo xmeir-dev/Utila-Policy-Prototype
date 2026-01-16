@@ -234,7 +234,7 @@ export default function Home() {
                                 {tx.initiatorName || walletState.connectedUser?.name || "Unknown"}
                               </div>
                             </div>
-                            <span>Created at: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date().toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                            <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
                           </div>
                         </div>
                       );
