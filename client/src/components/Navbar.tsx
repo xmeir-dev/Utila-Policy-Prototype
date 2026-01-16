@@ -50,11 +50,9 @@ export function Navbar({ walletState }: NavbarProps) {
                 onClick={() => setIsDialogOpen(true)}
                 className="rounded-[16px] font-mono text-sm h-[48px] gap-2 pl-[8px] pr-[8px]"
               >
-                <img 
-                  src={waystarRoycoLogo} 
-                  alt={connectedUser.name} 
-                  className="h-6 w-auto object-contain" 
-                />
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${connectedUser.avatarBg} ${connectedUser.avatarColor}`}>
+                  <span className="text-sm font-semibold">{connectedUser.name.charAt(0)}</span>
+                </div>
                 {connectedUser.name}
                 <ChevronDown className="w-4 h-4 opacity-50" />
               </Button>
