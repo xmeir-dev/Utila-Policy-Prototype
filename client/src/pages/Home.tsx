@@ -186,7 +186,7 @@ export default function Home() {
                   >
                     <a href="https://catkin-buzzard-15c.notion.site/Specs-Utila-Transaction-Policy-2e9da37fe9f980b28c35c2f7ee0d3c6a" target="_blank" rel="noopener noreferrer" data-testid="link-specs">
                       <SiNotion className="w-5 h-5" />
-                      <span>Specs and explanation</span>
+                      <span>Specs and Explanation</span>
                     </a>
                   </Button>
                 </div>
