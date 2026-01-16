@@ -1,97 +1,238 @@
+/**
+ * shared/schema.ts
+ * 
+ * Central data model definitions for the Utila crypto wallet management platform.
+ * This file defines the database schema using Drizzle ORM and provides type-safe
+ * schemas for data validation using Zod.
+ * 
+ * WHY THIS MATTERS:
+ * - Single source of truth for data structures across frontend and backend
+ * - Ensures type safety and runtime validation throughout the application
+ * - Enables automatic form validation on the frontend using the same schemas
+ */
+
 import { pgTable, text, serial, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+/**
+ * USERS TABLE
+ * 
+ * Represents authenticated users who can interact with the platform.
+ * Each user is identified by their crypto wallet address.
+ * 
+ * WHY wallet-based auth: This is a crypto platform, so wallet addresses
+ * serve as the primary identity mechanism (similar to MetaMask login).
+ */
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  // Unique wallet address serves as the user's identity (e.g., "0x123...abc")
   walletAddress: text("wallet_address").notNull().unique(),
+  // Tracks whether the user is currently connected to the platform
   isConnected: boolean("is_connected").default(false),
 });
 
+// Schema for inserting new users - omits auto-generated fields like 'id'
 export const insertUserSchema = createInsertSchema(users).pick({
   walletAddress: true,
   isConnected: true,
 });
 
+// Type definitions for TypeScript type safety
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
+/**
+ * TRANSACTIONS TABLE
+ * 
+ * Records all crypto transfers initiated through the platform.
+ * Transactions may require multiple approvals before execution based on policies.
+ * 
+ * WHY track approvals: Enterprise crypto operations often require multi-sig
+ * authorization to prevent unauthorized transfers and reduce fraud risk.
+ */
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
+  // Links transaction to the user who initiated it
   userId: integer("user_id").notNull(),
+  // Transaction type (e.g., "Send ETH", "Transfer")
   type: text("type").notNull(),
+  // Amount with currency symbol (e.g., "100 ETH", "50000 USDC")
   amount: text("amount").notNull(),
-  status: text("status").notNull(), // 'pending', 'completed', 'failed'
+  // Workflow status: 'pending' awaits approval, 'completed' is done, 'failed' had an error
+  status: text("status").notNull(),
+  // Blockchain transaction hash once submitted to the network
   txHash: text("tx_hash"),
+  // Human-readable name of who started this transaction
   initiatorName: text("initiator_name"),
-  approvals: text("approvals").array(), // names of approvers who have approved
-  quorumRequired: integer("quorum_required").default(1), // number of approvals needed
+  // Array of approver names who have signed off on this transaction
+  // WHY array: Enables multi-signature approval workflows
+  approvals: text("approvals").array(),
+  // Number of approvals needed before transaction can execute
+  // WHY configurable: Different transaction types may need different approval thresholds
+  quorumRequired: integer("quorum_required").default(1),
+  // Source wallet label (e.g., "Treasury", "Finances")
   fromWallet: text("from_wallet"),
+  // Destination blockchain address
   toAddress: text("to_address"),
+  // Human-readable label for destination (e.g., "Bank of America")
   toLabel: text("to_label"),
+  // ISO timestamp when transaction was created
   createdAt: text("created_at").default("now()"),
 });
 
+// Schema for creating transactions - excludes auto-generated fields
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, createdAt: true });
 
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 
-// Policies table with comprehensive trigger conditions
+/**
+ * POLICIES TABLE
+ * 
+ * Defines automated rules that govern transaction approval workflows.
+ * Policies determine whether transactions are automatically allowed, denied,
+ * or require manual approval based on various conditions.
+ * 
+ * WHY policies: Enterprise wallets need governance rules to:
+ * - Prevent unauthorized large transfers
+ * - Require multi-party approval for sensitive operations
+ * - Automatically allow low-risk transactions to reduce friction
+ * 
+ * POLICY EVALUATION ORDER: Policies are evaluated by priority (lower number = higher priority).
+ * The first matching policy determines the action; if no policy matches, default is deny.
+ */
 export const policies = pgTable("policies", {
   id: serial("id").primaryKey(),
+  // Human-readable policy name (e.g., "Large Transfer Approval")
   name: text("name").notNull(),
+  // Detailed explanation of what this policy does and why
   description: text("description").notNull(),
-  action: text("action").notNull(), // 'allow', 'deny', 'require_approval'
+  // What happens when policy matches: 'allow', 'deny', or 'require_approval'
+  action: text("action").notNull(),
+  // Whether this policy is currently being enforced
   isActive: boolean("is_active").default(true),
+  // Evaluation order - lower numbers are checked first
   priority: integer("priority").notNull().default(0),
   
-  // Trigger conditions with AND/OR logic
-  conditionLogic: text("condition_logic").default("AND"), // 'AND' or 'OR'
+  /**
+   * CONDITION LOGIC
+   * 
+   * Determines how multiple conditions are combined:
+   * - 'AND': ALL conditions must match for policy to trigger
+   * - 'OR': ANY condition matching triggers the policy
+   * 
+   * WHY this matters: Allows flexible rule composition like
+   * "transfers over $10k AND from Treasury" vs "from Treasury OR to external"
+   */
+  conditionLogic: text("condition_logic").default("AND"),
   
-  // Initiator conditions
-  initiatorType: text("initiator_type"), // 'any', 'user', 'group'
-  initiatorValues: text("initiator_values").array(), // user IDs or group names
+  /**
+   * INITIATOR CONDITIONS
+   * 
+   * Controls which users can trigger this policy:
+   * - 'any': Applies to all users
+   * - 'user': Only specific users (listed in initiatorValues)
+   * - 'group': Users belonging to specific groups
+   */
+  initiatorType: text("initiator_type"),
+  initiatorValues: text("initiator_values").array(),
   
-  // Source wallet conditions
-  sourceWalletType: text("source_wallet_type"), // 'any', 'specific'
-  sourceWallets: text("source_wallets").array(), // wallet addresses
+  /**
+   * SOURCE WALLET CONDITIONS
+   * 
+   * Controls which source wallets this policy applies to:
+   * - 'any': All wallets
+   * - 'specific': Only wallets listed in sourceWallets array
+   * 
+   * WHY: Different wallets may have different security requirements
+   * (e.g., Treasury requires more approvals than petty cash)
+   */
+  sourceWalletType: text("source_wallet_type"),
+  sourceWallets: text("source_wallets").array(),
   
-  // Destination conditions
-  destinationType: text("destination_type"), // 'any', 'internal', 'external', 'whitelist'
-  destinationValues: text("destination_values").array(), // specific addresses if whitelist
+  /**
+   * DESTINATION CONDITIONS
+   * 
+   * Controls allowed/restricted destinations:
+   * - 'any': No destination restrictions
+   * - 'internal': Only to other company wallets
+   * - 'external': Only to addresses outside the organization
+   * - 'whitelist': Only to pre-approved addresses
+   * 
+   * WHY: External transfers typically need more scrutiny than internal moves
+   */
+  destinationType: text("destination_type"),
+  destinationValues: text("destination_values").array(),
   
-  // Amount threshold (in USD)
-  amountCondition: text("amount_condition"), // 'any', 'above', 'below', 'between'
-  amountMin: text("amount_min"), // stored as string for precision
+  /**
+   * AMOUNT THRESHOLD CONDITIONS
+   * 
+   * Triggers policy based on USD value of transfer:
+   * - 'any': No amount restrictions
+   * - 'above': Only transfers exceeding amountMin
+   * - 'below': Only transfers under amountMin
+   * - 'between': Transfers between amountMin and amountMax
+   * 
+   * WHY: Large transfers typically require additional oversight
+   */
+  amountCondition: text("amount_condition"),
+  amountMin: text("amount_min"), // Stored as string to preserve precision
   amountMax: text("amount_max"),
   
-  // Asset type conditions
-  assetType: text("asset_type"), // 'any', 'specific'
-  assetValues: text("asset_values").array(), // asset symbols like ['BTC', 'ETH']
+  /**
+   * ASSET TYPE CONDITIONS
+   * 
+   * Restricts policy to specific cryptocurrencies:
+   * - 'any': Applies to all assets
+   * - 'specific': Only assets in assetValues (e.g., ['ETH', 'USDC'])
+   * 
+   * WHY: Some tokens may have different risk profiles or liquidity considerations
+   */
+  assetType: text("asset_type"),
+  assetValues: text("asset_values").array(),
   
-  // Approval settings (when action is 'require_approval')
-  approvers: text("approvers").array(), // user IDs or addresses of approvers
-  quorumRequired: integer("quorum_required").default(1), // number of approvals needed
+  /**
+   * TRANSACTION APPROVAL SETTINGS
+   * 
+   * When action is 'require_approval', these fields define who can approve
+   * and how many approvals are needed.
+   */
+  approvers: text("approvers").array(), // Users who can approve transactions matching this policy
+  quorumRequired: integer("quorum_required").default(1), // Minimum approvals needed
   
-  // Policy change approval tracking
+  /**
+   * POLICY CHANGE APPROVAL TRACKING
+   * 
+   * Policies themselves can require approval to modify, preventing unauthorized
+   * changes to security rules. This creates an audit trail and governance layer.
+   * 
+   * WHY: Prevents single-point-of-failure where one admin could weaken security
+   */
   status: text("status").default("active"), // 'active', 'pending_approval', 'draft'
-  pendingChanges: text("pending_changes"), // JSON string of proposed changes
-  changeApprovers: text("change_approvals").array(), // approvers who approved the change
-  changeApproversList: text("change_approvers_list").array(), // list of who CAN approve changes
+  pendingChanges: text("pending_changes"), // JSON string of proposed modifications
+  changeApprovers: text("change_approvals").array(), // Who has approved the pending change
+  changeApproversList: text("change_approvers_list").array(), // Who CAN approve changes
   changeApprovalsRequired: integer("change_approvals_required").default(1),
-  changeInitiator: text("change_initiator"), // name of who initiated the pending change
+  changeInitiator: text("change_initiator"), // Who requested the change
   
+  // Timestamps for audit trail
   createdAt: text("created_at").default("now()"),
   updatedAt: text("updated_at"),
 });
 
+// Schema for creating/updating policies - excludes auto-managed fields
 export const insertPolicySchema = createInsertSchema(policies).omit({ id: true, createdAt: true, updatedAt: true });
 
 export type Policy = typeof policies.$inferSelect;
 export type InsertPolicy = z.infer<typeof insertPolicySchema>;
 
-// Policy trigger condition types for frontend
+/**
+ * TRIGGER CONDITION SCHEMA
+ * 
+ * Zod schema for validating policy trigger conditions on the frontend.
+ * Used in the PolicyForm component to ensure valid condition configurations.
+ */
 export const triggerConditionSchema = z.object({
   conditionLogic: z.enum(['AND', 'OR']).default('AND'),
   initiatorType: z.enum(['any', 'user', 'group']).optional(),
@@ -109,19 +250,38 @@ export const triggerConditionSchema = z.object({
 
 export type TriggerConditions = z.infer<typeof triggerConditionSchema>;
 
-// Simulation request schema
+/**
+ * SIMULATION REQUEST SCHEMA
+ * 
+ * Defines the shape of data needed to simulate a transaction against policies.
+ * Used by the TransactionSimulator component to test "what-if" scenarios.
+ * 
+ * WHY simulation: Allows users to verify policies work as expected before
+ * real transactions, reducing costly mistakes and policy misconfiguration.
+ */
 export const simulateTransactionSchema = z.object({
+  // Who is initiating the transaction
   initiator: z.string(),
+  // Groups the initiator belongs to (for group-based policy matching)
   initiatorGroups: z.array(z.string()).optional(),
+  // Source wallet address or identifier
   sourceWallet: z.string(),
+  // Destination address
   destination: z.string(),
+  // Whether destination is an internal company wallet
   destinationIsInternal: z.boolean(),
+  // USD value of the transfer for amount-based policy matching
   amountUsd: z.number(),
+  // Cryptocurrency being transferred (e.g., 'ETH', 'USDC')
   asset: z.string(),
 });
 
 export type SimulateTransactionRequest = z.infer<typeof simulateTransactionSchema>;
 
-// Request/Response types
+/**
+ * API RESPONSE TYPES
+ * 
+ * Type definitions for API responses to ensure frontend type safety.
+ */
 export type TransactionsListResponse = Transaction[];
 export type PoliciesListResponse = Policy[];

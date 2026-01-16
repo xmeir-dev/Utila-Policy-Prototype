@@ -154,16 +154,12 @@ export default function Home() {
               <motion.h1 
                 variants={itemVariants} 
                 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 font-display text-foreground"
-              >
-                Welcome to Utila
-              </motion.h1>
+              >Utila Condition Prototype</motion.h1>
 
               <motion.p 
                 variants={itemVariants}
                 className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
-              >
-                The future of utility is here.
-              </motion.p>
+              >By Meir Rosenschein, January 16, 2026</motion.p>
             </motion.div>
           ) : (
             <motion.div
