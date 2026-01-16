@@ -268,5 +268,25 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/transactions/:id/approve", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid transaction ID" });
+      }
+      const { approver } = req.body;
+      if (!approver || typeof approver !== 'string') {
+        return res.status(400).json({ message: "Approver name is required" });
+      }
+      const transaction = await storage.approveTransaction(id, approver);
+      if (!transaction) {
+        return res.status(404).json({ message: "Transaction not found or not pending" });
+      }
+      res.status(200).json(transaction);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to approve transaction" });
+    }
+  });
+
   return httpServer;
 }

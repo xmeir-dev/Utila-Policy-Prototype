@@ -19,6 +19,7 @@ export interface IStorage {
   reorderPolicies(orderedIds: number[]): Promise<Policy[]>;
   simulateTransaction(request: SimulateTransactionRequest): Promise<{ matchedPolicy: Policy | null; action: string; reason: string }>;
   approvePolicyChange(id: number, approver: string): Promise<Policy | undefined>;
+  approveTransaction(id: number, approver: string): Promise<Transaction | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -285,6 +286,40 @@ export class DatabaseStorage implements IStorage {
         .update(policies)
         .set({ changeApprovers: newApprovals })
         .where(eq(policies.id, id))
+        .returning();
+      return updated;
+    }
+  }
+
+  async approveTransaction(id: number, approver: string): Promise<Transaction | undefined> {
+    const [tx] = await db.select().from(transactions).where(eq(transactions.id, id));
+    if (!tx || tx.status !== 'pending') return undefined;
+
+    const currentApprovals = tx.approvals || [];
+    if (currentApprovals.includes(approver)) {
+      return tx; // Already approved
+    }
+
+    const newApprovals = [...currentApprovals, approver];
+    const requiredApprovals = tx.quorumRequired || 1;
+
+    if (newApprovals.length >= requiredApprovals) {
+      // Fully approved - mark as completed
+      const [updated] = await db
+        .update(transactions)
+        .set({
+          approvals: newApprovals,
+          status: 'completed',
+        })
+        .where(eq(transactions.id, id))
+        .returning();
+      return updated;
+    } else {
+      // Just add the approval
+      const [updated] = await db
+        .update(transactions)
+        .set({ approvals: newApprovals })
+        .where(eq(transactions.id, id))
         .returning();
       return updated;
     }

@@ -9,8 +9,10 @@ import { SiEthereum, SiTether } from "react-icons/si";
 import { RiCoinFill } from "react-icons/ri";
 import { MdOutlinePaid } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 const getAssetIcon = (amount: string) => {
   if (amount.includes("ETH")) return <SiEthereum className="w-4 h-4 text-[#627EEA]" />;
@@ -35,6 +37,22 @@ const formatAmount = (amountStr: string) => {
 export default function Home() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
+  const { toast } = useToast();
+
+  const approveMutation = useMutation({
+    mutationFn: async (txId: number) => {
+      return await apiRequest('POST', `/api/transactions/${txId}/approve`, {
+        approver: walletState.connectedUser?.name || 'anonymous'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
+      toast({ title: "Transaction approved" });
+    },
+    onError: () => {
+      toast({ title: "Failed to approve transaction", variant: "destructive" });
+    },
+  });
 
   const { data: pendingTransactions = [], refetch: refetchPending } = useQuery<any[]>({
     queryKey: ["/api/transactions/pending", walletState.connectedUser?.name],
@@ -251,9 +269,11 @@ export default function Home() {
                                   <Button 
                                     size="sm" 
                                     className="h-6 px-3 text-xs"
+                                    onClick={() => approveMutation.mutate(tx.id)}
+                                    disabled={approveMutation.isPending}
                                     data-testid={`button-approve-${tx.id}`}
                                   >
-                                    Approve
+                                    {approveMutation.isPending ? 'Approving...' : 'Approve'}
                                   </Button>
                                 )}
                               </div>
