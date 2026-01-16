@@ -1,14 +1,14 @@
 import etherscanLogo from "@assets/etherscan-logo-circle_1768521442428.png"
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send, Plus, X, User, Lock, CornerUpRight } from "lucide-react";
+import { ArrowLeft, ChevronDown, Wallet, RefreshCw, Check, ChevronRight, Send, Plus, X, User, Lock, CornerUpRight, AlertTriangle } from "lucide-react";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { MdOutlinePaid } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocation } from "wouter";
 import { Navbar } from "@/components/Navbar";
@@ -343,6 +343,9 @@ export default function Transfer() {
 
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [simulationResult, setSimulationResult] = useState<{ status: "approved" | "rejected" | "pending"; message: string } | null>(null);
+  const [showPolicyReviewWarning, setShowPolicyReviewWarning] = useState(false);
+  const [policyReviewInfo, setPolicyReviewInfo] = useState<{ changeType: 'edit' | 'delete' | null; policyName: string | null } | null>(null);
+  const [pendingTransferData, setPendingTransferData] = useState<any>(null);
 
   const handleSimulate = async () => {
     const totalAmount = getTotalRecipientAmount();
@@ -399,6 +402,75 @@ export default function Transfer() {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const executeTransfer = async (simulationResult: any) => {
+    try {
+      if (!walletState.connectedUser?.id) {
+        return;
+      }
+
+      // Calculate the actual token amount from USD
+      const usdAmount = parseFloat((recipients[0]?.amount || "0").replace(/,/g, ''));
+      const tokenAmount = (usdAmount / selectedAsset.price).toFixed(2);
+      
+      // Get the source wallet name
+      const sourceWallet = availableWallets.find(w => w.id === selectedWallets[0]);
+      const sourceWalletName = sourceWallet?.name || "Unknown Wallet";
+      
+      // Create the transaction in the database
+      await apiRequest("POST", "/api/transactions", {
+        userId: walletState.connectedUser.id,
+        type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
+        amount: `${tokenAmount} ${selectedAsset.symbol}`,
+        status: simulationResult.action === "require_approval" ? "pending" : "completed",
+        initiatorName: walletState.connectedUser.name,
+        approvals: [],
+        quorumRequired: simulationResult.matchedPolicy?.quorumRequired || 1,
+        fromWallet: sourceWalletName,
+        toAddress: recipients[0]?.address || "",
+        toLabel: recipients[0]?.label || ""
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+
+      if (simulationResult.action === "require_approval") {
+        toast({
+          title: "Transfer Pending",
+          description: "This transaction requires approval based on active policies.",
+        });
+      } else {
+        toast({
+          title: "Transfer Successful",
+          description: `Successfully sent ${recipients[0]?.amount} ${selectedAsset.symbol}`,
+        });
+      }
+      
+      setLocation("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while processing the transfer.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleConfirmPolicyReviewContinue = async () => {
+    setShowPolicyReviewWarning(false);
+    if (pendingTransferData) {
+      await executeTransfer(pendingTransferData);
+      setPendingTransferData(null);
+      setPolicyReviewInfo(null);
+    }
+  };
+
+  const handleCancelPolicyReviewWarning = () => {
+    setShowPolicyReviewWarning(false);
+    setPendingTransferData(null);
+    setPolicyReviewInfo(null);
+    setIsProcessing(false);
+  };
+
   const handleContinue = async () => {
     setIsProcessing(true);
     try {
@@ -444,48 +516,25 @@ export default function Transfer() {
           description: result.reason,
           variant: "destructive"
         });
+        setIsProcessing(false);
         setLocation("/");
         return;
       }
 
-      // Calculate the actual token amount from USD
-      const usdAmount = parseFloat((recipients[0]?.amount || "0").replace(/,/g, ''));
-      const tokenAmount = (usdAmount / selectedAsset.price).toFixed(2);
-      
-      // Get the source wallet name
-      const sourceWallet = availableWallets.find(w => w.id === selectedWallets[0]);
-      const sourceWalletName = sourceWallet?.name || "Unknown Wallet";
-      
-      // Create the transaction in the database
-      await apiRequest("POST", "/api/transactions", {
-        userId: walletState.connectedUser.id,
-        type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
-        amount: `${tokenAmount} ${selectedAsset.symbol}`,
-        status: result.action === "require_approval" ? "pending" : "completed",
-        initiatorName: walletState.connectedUser.name,
-        approvals: [],
-        quorumRequired: result.matchedPolicy?.quorumRequired || 1,
-        fromWallet: sourceWalletName,
-        toAddress: recipients[0]?.address || "",
-        toLabel: recipients[0]?.label || ""
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-
-      if (result.action === "require_approval") {
-        toast({
-          title: "Transfer Pending",
-          description: "This transaction requires approval based on active policies.",
+      // Check if the matched policy is currently in review
+      if (result.policyInReview?.isInReview) {
+        setPolicyReviewInfo({
+          changeType: result.policyInReview.changeType,
+          policyName: result.policyInReview.policyName,
         });
-      } else {
-        toast({
-          title: "Transfer Successful",
-          description: `Successfully sent ${recipients[0]?.amount} ${selectedAsset.symbol}`,
-        });
+        setPendingTransferData(result);
+        setIsProcessing(false);
+        setShowPolicyReviewWarning(true);
+        return;
       }
-      
-      setLocation("/");
+
+      // No policy in review, proceed directly
+      await executeTransfer(result);
     } catch (error) {
       toast({
         title: "Error",
@@ -1143,6 +1192,46 @@ export default function Transfer() {
                 Confirm {selectedWallets.length > 0 ? `(${selectedWallets.length} wallet${selectedWallets.length > 1 ? 's' : ''})` : ''}
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showPolicyReviewWarning} onOpenChange={setShowPolicyReviewWarning}>
+          <DialogContent className="sm:max-w-[440px] rounded-[16px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                Policy Under Review
+              </DialogTitle>
+              <DialogDescription className="text-left pt-2">
+                {policyReviewInfo?.changeType === 'delete' ? (
+                  <>
+                    The policy <span className="font-semibold">"{policyReviewInfo?.policyName}"</span> that affects this transfer is currently pending removal. If approved, this policy will no longer apply to future transfers.
+                  </>
+                ) : (
+                  <>
+                    The policy <span className="font-semibold">"{policyReviewInfo?.policyName}"</span> that affects this transfer is currently being edited. The pending changes may alter how this transfer is processed once approved.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-2 text-sm text-muted-foreground">
+              Do you want to proceed with this transfer anyway?
+            </div>
+            <DialogFooter className="flex gap-2 sm:justify-end mt-2">
+              <Button
+                variant="outline"
+                onClick={handleCancelPolicyReviewWarning}
+                data-testid="button-cancel-policy-review"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmPolicyReviewContinue}
+                data-testid="button-confirm-policy-review"
+              >
+                Continue Anyway
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

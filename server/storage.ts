@@ -245,7 +245,16 @@ export class DatabaseStorage implements IStorage {
    * Returns the first matching policy's action, or 'deny' if no match.
    * This is the core policy engine that determines transaction fate.
    */
-  async simulateTransaction(request: SimulateTransactionRequest): Promise<{ matchedPolicy: Policy | null; action: string; reason: string }> {
+  async simulateTransaction(request: SimulateTransactionRequest): Promise<{ 
+    matchedPolicy: Policy | null; 
+    action: string; 
+    reason: string;
+    policyInReview?: {
+      isInReview: boolean;
+      changeType: 'edit' | 'delete' | null;
+      policyName: string | null;
+    };
+  }> {
     const allPolicies = await this.getPolicies();
     // Pending policies are still enforced - changes don't take effect until approved
     const activePolicies = allPolicies.filter(p => p.isActive && (p.status === 'active' || p.status === 'pending_approval'));
@@ -254,10 +263,27 @@ export class DatabaseStorage implements IStorage {
     for (const policy of activePolicies) {
       const matches = this.checkPolicyMatch(policy, request);
       if (matches.matched) {
+        // Check if this policy has pending changes
+        let policyInReview = {
+          isInReview: false,
+          changeType: null as 'edit' | 'delete' | null,
+          policyName: null as string | null,
+        };
+
+        if (policy.status === 'pending_approval' && policy.pendingChanges) {
+          const pendingChanges = JSON.parse(policy.pendingChanges);
+          policyInReview = {
+            isInReview: true,
+            changeType: pendingChanges.__delete === true ? 'delete' : 'edit',
+            policyName: policy.name,
+          };
+        }
+
         return {
           matchedPolicy: policy,
           action: policy.action,
           reason: matches.reason,
+          policyInReview,
         };
       }
     }
@@ -267,6 +293,11 @@ export class DatabaseStorage implements IStorage {
       matchedPolicy: null,
       action: 'deny',
       reason: 'No matching policy found. Default action is deny.',
+      policyInReview: {
+        isInReview: false,
+        changeType: null,
+        policyName: null,
+      },
     };
   }
 
