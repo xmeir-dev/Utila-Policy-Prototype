@@ -343,23 +343,6 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
                 data-testid="input-policy-description"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label>Action</Label>
-              <Select
-                value={formData.action}
-                onValueChange={(value) => updateField('action', value)}
-              >
-                <SelectTrigger className="rounded-[14px]" data-testid="select-policy-action">
-                  <SelectValue placeholder="Select action" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="allow">Allow Transaction</SelectItem>
-                  <SelectItem value="deny">Deny Transaction</SelectItem>
-                  <SelectItem value="require_approval">Require Approval</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         )}
       </div>
@@ -690,6 +673,23 @@ export function PolicyForm({ initialData, onSubmit, onCancel, isSubmitting, subm
 
         {expandedSections.includes('approvals') && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
+            <div className="space-y-2">
+              <Label>Action</Label>
+              <Select
+                value={formData.action}
+                onValueChange={(value) => updateField('action', value)}
+              >
+                <SelectTrigger className="rounded-[14px]" data-testid="select-policy-action">
+                  <SelectValue placeholder="Select action" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="allow">Allow Transaction</SelectItem>
+                  <SelectItem value="deny">Deny Transaction</SelectItem>
+                  <SelectItem value="require_approval">Require Approval</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {formData.action === 'require_approval' ? (
               <div className="space-y-4">
                 <div className="space-y-3">
