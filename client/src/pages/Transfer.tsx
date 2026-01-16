@@ -448,11 +448,15 @@ export default function Transfer() {
         return;
       }
 
+      // Calculate the actual token amount from USD
+      const usdAmount = parseFloat((recipients[0]?.amount || "0").replace(/,/g, ''));
+      const tokenAmount = (usdAmount / selectedAsset.price).toFixed(2);
+      
       // Create the transaction in the database
       await apiRequest("POST", "/api/transactions", {
         userId: walletState.connectedUser.id,
         type: selectedAsset.symbol === "ETH" ? "Send ETH" : "Transfer",
-        amount: `${recipients[0]?.amount} ${selectedAsset.symbol}`,
+        amount: `${tokenAmount} ${selectedAsset.symbol}`,
         status: result.action === "require_approval" ? "pending" : "completed",
         initiatorName: walletState.connectedUser.name
       });

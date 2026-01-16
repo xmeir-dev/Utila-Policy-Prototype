@@ -7,9 +7,17 @@ import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { SiEthereum, SiTether } from "react-icons/si";
 import { RiCoinFill } from "react-icons/ri";
+import { MdOutlinePaid } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+
+const getAssetIcon = (amount: string) => {
+  if (amount.includes("ETH")) return <SiEthereum className="w-4 h-4 text-[#627EEA]" />;
+  if (amount.includes("USDC")) return <MdOutlinePaid className="w-4 h-4 text-[#2775CA]" />;
+  if (amount.includes("USDT")) return <SiTether className="w-4 h-4 text-[#26A17B]" />;
+  return <RiCoinFill className="w-4 h-4 text-muted-foreground" />;
+};
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -208,9 +216,7 @@ export default function Home() {
                           </div>
                           <p className="text-xs text-muted-foreground mb-3">from wallet to address book entry</p>
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
-                              <div className="w-3 h-3 rounded-full bg-blue-500" />
-                            </div>
+                            {getAssetIcon(tx.amount || "")}
                             <span className="text-sm font-semibold">{tx.amount}</span>
                           </div>
                           <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/50 pt-2">
