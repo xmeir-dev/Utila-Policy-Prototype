@@ -10,6 +10,7 @@ import { RiCoinFill } from "react-icons/ri";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useEffect } from "react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
