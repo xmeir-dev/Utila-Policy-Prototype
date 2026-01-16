@@ -109,7 +109,7 @@ export function TransactionSimulator() {
   };
 
   return (
-    <Card className="p-6 space-y-6">
+    <div className="space-y-6">
       <form onSubmit={handleSimulate} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -237,6 +237,6 @@ export function TransactionSimulator() {
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
