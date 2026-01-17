@@ -544,19 +544,21 @@ export default function Policies() {
               <h2 className="font-bold font-display text-foreground text-[24px]">Policies</h2>
               <p className="text-sm mt-1 text-[#8a8a8a]">Set transfer approval rules for Waystar Royco</p>
             </div>
-            {policies.length > 0 && (
-              <Button
-                onClick={() => setShowAddModal(true)}
-                className="gap-2 rounded-lg"
-                data-testid="button-add-policy-header"
-              >
-                <Plus className="w-4 h-4" />
-                Add Policy
-              </Button>
-            )}
           </div>
 
           <div className="space-y-4">
+            {policies.length > 0 && (
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => setShowAddModal(true)}
+                  className="gap-2 rounded-lg"
+                  data-testid="button-add-policy-header"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Policy
+                </Button>
+              </div>
+            )}
             {isLoading ? (
                 <Card className="p-6">
                   <div className="flex items-center justify-center">
