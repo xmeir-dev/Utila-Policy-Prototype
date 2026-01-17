@@ -550,7 +550,7 @@ export default function Home() {
                         <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mb-4">
                           <Inbox className="w-6 h-6 text-muted-foreground/50" />
                         </div>
-                        <h4 className="text-sm font-medium text-foreground mb-1">Nothing to approve</h4>
+                        <h4 className="text-sm font-medium text-foreground mb-1">Nothing to approve yet</h4>
                         <p className="text-xs max-w-[200px] text-[#8a8a8a]">Transfers and policy changes requiring approval will appear here.</p>
                       </div>
                     )}
