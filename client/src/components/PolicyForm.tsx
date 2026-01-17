@@ -333,7 +333,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
   const [aiGenerationComplete, setAiGenerationComplete] = useState(false);
   const [reviewedAndApproved, setReviewedAndApproved] = useState(false);
   const [showManualFields, setShowManualFields] = useState(isEditMode);
-  const [expandedSections, setExpandedSections] = useState<string[]>(['details', 'conditions', 'initiator']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['details']);
 
   const pendingChanges = (formData as any).status === 'pending_approval' && (formData as any).pendingChanges 
     ? JSON.parse((formData as any).pendingChanges) 
@@ -605,7 +605,14 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
           <div className="space-y-3">
             <button
               type="button"
-              onClick={() => toggleSection('conditions')}
+              onClick={() => {
+                const isExpanding = !expandedSections.includes('conditions');
+                if (isExpanding) {
+                  setExpandedSections(prev => [...new Set([...prev, 'conditions', 'logic'])]);
+                } else {
+                  toggleSection('conditions');
+                }
+              }}
               className="flex items-center gap-2"
             >
               <ChevronDown 
