@@ -580,7 +580,7 @@ export default function Policies() {
                   </div>
                 </Card>
               ) : policies.length === 0 ? (
-                <div className="flex flex-col items-center justify-center gap-3 py-12">
+                <Card className="flex flex-col items-center justify-center gap-3 py-12 border-muted/50">
                   <Scale className="w-16 h-16 text-muted-foreground/30" />
                   <p className="text-sm text-muted-foreground text-center max-w-[320px]">Without an active policy, all outgoing transfers are automatically denied.</p>
                   <Button 
@@ -591,7 +591,7 @@ export default function Policies() {
                     <Plus className="w-4 h-4" />
                     Add Your First Policy
                   </Button>
-                </div>
+                </Card>
               ) : (
                 <Card className="overflow-hidden">
                   <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
