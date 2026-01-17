@@ -492,14 +492,22 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     onSubmit(formData as InsertPolicy);
   };
 
+  // AI flow validation: If user started AI generation but hasn't completed it, block submission
+  const isAiFlowInProgress = !isEditMode && conversationHistory.length > 0 && !aiGenerationComplete;
+  
   const isValid = formData.name?.trim() && 
     formData.description?.trim() && 
     formData.changeApproversList && 
     formData.changeApproversList.length > 0 &&
     (formData.action !== 'require_approval' || (formData.approvers && formData.approvers.length > 0)) &&
-    (!aiGenerationComplete || reviewedAndApproved);
+    (!aiGenerationComplete || reviewedAndApproved) &&
+    !isAiFlowInProgress;
 
   const getDisabledReason = () => {
+    // Check AI flow first - don't allow submission during active AI conversation
+    if (isAiFlowInProgress) {
+      return "Please complete the AI conversation first";
+    }
     if (!formData.name?.trim()) return "Please enter a policy name";
     if (!formData.description?.trim()) return "Please enter a description";
     if (!formData.changeApproversList || formData.changeApproversList.length === 0) {
