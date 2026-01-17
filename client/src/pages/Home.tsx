@@ -397,7 +397,7 @@ export default function Home() {
                                           if (allowedButNotApproved.length > 0) {
                                             return (
                                               <div>
-                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Pending from</p>
+                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Also can approve</p>
                                                 <ul className="text-xs space-y-1">
                                                   {allowedButNotApproved.map((name, i) => (
                                                     <li key={i} className="text-muted-foreground/70">{name}</li>
@@ -492,7 +492,7 @@ export default function Home() {
                                           if (pendingNames.length > 0) {
                                             return (
                                               <div>
-                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Others authorized</p>
+                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Also can approve</p>
                                                 <ul className="text-xs space-y-1">
                                                   {pendingNames.map((name, i) => (
                                                     <li key={i} className="text-muted-foreground/70">{name}</li>
