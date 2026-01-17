@@ -156,9 +156,7 @@ export default function TransferHistory() {
                     </tr>
                   ) : transactions.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
-                        No transactions found
-                      </td>
+                      <td colSpan={7} className="px-6 py-12 text-center text-[#ababab]">No transactions yet</td>
                     </tr>
                   ) : (
                     transactions.map((tx) => {
