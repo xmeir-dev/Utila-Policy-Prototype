@@ -87,9 +87,52 @@ function ConditionSection({ title, icon, isExpanded, onToggle, children, isConfi
   );
 }
 
+function MoneyInput({ 
+  value, 
+  onChange, 
+  placeholder, 
+  className, 
+  testId 
+}: { 
+  value: string; 
+  onChange: (val: string) => void; 
+  placeholder?: string;
+  className?: string;
+  testId?: string;
+}) {
+  const formatValue = (val: string) => {
+    if (!val) return "";
+    const numeric = val.replace(/[^0-9.]/g, "");
+    const parts = numeric.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9.]/g, "");
+    // Prevent multiple decimals
+    const parts = raw.split(".");
+    if (parts.length > 2) return;
+    onChange(raw);
+  };
+
+  return (
+    <div className="relative">
+      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+      <Input
+        type="text"
+        value={formatValue(value)}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className={cn("pl-8", className)}
+        data-testid={testId}
+      />
+    </div>
+  );
+}
+
 /**
  * Reusable input for managing arrays of string values (e.g., wallet addresses).
- * Supports keyboard-driven entry (Enter to add) with duplicate prevention.
  */
 function TagInput({ 
   values, 
@@ -808,25 +851,23 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <Label className="text-xs">Min (USD)</Label>
-                          <Input
-                            type="number"
+                          <MoneyInput
                             value={formData.amountMin || ""}
-                            onChange={(e) => updateField('amountMin', e.target.value)}
+                            onChange={(val) => updateField('amountMin', val)}
                             placeholder="0"
                             className="rounded-[14px]"
-                            data-testid="input-amount-min"
+                            testId="input-amount-min"
                           />
                         </div>
                         {formData.amountCondition === 'between' && (
                           <div className="space-y-2">
                             <Label className="text-xs">Max (USD)</Label>
-                            <Input
-                              type="number"
+                            <MoneyInput
                               value={formData.amountMax || ""}
-                              onChange={(e) => updateField('amountMax', e.target.value)}
+                              onChange={(val) => updateField('amountMax', val)}
                               placeholder="1000"
                               className="rounded-[14px]"
-                              data-testid="input-amount-max"
+                              testId="input-amount-max"
                             />
                           </div>
                         )}
