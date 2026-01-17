@@ -168,6 +168,8 @@ export async function registerRoutes(
           content: `You are an expert security policy generator for a crypto wallet infrastructure.
 Your goal is to help the user create a complete policy by asking ONE clarifying question at a time.
 
+When generating a policy description, keep it concise. Avoid redundant phrasing like "This policy requires".
+
 Schema fields you need to fill:
 - name: Short descriptive name
 - description: Full description  
