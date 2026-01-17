@@ -368,8 +368,8 @@ export default function Home() {
                           const isPolicyInitiator = isUserInitiator(policy.changeInitiator, walletState.walletAddress);
                           const isAuthorizedApprover = policy.changeApproversList?.includes(walletState.connectedUser?.name || '');
                           return (
-                            <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 px-2 py-3" data-testid={`pending-policy-${policy.id}`}>
-                              <div className="flex items-center justify-between mb-2">
+                            <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 px-2 py-3 border border-border/50" data-testid={`pending-policy-${policy.id}`}>
+                              <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium">Policy change</span>
                                   <span className="text-[12px] text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1} approvals</span>
@@ -408,7 +408,7 @@ export default function Home() {
                                   )}
                                 </div>
                               </div>
-                              <p className="mb-3 text-[14px] text-[#8a8a8a]">
+                              <p className="mb-1 text-[14px] text-[#8a8a8a]">
                                 {policy.name}
                               </p>
                               <div className="text-[10px] text-muted-foreground">
@@ -422,8 +422,8 @@ export default function Home() {
                         {filteredTransfers.map((tx) => {
                           const isInitiator = tx.initiatorName === walletState.connectedUser?.name;
                           return (
-                            <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 px-2 py-3">
-                              <div className="flex items-center justify-between mb-2">
+                            <div key={tx.id} className="p-4 rounded-[14px] bg-card/50 px-2 py-3 border border-border/50">
+                              <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium">Transfer of {formatAmount(tx.amount)}</span>
                                   <span className="text-[12px] text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1} approvals</span>
@@ -444,7 +444,7 @@ export default function Home() {
                                   )}
                                 </div>
                               </div>
-                              <p className="mb-3 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
+                              <p className="mb-1 text-[14px] text-[#8a8a8a]">From {tx.initiatorName || "Wallet"} to Bank of America</p>
                               <div className="text-[10px] text-muted-foreground">
                                 <span className="text-[14px] text-[#8a8a8a]">Initiated by <span className="text-foreground font-medium">{tx.initiatorName || walletState.connectedUser?.name || "Unknown"}</span> on {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</span>
                               </div>
