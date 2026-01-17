@@ -49,7 +49,7 @@ const AddressCellWithTooltip = ({
             target="_blank" 
             rel="noopener noreferrer"
             className="opacity-0 group-hover:opacity-100 transition-opacity"
-            data-testid="link-etherscan"
+            data-testid="link-etherscan-single"
           >
             <img src={etherscanLogo} alt="Etherscan" className="w-3.5 h-3.5" />
           </a>

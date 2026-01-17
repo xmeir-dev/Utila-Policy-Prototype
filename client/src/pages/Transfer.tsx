@@ -411,13 +411,33 @@ export default function Transfer() {
         return;
       }
 
-      // Calculate the actual token amount from USD
-      const usdAmount = parseFloat((recipients[0]?.amount || "0").replace(/,/g, ''));
-      const tokenAmount = (usdAmount / selectedAsset.price).toFixed(2);
+      // Calculate the total token amount from USD
+      const totalUsdAmount = recipients.reduce((sum, r) => sum + (parseFloat(r.amount.replace(/,/g, '')) || 0), 0);
+      const tokenAmount = (totalUsdAmount / selectedAsset.price).toFixed(2);
       
-      // Get the source wallet name
-      const sourceWallet = availableWallets.find(w => w.id === selectedWallets[0]);
-      const sourceWalletName = sourceWallet?.name || "Unknown Wallet";
+      // Build source wallet arrays
+      const sourceWalletNames = selectedWallets.map(id => {
+        const wallet = availableWallets.find(w => w.id === id);
+        return wallet?.name || "Unknown Wallet";
+      });
+      const sourceWalletAddresses = selectedWallets.map(id => {
+        const wallet = availableWallets.find(w => w.id === id);
+        return wallet?.address || "";
+      });
+      const sourceWalletAmounts = selectedWallets.map(id => {
+        const usdAmt = parseFloat((walletAmounts[id] || "0").replace(/,/g, '')) || 0;
+        const tokenAmt = (usdAmt / selectedAsset.price).toFixed(2);
+        return `${tokenAmt} ${selectedAsset.symbol}`;
+      });
+      
+      // Build recipient arrays
+      const recipientAddresses = recipients.map(r => r.address);
+      const recipientLabels = recipients.map(r => r.label || "");
+      const recipientAmounts = recipients.map(r => {
+        const usdAmt = parseFloat(r.amount.replace(/,/g, '')) || 0;
+        const tokenAmt = (usdAmt / selectedAsset.price).toFixed(2);
+        return `${tokenAmt} ${selectedAsset.symbol}`;
+      });
       
       // Create the transaction in the database
       await apiRequest("POST", "/api/transactions", {
@@ -428,9 +448,15 @@ export default function Transfer() {
         initiatorName: walletState.connectedUser.name,
         approvals: [],
         quorumRequired: simulationResult.matchedPolicy?.quorumRequired || 1,
-        fromWallet: sourceWalletName,
-        toAddress: recipients[0]?.address || "",
-        toLabel: recipients[0]?.label || "",
+        fromWallet: sourceWalletNames[0] || "Unknown Wallet",
+        fromWallets: sourceWalletNames,
+        fromAddresses: sourceWalletAddresses,
+        fromAmounts: sourceWalletAmounts,
+        toAddress: recipientAddresses[0] || "",
+        toLabel: recipientLabels[0] || "",
+        toAddresses: recipientAddresses,
+        toLabels: recipientLabels,
+        toAmounts: recipientAmounts,
         authorizedApprovers: simulationResult.matchedPolicy?.approvers || []
       });
 
