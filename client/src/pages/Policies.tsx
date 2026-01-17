@@ -603,7 +603,7 @@ export default function Policies() {
                   </Button>
                   <div className="mt-4 space-y-2">
                     <p className="text-center text-[#ababab] text-[14px]">Or try a suggestion</p>
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-col items-center gap-2">
                       {POLICY_SUGGESTIONS.map((suggestion, index) => (
                         <button
                           key={index}
