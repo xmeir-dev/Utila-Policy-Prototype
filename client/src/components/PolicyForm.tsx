@@ -43,6 +43,7 @@ interface PolicyFormProps {
   isDeleting?: boolean;
   submitLabel?: string;
   isEditMode?: boolean;
+  initialAiPrompt?: string;
 }
 
 interface ConditionSectionProps {
@@ -299,7 +300,7 @@ function MultiWalletSelector({
   );
 }
 
-export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmitting, isDeleting, submitLabel = "Save Policy", isEditMode = false }: PolicyFormProps) {
+export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmitting, isDeleting, submitLabel = "Save Policy", isEditMode = false, initialAiPrompt }: PolicyFormProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<InsertPolicy>>({
     name: "",
@@ -324,8 +325,9 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     ...initialData,
   });
 
-  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiPrompt, setAiPrompt] = useState(initialAiPrompt || "");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
   const [conversationHistory, setConversationHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [aiGenerationComplete, setAiGenerationComplete] = useState(false);
@@ -398,6 +400,13 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
       setIsGenerating(false);
     }
   };
+
+  useEffect(() => {
+    if (initialAiPrompt && !hasAutoTriggered && !isEditMode) {
+      setHasAutoTriggered(true);
+      handleGenerateAI();
+    }
+  }, [initialAiPrompt, hasAutoTriggered, isEditMode]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

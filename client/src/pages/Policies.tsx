@@ -315,6 +315,12 @@ function SortablePolicyItem({
   );
 }
 
+const POLICY_SUGGESTIONS = [
+  { label: "Large transfers need approval", prompt: "Any transfer over $10,000 needs approval from at least 2 team members" },
+  { label: "Internal transfers auto-approved", prompt: "Allow all transfers between our internal wallets without requiring approval" },
+  { label: "Block USDT transfers to external wallets", prompt: "Block all USDT transfers to external wallets" },
+];
+
 export default function Policies() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -322,6 +328,7 @@ export default function Policies() {
   const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
   const [showSimulator, setShowSimulator] = useState(false);
   const [viewingPendingPolicyId, setViewingPendingPolicyId] = useState<number | null>(null);
+  const [prefilledAiPrompt, setPrefilledAiPrompt] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
   const sensors = useSensors(
@@ -585,12 +592,34 @@ export default function Policies() {
                   <p className="text-sm text-muted-foreground text-center max-w-[320px]">Without an active policy, all outgoing transfers are automatically denied.</p>
                   <Button 
                     className="mt-2 gap-2 rounded-lg" 
-                    onClick={() => setShowAddModal(true)}
+                    onClick={() => {
+                      setPrefilledAiPrompt(undefined);
+                      setShowAddModal(true);
+                    }}
                     data-testid="button-add-first-policy"
                   >
                     <Plus className="w-4 h-4" />
                     Add Your First Policy
                   </Button>
+                  <div className="mt-4 space-y-2 w-full max-w-[380px]">
+                    <p className="text-xs text-muted-foreground text-center">Or try one of these suggestions:</p>
+                    <div className="flex flex-col gap-2">
+                      {POLICY_SUGGESTIONS.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => {
+                            setPrefilledAiPrompt(suggestion.prompt);
+                            setShowAddModal(true);
+                          }}
+                          className="text-left px-4 py-3 rounded-lg border border-border hover-elevate active-elevate-2 transition-colors"
+                          data-testid={`suggestion-${index}`}
+                        >
+                          <span className="text-sm text-foreground">{suggestion.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </Card>
               ) : (
                 <Card className="overflow-hidden">
@@ -631,7 +660,10 @@ export default function Policies() {
           </div>
         </motion.div>
       </main>
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+      <Dialog open={showAddModal} onOpenChange={(open) => {
+        setShowAddModal(open);
+        if (!open) setPrefilledAiPrompt(undefined);
+      }}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0 hide-scrollbar">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
             <DialogTitle className="text-xl font-bold">Create a policy</DialogTitle>
@@ -639,10 +671,12 @@ export default function Policies() {
           </DialogHeader>
           <div className="p-6">
             <PolicyForm
+              key={prefilledAiPrompt || 'new'}
               onSubmit={(data) => createMutation.mutate(data)}
               onCancel={() => setShowAddModal(false)}
               isSubmitting={createMutation.isPending}
               submitLabel="Create Policy"
+              initialAiPrompt={prefilledAiPrompt}
             />
           </div>
         </DialogContent>
