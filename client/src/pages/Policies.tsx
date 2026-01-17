@@ -354,24 +354,38 @@ export default function Policies() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<InsertPolicy> }) => {
-      return await apiRequest('PUT', `/api/policies/${id}?submitter=${encodeURIComponent(walletState.walletAddress || 'anonymous')}`, {
+      const response = await apiRequest('PUT', `/api/policies/${id}?submitter=${encodeURIComponent(walletState.walletAddress || 'anonymous')}`, {
         ...data,
         submitterName: walletState.connectedUser?.name || 'anonymous'
       });
+      return await response.json() as Policy;
     },
-    onSuccess: () => {
+    onSuccess: (data: Policy) => {
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
       setEditingPolicy(null);
+      const wasAutoApproved = data.status === 'active';
       toast({ 
-        title: "Policy change submitted", 
-        description: "Changes require approval before taking effect." 
+        title: wasAutoApproved ? "Policy updated" : "Policy change submitted", 
+        description: wasAutoApproved 
+          ? "Your change was automatically approved and applied." 
+          : "Changes require additional approval before taking effect."
       });
     },
     onError: (error: Error) => {
-      const message = error.message || "Failed to update policy";
+      let errorMessage = "Failed to update policy";
+      try {
+        const jsonStart = error.message.indexOf('{');
+        if (jsonStart !== -1) {
+          const parsed = JSON.parse(error.message.slice(jsonStart));
+          errorMessage = parsed.message || errorMessage;
+        }
+      } catch {
+        errorMessage = error.message || errorMessage;
+      }
+      const isAuthError = errorMessage.includes("not authorized");
       toast({ 
-        title: message.includes("not authorized") ? "Not Authorized" : "Failed to update policy", 
-        description: message.includes("not authorized") ? message : undefined,
+        title: isAuthError ? "Not Authorized" : "Failed to update policy", 
+        description: errorMessage,
         variant: "destructive" 
       });
     },
@@ -392,24 +406,38 @@ export default function Policies() {
 
   const requestDeletionMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('POST', `/api/policies/${id}/request-deletion`, {
+      const response = await apiRequest('POST', `/api/policies/${id}/request-deletion`, {
         submitter: walletState.walletAddress || 'anonymous',
         submitterName: walletState.connectedUser?.name || 'anonymous'
       });
+      return await response.json() as Policy;
     },
-    onSuccess: () => {
+    onSuccess: (data: Policy) => {
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
       setEditingPolicy(null);
+      const wasAutoDeleted = data.status === 'deleted';
       toast({ 
-        title: "Deletion request submitted", 
-        description: "This deletion requires approval before taking effect." 
+        title: wasAutoDeleted ? "Policy deleted" : "Deletion request submitted", 
+        description: wasAutoDeleted 
+          ? "Your deletion was automatically approved and applied." 
+          : "This deletion requires additional approval before taking effect."
       });
     },
     onError: (error: Error) => {
-      const message = error.message || "Failed to submit deletion request";
+      let errorMessage = "Failed to submit deletion request";
+      try {
+        const jsonStart = error.message.indexOf('{');
+        if (jsonStart !== -1) {
+          const parsed = JSON.parse(error.message.slice(jsonStart));
+          errorMessage = parsed.message || errorMessage;
+        }
+      } catch {
+        errorMessage = error.message || errorMessage;
+      }
+      const isAuthError = errorMessage.includes("not authorized");
       toast({ 
-        title: message.includes("not authorized") ? "Not Authorized" : "Failed to submit deletion request", 
-        description: message.includes("not authorized") ? message : undefined,
+        title: isAuthError ? "Not Authorized" : "Failed to submit deletion request", 
+        description: errorMessage,
         variant: "destructive" 
       });
     },
@@ -686,9 +714,10 @@ export default function Policies() {
                     const canCancel = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '');
                     
                     const approversList = viewingPendingPolicy.changeApproversList || [];
-                    const initiatorAsName = addressToName(initiatorName);
-                    const eligibleApprovers = approversList.filter((name: string) => name !== initiatorAsName);
-                    const isQuorumImpossible = eligibleApprovers.length < requiredApprovals;
+                    const approversWhoHaveApproved = viewingPendingPolicy.changeApprovers || [];
+                    const eligibleApprovers = approversList.filter((name: string) => !approversWhoHaveApproved.includes(name));
+                    const remainingApprovalsNeeded = requiredApprovals - currentApprovals;
+                    const isQuorumImpossible = remainingApprovalsNeeded > 0 && eligibleApprovers.length < remainingApprovalsNeeded;
                     
                     return (
                       <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
@@ -722,7 +751,7 @@ export default function Policies() {
                           {isQuorumImpossible && (
                             <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
                               <p className="text-sm text-destructive font-medium">
-                                This change cannot be approved: {requiredApprovals} approval(s) required, but only {eligibleApprovers.length} eligible approver(s) available after excluding the submitter.
+                                This change cannot be approved: {remainingApprovalsNeeded} more approval(s) needed, but only {eligibleApprovers.length} eligible approver(s) remaining.
                               </p>
                             </div>
                           )}
@@ -774,9 +803,10 @@ export default function Policies() {
                   const canCancel = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '');
                   
                   const approversList = viewingPendingPolicy.changeApproversList || [];
-                  const initiatorAsName = addressToName(initiatorName);
-                  const eligibleApprovers = approversList.filter((name: string) => name !== initiatorAsName);
-                  const isQuorumImpossible = eligibleApprovers.length < requiredApprovals;
+                  const approversWhoHaveApproved = viewingPendingPolicy.changeApprovers || [];
+                  const eligibleApprovers = approversList.filter((name: string) => !approversWhoHaveApproved.includes(name));
+                  const remainingApprovalsNeeded = requiredApprovals - currentApprovals;
+                  const isQuorumImpossible = remainingApprovalsNeeded > 0 && eligibleApprovers.length < remainingApprovalsNeeded;
                   
                   return (
                     <>
@@ -853,7 +883,7 @@ export default function Policies() {
                           {isQuorumImpossible && (
                             <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
                               <p className="text-sm text-destructive font-medium">
-                                This change cannot be approved: {requiredApprovals} approval(s) required, but only {eligibleApprovers.length} eligible approver(s) available after excluding the submitter.
+                                This change cannot be approved: {remainingApprovalsNeeded} more approval(s) needed, but only {eligibleApprovers.length} eligible approver(s) remaining.
                               </p>
                             </div>
                           )}
