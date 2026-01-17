@@ -77,7 +77,12 @@ const AddressCellWithTooltip = ({
               <div className="flex flex-col">
                 <span className="font-medium">{addr.label || truncateAddress(addr.address)}</span>
                 {addr.amount && (
-                  <span className="text-xs text-muted-foreground">{addr.amount}</span>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-muted-foreground">{addr.amount}</span>
+                    <span className="text-xs text-[#ababab]">
+                      ${(parseFloat(addr.amount.split(' ')[0].replace(/,/g, '')) * 2500).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
                 )}
               </div>
               {addr.address && (
@@ -293,7 +298,14 @@ export default function TransferHistory() {
                             <span className="text-sm font-normal">{tx.initiatorName || "-"}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm font-normal">{formatAmount(tx.amount)}</span>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-normal">{formatAmount(tx.amount)}</span>
+                              {tx.amount && (
+                                <span className="text-xs text-[#ababab]">
+                                  ${(parseFloat(tx.amount.split(' ')[0].replace(/,/g, '')) * 2500).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <AddressCellWithTooltip 
