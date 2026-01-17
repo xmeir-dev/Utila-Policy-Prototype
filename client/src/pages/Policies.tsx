@@ -601,9 +601,9 @@ export default function Policies() {
                     <Plus className="w-4 h-4" />
                     Add Your First Policy
                   </Button>
-                  <div className="mt-4 space-y-2 w-full max-w-[380px]">
+                  <div className="mt-4 space-y-2">
                     <p className="text-center text-[#ababab] text-[14px]">Or try a suggestion</p>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap justify-center gap-2">
                       {POLICY_SUGGESTIONS.map((suggestion, index) => (
                         <button
                           key={index}
@@ -612,7 +612,7 @@ export default function Policies() {
                             setPrefilledAiPrompt(suggestion.prompt);
                             setShowAddModal(true);
                           }}
-                          className="px-4 py-3 rounded-lg border border-border hover-elevate active-elevate-2 transition-colors text-center text-[14px]"
+                          className="px-3 py-1.5 rounded-full border border-border hover-elevate active-elevate-2 transition-colors text-center text-[14px]"
                           data-testid={`suggestion-${index}`}
                         >
                           <span className="text-sm text-foreground">{suggestion.label}</span>
