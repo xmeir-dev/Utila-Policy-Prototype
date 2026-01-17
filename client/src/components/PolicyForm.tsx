@@ -548,6 +548,9 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
                 {isGenerating && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isGenerating ? "Generating..." : "Generate Policy"}
               </Button>
+              <p className="text-[12px] font-normal text-[#ababab] px-1">
+                This feature is AI-powered and experimental. Review each condition thoroughly before submitting the policy.
+              </p>
             </div>
           )}
           
