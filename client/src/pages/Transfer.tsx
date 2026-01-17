@@ -586,7 +586,19 @@ export default function Transfer() {
               >
                 <div className="flex flex-col gap-0.5">
                   <h3 className="text-sm dark:text-amber-200 text-[#d67424] font-medium">Create a policy to enable transactions</h3>
-                  <p className="dark:text-amber-400 text-[14px] font-normal text-[#ababab]">Why do we require this?</p>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <p className="dark:text-amber-400 text-[14px] font-normal text-[#ababab] cursor-help">Why do we require this?</p>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[280px] p-3">
+                      <div className="space-y-1">
+                        <p className="font-semibold text-sm">Policies reduce operational risk</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          Money is easy to move and hard to undo. Defining rules upfront is cheaper than fixing mistakes later
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <div 
                   className="rounded-full h-8 w-8 flex items-center justify-center text-amber-700 dark:text-amber-400 shrink-0 group-hover:bg-amber-500/20 transition-colors"
