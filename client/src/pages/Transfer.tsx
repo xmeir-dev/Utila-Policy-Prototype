@@ -585,9 +585,7 @@ export default function Transfer() {
                 onClick={() => setLocation("/policies")}
               >
                 <div className="flex flex-col gap-0.5">
-                  <h3 className="text-sm dark:text-amber-200 text-[#d67424] font-medium">
-                    Secure your account
-                  </h3>
+                  <h3 className="text-sm dark:text-amber-200 text-[#d67424] font-medium">Create a policy to enable transactions</h3>
                   <p className="dark:text-amber-400 text-[#8a8a8a] text-[14px] font-normal">Create a policy to enable transactions</p>
                 </div>
                 <div 
@@ -858,42 +856,41 @@ export default function Transfer() {
           </div>
         </motion.div>
       </main>
-
-      <Dialog open={showSimulationModal} onOpenChange={setShowSimulationModal}>
-        <DialogContent className="sm:max-w-[440px] rounded-[16px] p-6">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Transfer Simulation</DialogTitle>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className={`p-4 rounded-[12px] border ${
-              simulationResult?.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/30' : 
-              simulationResult?.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30' :
-              'bg-destructive/10 border-destructive/30'
-            }`}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  simulationResult?.status === 'approved' ? 'bg-emerald-500' : 
-                  simulationResult?.status === 'pending' ? 'bg-amber-500' :
-                  'bg-destructive'
-                }`} />
-                <span className={`font-bold uppercase tracking-tight text-xs ${
-                  simulationResult?.status === 'approved' ? 'text-emerald-600' : 
-                  simulationResult?.status === 'pending' ? 'text-amber-600' :
-                  'text-destructive'
-                }`}>
-                  Status: {simulationResult?.status === 'pending' ? 'Requires Approval' : `Transfer ${simulationResult?.status}`}
-                </span>
+        <Dialog open={showSimulationModal} onOpenChange={setShowSimulationModal}>
+          <DialogContent className="sm:max-w-[440px] rounded-[16px] p-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold">Transfer Simulation</DialogTitle>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className={`p-4 rounded-[12px] border ${
+                simulationResult?.status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/30' : 
+                simulationResult?.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30' :
+                'bg-destructive/10 border-destructive/30'
+              }`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    simulationResult?.status === 'approved' ? 'bg-emerald-500' : 
+                    simulationResult?.status === 'pending' ? 'bg-amber-500' :
+                    'bg-destructive'
+                  }`} />
+                  <span className={`font-bold uppercase tracking-tight text-xs ${
+                    simulationResult?.status === 'approved' ? 'text-emerald-600' : 
+                    simulationResult?.status === 'pending' ? 'text-amber-600' :
+                    'text-destructive'
+                  }`}>
+                    Status: {simulationResult?.status === 'pending' ? 'Requires Approval' : `Transfer ${simulationResult?.status}`}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground leading-relaxed">
+                  {simulationResult?.message}
+                </p>
               </div>
-              <p className="text-sm text-foreground leading-relaxed">
-                {simulationResult?.message}
-              </p>
+              <Button className="w-full rounded-[12px]" onClick={() => setShowSimulationModal(false)}>
+                Close
+              </Button>
             </div>
-            <Button className="w-full rounded-[12px]" onClick={() => setShowSimulationModal(false)}>
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
         <Dialog open={showDestinationModal} onOpenChange={setShowDestinationModal}>
           <DialogContent className="sm:max-w-[440px] rounded-[16px] p-0 gap-0 overflow-hidden">
             <DialogHeader className="p-6 pb-4 border-b border-border">
@@ -1200,7 +1197,6 @@ export default function Transfer() {
             </div>
           </DialogContent>
         </Dialog>
-
         <Dialog open={showPolicyReviewWarning} onOpenChange={setShowPolicyReviewWarning}>
           <DialogContent className="sm:max-w-[440px] rounded-[16px]">
             <DialogHeader>
