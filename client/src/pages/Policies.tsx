@@ -554,9 +554,9 @@ export default function Policies() {
 
           <div className="space-y-4">
             {policies.length > 0 && (
-              <div className="flex justify-center gap-3">
+              <div className="flex items-center justify-center gap-3">
                 <Button 
-                  className="mt-2 gap-2 rounded-lg" 
+                  className="gap-2 rounded-lg" 
                   onClick={() => {
                     setPrefilledAiPrompt(undefined);
                     setShowAddModal(true);
@@ -572,6 +572,7 @@ export default function Policies() {
                   className="gap-2 rounded-lg"
                   data-testid="button-simulate-transaction"
                 >
+                  <TestTubeDiagonal className="w-4 h-4" />
                   Simulate a Transaction
                 </Button>
               </div>
