@@ -386,7 +386,7 @@ export default function Home() {
                                                 <li key={i} className="flex justify-between items-center">
                                                   <span>{name}</span>
                                                   <span className="text-[10px] text-muted-foreground">
-                                                    {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                                                    {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''} {policy.updatedAt ? new Date(policy.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : ''}
                                                   </span>
                                                 </li>
                                               ))}
@@ -485,7 +485,7 @@ export default function Home() {
                                                     <span>{name}</span>
                                                     {record && (
                                                       <span className="text-[10px] text-muted-foreground">
-                                                        {new Date(record.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                        {new Date(record.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} {new Date(record.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}
                                                       </span>
                                                     )}
                                                   </li>
