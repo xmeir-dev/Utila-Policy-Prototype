@@ -550,20 +550,20 @@ export default function Policies() {
             {policies.length > 0 && (
               <div className="flex justify-center gap-3">
                 <Button
-                  variant="secondary"
-                  onClick={() => setShowSimulator(true)}
-                  className="gap-2 rounded-lg"
-                  data-testid="button-simulate-transaction"
-                >
-                  Simulate a Transaction
-                </Button>
-                <Button
                   onClick={() => setShowAddModal(true)}
                   className="gap-2 rounded-lg"
                   data-testid="button-add-policy-header"
                 >
                   <Plus className="w-4 h-4" />
                   Add Policy
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowSimulator(true)}
+                  className="gap-2 rounded-lg"
+                  data-testid="button-simulate-transaction"
+                >
+                  Simulate a Transaction
                 </Button>
               </div>
             )}
