@@ -98,9 +98,17 @@ When a policy is edited or deleted, the changes don't take effect immediately. I
 - Policies with pending deletion show red "Deletion pending" badge
 - Both badges expand on hover to reveal a chevron and are clickable to view details
 
-**Self-Approval Prevention:**
-- Users cannot approve/review policy changes they initiated themselves
-- If the current user's wallet address matches the policy's `changeInitiator`, they see a "Pending" badge instead of a "Review" button
+**Auto-Approval System:**
+- When a user submits a policy change or deletion, their submission automatically counts as their first approval (if they are in `changeApproversList`)
+- If the submitter's approval alone meets the quorum (e.g., quorum=1), changes are applied immediately without waiting for additional approvals
+- Toast messages reflect this: "Policy updated" / "Policy deleted" with "automatically approved" message when auto-applied
+- If more approvals are needed, the policy enters `pending_approval` status with the submitter's approval pre-counted
+- Quorum validation checks if `(submitter's approval) + remaining eligible approvers >= quorum required`
+- If quorum is mathematically impossible, the submission is rejected with a clear error message
+
+**Self-Approval Rules:**
+- The submitter's initial submission counts as their approval, so they cannot approve again afterwards
+- If the current user's wallet address matches the policy's `changeInitiator`, they see a "You initiated this change" badge in the review modal
 - Address-to-name mapping in `Home.tsx` and `Policies.tsx` uses `ADDRESS_TO_NAME` constant to display friendly names
 
 **Authorization System:**
