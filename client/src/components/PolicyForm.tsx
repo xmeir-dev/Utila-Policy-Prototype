@@ -882,7 +882,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
                   !expandedSections.includes('action') && "-rotate-90"
                 )} 
               />
-              <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Action</Label>
+              <Label className="cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#171717] text-[18px] font-semibold">Transfer Approval</Label>
             </button>
 
             {expandedSections.includes('action') && (
