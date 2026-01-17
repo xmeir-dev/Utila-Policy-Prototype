@@ -723,7 +723,7 @@ export default function Policies() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         {highRiskFindings.length > 0 ? (
-                          <AlertTriangle className="w-5 h-5 text-red-500" />
+                          <ShieldAlert className="w-5 h-5 text-red-500" />
                         ) : (
                           <CheckCircle className="w-5 h-5 text-green-500" />
                         )}
