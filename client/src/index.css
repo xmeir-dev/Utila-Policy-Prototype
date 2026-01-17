@@ -209,4 +209,15 @@
   .active-elevate-2:active {
     transform: scale(0.98);
   }
+
+  /* Disable hover elevation for non-interactive badges */
+  .no-default-hover-elevate {
+    transition: none !important;
+  }
+
+  .no-default-hover-elevate:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
 }
