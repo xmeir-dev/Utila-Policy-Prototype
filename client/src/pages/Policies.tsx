@@ -316,9 +316,9 @@ function SortablePolicyItem({
 }
 
 const POLICY_SUGGESTIONS = [
-  { label: "Large transfers need approval", prompt: "Any transfer over $10,000 needs approval from at least 2 team members" },
-  { label: "Internal transfers auto-approved", prompt: "Allow all transfers between our internal wallets without requiring approval" },
-  { label: "Block USDT transfers to external wallets", prompt: "Block all USDT transfers to external wallets" },
+  { label: "Large transfers need approval", prompt: "I want a policy for large transfers that requires approval" },
+  { label: "Internal transfers auto-approved", prompt: "I want to auto-approve internal transfers" },
+  { label: "Block USDT transfers to external wallets", prompt: "I want to block USDT transfers to external wallets" },
 ];
 
 export default function Policies() {
