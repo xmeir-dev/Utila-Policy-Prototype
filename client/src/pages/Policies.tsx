@@ -811,6 +811,9 @@ export default function Policies() {
                         ))}
                       </div>
                     )}
+                    <p className="text-[12px] font-normal text-[#ababab] mt-4 px-1">
+                      This feature is AI-powered and experimental. Review each suggestion carefully before making changes.
+                    </p>
                   </Card>
                 );
               })()}
