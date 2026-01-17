@@ -586,7 +586,7 @@ export default function Transfer() {
               >
                 <div className="flex flex-col gap-0.5">
                   <h3 className="text-sm dark:text-amber-200 text-[#d67424] font-medium">Create a policy to enable transactions</h3>
-                  <p className="dark:text-amber-400 text-[#8a8a8a] text-[14px] font-normal">Create a policy to enable transactions</p>
+                  <p className="dark:text-amber-400 text-[14px] font-normal text-[#ababab]">Why do we require this?</p>
                 </div>
                 <div 
                   className="rounded-full h-8 w-8 flex items-center justify-center text-amber-700 dark:text-amber-400 shrink-0 group-hover:bg-amber-500/20 transition-colors"
