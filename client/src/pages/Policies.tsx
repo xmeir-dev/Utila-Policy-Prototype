@@ -240,7 +240,7 @@ function SortablePolicyItem({
                   : 'text-amber-600 border-amber-600/30 bg-amber-500/10'
             }`}
           >
-            {policy.action === 'allow' ? 'Approved' : policy.action === 'deny' ? 'Denied' : 'Requires approval'}
+            {policy.action === 'allow' ? 'Auto-allowed' : policy.action === 'deny' ? 'Auto-denied' : 'Requires approval'}
           </Badge>
           {!policy.isActive && (
             <Badge variant="secondary" className="h-5 px-1.5 text-[11px]">
