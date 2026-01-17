@@ -737,6 +737,7 @@ export default function Policies() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="text-[#8a8a8a]"
                         onClick={() => setRiskAnalysisResult(null)}
                         data-testid="button-dismiss-risks"
                       >
