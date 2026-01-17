@@ -23,6 +23,7 @@ import { SiEthereum, SiTether, SiGithub, SiNotion } from "react-icons/si";
 import { RiCoinFill } from "react-icons/ri";
 import { MdOutlinePaid } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -365,6 +366,7 @@ export default function Home() {
                           }
                           const initiatorName = addressToName(policy.changeInitiator);
                           const isPolicyInitiator = isUserInitiator(policy.changeInitiator, walletState.walletAddress);
+                          const isAuthorizedApprover = policy.changeApproversList?.includes(walletState.connectedUser?.name || '');
                           return (
                             <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 px-2 py-3" data-testid={`pending-policy-${policy.id}`}>
                               <div className="flex items-center justify-between mb-2">
@@ -375,6 +377,24 @@ export default function Home() {
                                 <div className="flex items-center gap-2">
                                   {isPolicyInitiator ? (
                                     <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5 font-normal">Pending</Badge>
+                                  ) : !isAuthorizedApprover ? (
+                                    <Tooltip delayDuration={200}>
+                                      <TooltipTrigger asChild>
+                                        <div>
+                                          <Button 
+                                            size="sm" 
+                                            className="h-6 px-3 text-xs"
+                                            disabled
+                                            data-testid={`button-review-policy-${policy.id}`}
+                                          >
+                                            Review
+                                          </Button>
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>You are not authorized to approve this request</p>
+                                      </TooltipContent>
+                                    </Tooltip>
                                   ) : (
                                     <Button 
                                       size="sm" 
