@@ -17,6 +17,122 @@ const truncateAddress = (address: string): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
+interface AddressInfo {
+  label: string;
+  address: string;
+  amount?: string;
+}
+
+const AddressCellWithTooltip = ({ 
+  addresses, 
+  etherscanLogo 
+}: { 
+  addresses: AddressInfo[];
+  etherscanLogo: string;
+}) => {
+  if (!addresses || addresses.length === 0) {
+    return <span className="text-sm font-normal">-</span>;
+  }
+
+  const firstAddress = addresses[0];
+  const additionalCount = addresses.length - 1;
+
+  if (addresses.length === 1) {
+    return (
+      <div className="flex items-center gap-2 group">
+        <span className="text-sm font-normal text-[#171717]">
+          {firstAddress.label || truncateAddress(firstAddress.address)}
+        </span>
+        {firstAddress.address && (
+          <a 
+            href={`https://etherscan.io/address/${firstAddress.address}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            data-testid="link-etherscan"
+          >
+            <img src={etherscanLogo} alt="Etherscan" className="w-3.5 h-3.5" />
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger asChild>
+        <div className="flex items-center gap-2 cursor-pointer" data-testid="addresses-tooltip-trigger">
+          <span className="text-sm font-normal text-[#171717]">
+            {firstAddress.label || truncateAddress(firstAddress.address)}
+          </span>
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-auto">
+            +{additionalCount}
+          </Badge>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-[300px] p-3">
+        <div className="space-y-2">
+          {addresses.map((addr, idx) => (
+            <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+              <div className="flex flex-col">
+                <span className="font-medium">{addr.label || truncateAddress(addr.address)}</span>
+                {addr.amount && (
+                  <span className="text-xs text-muted-foreground">{addr.amount}</span>
+                )}
+              </div>
+              {addr.address && (
+                <a 
+                  href={`https://etherscan.io/address/${addr.address}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                  data-testid={`link-etherscan-${idx}`}
+                >
+                  <img src={etherscanLogo} alt="Etherscan" className="w-4 h-4" />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
+const buildFromAddresses = (tx: Transaction, fallbackAddress: string | null): AddressInfo[] => {
+  if (tx.fromWallets && tx.fromWallets.length > 0) {
+    return tx.fromWallets.map((label, idx) => ({
+      label: label || "",
+      address: tx.fromAddresses?.[idx] || "",
+      amount: tx.fromAmounts?.[idx],
+    }));
+  }
+  if (tx.fromWallet) {
+    return [{
+      label: tx.fromWallet,
+      address: fallbackAddress || "",
+    }];
+  }
+  return [];
+};
+
+const buildToAddresses = (tx: Transaction): AddressInfo[] => {
+  if (tx.toAddresses && tx.toAddresses.length > 0) {
+    return tx.toAddresses.map((address, idx) => ({
+      label: tx.toLabels?.[idx] || "",
+      address: address || "",
+      amount: tx.toAmounts?.[idx],
+    }));
+  }
+  if (tx.toAddress) {
+    return [{
+      label: tx.toLabel || "",
+      address: tx.toAddress,
+    }];
+  }
+  return [];
+};
+
 const formatAmount = (amountStr: string) => {
   if (!amountStr) return "Unknown";
   const [val, symbol] = amountStr.split(" ");
@@ -164,6 +280,9 @@ export default function TransferHistory() {
                       const approvalsCount = tx.approvals?.length || 0;
                       const quorumRequired = tx.quorumRequired || 1;
                       
+                      const fromAddresses: AddressInfo[] = buildFromAddresses(tx, walletState.walletAddress);
+                      const toAddresses: AddressInfo[] = buildToAddresses(tx);
+                      
                       return (
                         <tr 
                           key={tx.id} 
@@ -177,38 +296,16 @@ export default function TransferHistory() {
                             <span className="text-sm font-normal">{formatAmount(tx.amount)}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-2 group">
-                              <span className="text-sm font-normal text-[#171717]">
-                                {tx.fromWallet || "-"}
-                              </span>
-                              {tx.fromWallet && (
-                                <a 
-                                  href={`https://etherscan.io/address/${walletState.walletAddress}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <img src={etherscanLogo} alt="Etherscan" className="w-3.5 h-3.5" />
-                                </a>
-                              )}
-                            </div>
+                            <AddressCellWithTooltip 
+                              addresses={fromAddresses} 
+                              etherscanLogo={etherscanLogo} 
+                            />
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-2 group">
-                              <span className="text-sm font-normal text-[#171717]">
-                                {tx.toLabel || truncateAddress(tx.toAddress || "")}
-                              </span>
-                              {tx.toAddress && (
-                                <a 
-                                  href={`https://etherscan.io/address/${tx.toAddress}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <img src={etherscanLogo} alt="Etherscan" className="w-3.5 h-3.5" />
-                                </a>
-                              )}
-                            </div>
+                            <AddressCellWithTooltip 
+                              addresses={toAddresses} 
+                              etherscanLogo={etherscanLogo} 
+                            />
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">

@@ -76,10 +76,22 @@ export const transactions = pgTable("transactions", {
   quorumRequired: integer("quorum_required").default(1),
   // Source wallet label (e.g., "Treasury", "Finances")
   fromWallet: text("from_wallet"),
+  // Array of source wallet labels for multi-source transactions
+  fromWallets: text("from_wallets").array(),
+  // Array of source wallet addresses for multi-source transactions
+  fromAddresses: text("from_addresses").array(),
+  // Array of amounts from each source wallet
+  fromAmounts: text("from_amounts").array(),
   // Destination blockchain address
   toAddress: text("to_address"),
   // Human-readable label for destination (e.g., "Bank of America")
   toLabel: text("to_label"),
+  // Array of destination addresses for multi-recipient transactions
+  toAddresses: text("to_addresses").array(),
+  // Array of destination labels for multi-recipient transactions
+  toLabels: text("to_labels").array(),
+  // Array of amounts for each destination
+  toAmounts: text("to_amounts").array(),
   // Array of authorized approver names from the matched policy
   // Used to check if initiator's approval should auto-count
   authorizedApprovers: text("authorized_approvers").array(),
