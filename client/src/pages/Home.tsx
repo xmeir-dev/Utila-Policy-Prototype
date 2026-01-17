@@ -385,6 +385,9 @@ export default function Home() {
                                               {policy.changeApprovers.map((name, i) => (
                                                 <li key={i} className="flex justify-between items-center">
                                                   <span>{name}</span>
+                                                  <span className="text-[10px] text-muted-foreground">
+                                                    {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                                                  </span>
                                                 </li>
                                               ))}
                                             </ul>
@@ -474,9 +477,20 @@ export default function Home() {
                                           <div>
                                             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Approved by</p>
                                             <ul className="text-xs space-y-1">
-                                              {tx.approvals.map((name: string, i: number) => (
-                                                <li key={i}>{name}</li>
-                                              ))}
+                                              {tx.approvals.map((name: string, i: number) => {
+                                                const timestamps = tx.approvalTimestamps ? JSON.parse(tx.approvalTimestamps) : [];
+                                                const record = timestamps.find((t: any) => t.approver === name);
+                                                return (
+                                                  <li key={i} className="flex justify-between items-center">
+                                                    <span>{name}</span>
+                                                    {record && (
+                                                      <span className="text-[10px] text-muted-foreground">
+                                                        {new Date(record.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                      </span>
+                                                    )}
+                                                  </li>
+                                                );
+                                              })}
                                             </ul>
                                           </div>
                                         )}
