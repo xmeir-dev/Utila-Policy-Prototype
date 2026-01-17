@@ -727,7 +727,7 @@ export default function Policies() {
                         ) : (
                           <CheckCircle className="w-5 h-5 text-green-500" />
                         )}
-                        <span className="font-semibold text-foreground">
+                        <span className="text-foreground font-medium text-[14px]">
                           {highRiskFindings.length > 0 
                             ? `You have ${highRiskFindings.length} potential issue${highRiskFindings.length !== 1 ? 's' : ''}`
                             : 'No issues found'
@@ -743,7 +743,6 @@ export default function Policies() {
                         Dismiss
                       </Button>
                     </div>
-                    
                     {highRiskFindings.length === 0 ? (
                       <div className="text-center py-4 text-sm text-muted-foreground">
                         No high priority issues identified
