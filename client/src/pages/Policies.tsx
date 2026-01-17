@@ -316,12 +316,37 @@ function SortablePolicyItem({
   );
 }
 
+/**
+ * AI POLICY SUGGESTIONS FEATURE
+ * 
+ * Pre-defined prompts for common policy patterns that users can click to quickly
+ * start the AI-assisted policy creation flow. These suggestions cover the most
+ * frequently needed security policies:
+ * 
+ * 1. Large transfers - Requires human approval for high-value transactions
+ * 2. Internal transfers - Auto-approves safe internal wallet movements
+ * 3. Block specific assets - Prevents certain tokens from leaving to external addresses
+ * 
+ * When selected, the prompt is passed to PolicyForm which initiates a conversational
+ * AI session to gather remaining details (thresholds, approvers, etc.).
+ */
 const POLICY_SUGGESTIONS = [
   { label: "Large transfers need approval", prompt: "I want a policy for large transfers that requires approval" },
   { label: "Internal transfers auto-approved", prompt: "I want to auto-approve internal transfers" },
   { label: "Block USDT transfers to external wallets", prompt: "I want to block USDT transfers to external wallets" },
 ];
 
+/**
+ * AI RISK CHECKER FEATURE - Finding Structure
+ * 
+ * Represents a single risk identified by the AI analysis of the policy set.
+ * Categories cover different types of security concerns:
+ * - conflicts: Policies that contradict each other
+ * - permissive: Rules that allow too much without restrictions
+ * - gaps: Scenarios not covered by any policy (default is deny)
+ * - priority: Risky ordering where broad rules may shadow specific ones
+ * - exploitable: Conditions that could be gamed (e.g., split transfers)
+ */
 interface RiskFinding {
   category: 'conflicts' | 'permissive' | 'gaps' | 'priority' | 'exploitable';
   severity: 'low' | 'medium' | 'high';
@@ -331,6 +356,17 @@ interface RiskFinding {
   recommendation: string;
 }
 
+/**
+ * AI RISK CHECKER FEATURE - Analysis Result
+ * 
+ * Complete result from the AI risk analysis endpoint (/api/policies/analyze-risks).
+ * The analysis examines all active policies for potential security vulnerabilities,
+ * conflicts, and gaps that could be exploited or cause unexpected behavior.
+ * 
+ * - overallRiskLevel: Aggregate assessment of policy security
+ * - summary: Human-readable overview of the policy set's security posture
+ * - findings: Array of specific issues found, ordered by severity
+ */
 interface RiskAnalysisResult {
   overallRiskLevel: 'low' | 'medium' | 'high';
   summary: string;
@@ -533,6 +569,19 @@ export default function Policies() {
     },
   });
 
+  /**
+   * AI RISK CHECKER MUTATION
+   * 
+   * Triggers AI-powered security analysis of the current policy set.
+   * Sends all policies to /api/policies/analyze-risks which uses GPT-4 to:
+   * - Detect conflicting rules that could cause unexpected behavior
+   * - Identify overly permissive policies lacking proper restrictions
+   * - Find coverage gaps where transactions might slip through
+   * - Spot exploitable conditions (e.g., splitting transfers to bypass limits)
+   * 
+   * Results are displayed in a modal showing findings by severity with
+   * recommendations for improving the security posture.
+   */
   const riskAnalysisMutation = useMutation({
     mutationFn: async (policiesToAnalyze: Policy[]) => {
       const response = await apiRequest('POST', '/api/policies/analyze-risks', { policies: policiesToAnalyze });

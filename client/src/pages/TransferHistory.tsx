@@ -17,12 +17,28 @@ const truncateAddress = (address: string): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
+/**
+ * Structure representing a wallet address entry in transactions.
+ * Used by AddressCellWithTooltip to display source/destination wallets.
+ */
 interface AddressInfo {
-  label: string;
-  address: string;
-  amount?: string;
+  label: string;      // Human-readable wallet name (e.g., "Treasury", "Finances")
+  address: string;    // Ethereum address for Etherscan linking
+  amount?: string;    // Optional per-wallet amount for multi-wallet transactions
 }
 
+/**
+ * MULTIPLE WALLETS DISPLAY FEATURE
+ * 
+ * Renders wallet addresses in the transaction history table with support for
+ * displaying multiple wallets in a single transaction. When a transaction
+ * involves multiple source or destination wallets:
+ * - Shows the first wallet inline with a "+N" badge indicating additional wallets
+ * - Hovering reveals a tooltip with all wallets, their addresses, and amounts
+ * - Each wallet entry has an Etherscan link for blockchain verification
+ * 
+ * This handles batch transactions where funds move between multiple wallets simultaneously.
+ */
 const AddressCellWithTooltip = ({ 
   addresses, 
   etherscanLogo 
@@ -34,6 +50,7 @@ const AddressCellWithTooltip = ({
     return <span className="text-sm font-normal">-</span>;
   }
 
+  // Display first wallet inline, with badge showing count of additional wallets
   const firstAddress = addresses[0];
   const additionalCount = addresses.length - 1;
 
@@ -104,7 +121,19 @@ const AddressCellWithTooltip = ({
   );
 };
 
+/**
+ * MULTIPLE WALLETS - SOURCE ADDRESS BUILDER
+ * 
+ * Constructs an array of AddressInfo objects from transaction source data.
+ * Supports both legacy single-wallet format and new multi-wallet format:
+ * - New format: Uses fromWallets[], fromAddresses[], fromAmounts[] arrays
+ * - Legacy format: Falls back to single fromWallet field
+ * 
+ * This enables the table to display transactions that pull funds from multiple
+ * source wallets in a single operation (e.g., consolidating funds).
+ */
 const buildFromAddresses = (tx: Transaction, fallbackAddress: string | null): AddressInfo[] => {
+  // New multi-wallet format: parallel arrays for labels, addresses, and amounts
   if (tx.fromWallets && tx.fromWallets.length > 0) {
     return tx.fromWallets.map((label, idx) => ({
       label: label || "",
@@ -112,6 +141,7 @@ const buildFromAddresses = (tx: Transaction, fallbackAddress: string | null): Ad
       amount: tx.fromAmounts?.[idx],
     }));
   }
+  // Legacy single-wallet format for backwards compatibility
   if (tx.fromWallet) {
     return [{
       label: tx.fromWallet,
@@ -121,7 +151,19 @@ const buildFromAddresses = (tx: Transaction, fallbackAddress: string | null): Ad
   return [];
 };
 
+/**
+ * MULTIPLE WALLETS - DESTINATION ADDRESS BUILDER
+ * 
+ * Constructs an array of AddressInfo objects from transaction destination data.
+ * Supports both legacy single-destination and new multi-destination format:
+ * - New format: Uses toAddresses[], toLabels[], toAmounts[] arrays
+ * - Legacy format: Falls back to single toAddress field
+ * 
+ * This enables the table to display transactions that distribute funds to multiple
+ * destination addresses (e.g., batch payouts, multi-recipient transfers).
+ */
 const buildToAddresses = (tx: Transaction): AddressInfo[] => {
+  // New multi-destination format: parallel arrays for addresses, labels, and amounts
   if (tx.toAddresses && tx.toAddresses.length > 0) {
     return tx.toAddresses.map((address, idx) => ({
       label: tx.toLabels?.[idx] || "",
@@ -129,6 +171,7 @@ const buildToAddresses = (tx: Transaction): AddressInfo[] => {
       amount: tx.toAmounts?.[idx],
     }));
   }
+  // Legacy single-destination format for backwards compatibility
   if (tx.toAddress) {
     return [{
       label: tx.toLabel || "",

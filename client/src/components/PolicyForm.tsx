@@ -368,6 +368,17 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     ...initialData,
   });
 
+  /**
+   * AI POLICY GENERATION STATE
+   * 
+   * These state variables manage the conversational AI flow for policy creation:
+   * - aiPrompt: Current user input in the AI chat
+   * - isGenerating: Loading state while waiting for AI response
+   * - aiQuestion: Current follow-up question from AI (null when complete)
+   * - conversationHistory: Full chat history sent to API for context
+   * - aiGenerationComplete: True when AI has gathered all required fields
+   * - reviewedAndApproved: User must confirm AI-generated policy before saving
+   */
   const [aiPrompt, setAiPrompt] = useState(initialAiPrompt || "");
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
@@ -394,6 +405,19 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  /**
+   * AI POLICY GENERATION HANDLER
+   * 
+   * Sends user prompt to /api/policies/generate endpoint which uses GPT-4
+   * to iteratively build a complete policy through conversation. The AI:
+   * 1. Asks clarifying questions one at a time (amount thresholds, approvers, etc.)
+   * 2. Accumulates answers in conversationHistory for context
+   * 3. Returns partial policy object as fields are determined
+   * 4. Sets isComplete=true when all mandatory fields are collected
+   * 
+   * This enables natural language policy creation like:
+   * "Block transfers over $50k unless approved by Meir or Lena"
+   */
   const handleGenerateAI = async () => {
     if (!aiPrompt.trim()) return;
     setIsGenerating(true);
@@ -927,6 +951,17 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
               </div>
             )}
           </div>
+          {/* 
+           * REQUIRES APPROVAL - TRANSACTION APPROVERS SECTION
+           * 
+           * This section configures which team members can approve transactions
+           * that match this policy. When action is 'require_approval':
+           * - approvers: List of users who can approve (from AVAILABLE_USERS)
+           * - quorumRequired: Minimum approvals needed before transaction executes
+           * 
+           * The badge shows current quorum vs total approvers (e.g., "2 / 3")
+           * to help users understand the approval threshold at a glance.
+           */}
           <div className="space-y-4">
             <button
               type="button"
@@ -961,10 +996,12 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
                   </Select>
                 </div>
 
+                {/* Transaction approvers - only shown when manual approval is required */}
                 {formData.action === 'require_approval' && (
                   <div className="space-y-4 pt-2">
                     <div className="space-y-2">
                       <Label className="text-sm">Who can approve transactions?</Label>
+                      {/* MultiUserSelector displays the correct people who can approve */}
                       <MultiUserSelector
                         selected={formData.approvers || []}
                         onChange={(values) => updateField('approvers', values)}
@@ -994,6 +1031,17 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
               </div>
             )}
           </div>
+          {/* 
+           * GOVERNANCE SECTION - POLICY CHANGE APPROVERS
+           * 
+           * This section configures who can approve modifications to THIS policy itself.
+           * Different from transaction approvers - this controls meta-level governance:
+           * - changeApproversList: Users who can approve edits/deletions of this policy
+           * - changeApprovalsRequired: How many must agree before changes take effect
+           * 
+           * This prevents single-point-of-failure security modifications by requiring
+           * multi-party approval before any policy can be changed or deleted.
+           */}
           <div className="space-y-4">
             <button
               type="button"
@@ -1013,6 +1061,7 @@ export function PolicyForm({ initialData, onSubmit, onCancel, onDelete, isSubmit
               <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200 pl-7">
                 <div className="space-y-2">
                   <Label className="text-sm">Who can approve changes to this policy?</Label>
+                  {/* Policy change approvers - different from transaction approvers */}
                   <MultiUserSelector
                     selected={formData.changeApproversList || []}
                     onChange={(values) => updateField('changeApproversList', values)}
