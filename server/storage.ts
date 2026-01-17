@@ -132,14 +132,10 @@ export class DatabaseStorage implements IStorage {
     const policy = await this.getPolicy(id);
     if (!policy) return undefined;
 
-    // Inherit approval settings from existing approval policies
-    const allPolicies = await this.getPolicies();
-    const approvalPolicy = allPolicies.find(p => 
-      p.isActive && p.status === 'active' && p.action === 'require_approval'
-    );
-    
-    const approversList = approvalPolicy?.approvers || [];
-    const quorumRequired = approvalPolicy?.quorumRequired || 1;
+    // Use the policy's own governance settings (changeApproversList and changeApprovalsRequired)
+    // These are set when the policy is created and define who can modify the policy
+    const approversList = policy.changeApproversList || [];
+    const quorumRequired = policy.changeApprovalsRequired || 1;
 
     const [updated] = await db
       .update(policies)
@@ -147,8 +143,6 @@ export class DatabaseStorage implements IStorage {
         status: 'pending_approval',
         pendingChanges: JSON.stringify(changes),
         changeApprovers: [],
-        changeApproversList: approversList,
-        changeApprovalsRequired: quorumRequired,
         changeInitiator: submitter,
         updatedAt: new Date().toISOString(),
       })
@@ -166,28 +160,34 @@ export class DatabaseStorage implements IStorage {
     const policy = await this.getPolicy(id);
     if (!policy) return undefined;
 
-    const allPolicies = await this.getPolicies();
-    const approvalPolicy = allPolicies.find(p => 
-      p.isActive && p.status === 'active' && p.action === 'require_approval'
-    );
-    
-    const approversList = approvalPolicy?.approvers || [];
-    const quorumRequired = approvalPolicy?.quorumRequired || 1;
-
+    // Use the policy's own governance settings - no need to override them
     const [updated] = await db
       .update(policies)
       .set({
         status: 'pending_approval',
         pendingChanges: JSON.stringify({ __delete: true }),
         changeApprovers: [],
-        changeApproversList: approversList,
-        changeApprovalsRequired: quorumRequired,
         changeInitiator: submitter,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(policies.id, id))
       .returning();
     return updated;
+  }
+
+  /**
+   * Check if a user is authorized to modify a policy.
+   * Returns true if the user is in the policy's changeApproversList.
+   */
+  async canUserModifyPolicy(id: number, userName: string): Promise<boolean> {
+    const policy = await this.getPolicy(id);
+    if (!policy) return false;
+    
+    const approversList = policy.changeApproversList || [];
+    // If no approvers list defined, anyone can modify (for backwards compatibility)
+    if (approversList.length === 0) return true;
+    
+    return approversList.includes(userName);
   }
 
   async createPolicy(policy: InsertPolicy): Promise<Policy> {

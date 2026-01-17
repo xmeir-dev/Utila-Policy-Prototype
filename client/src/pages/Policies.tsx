@@ -321,7 +321,7 @@ export default function Policies() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
   const [showSimulator, setShowSimulator] = useState(false);
-  const [viewingPendingPolicy, setViewingPendingPolicy] = useState<Policy | null>(null);
+  const [viewingPendingPolicyId, setViewingPendingPolicyId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const sensors = useSensors(
@@ -334,6 +334,9 @@ export default function Policies() {
   const { data: policies = [], isLoading, isError } = useQuery<Policy[]>({
     queryKey: [api.policies.list.path],
   });
+
+  // Derive the viewing policy from fresh query data to avoid stale state
+  const viewingPendingPolicy = viewingPendingPolicyId ? policies.find(p => p.id === viewingPendingPolicyId) || null : null;
 
   const createMutation = useMutation({
     mutationFn: async (policy: InsertPolicy) => {
@@ -351,7 +354,10 @@ export default function Policies() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<InsertPolicy> }) => {
-      return await apiRequest('PUT', `/api/policies/${id}`, data);
+      return await apiRequest('PUT', `/api/policies/${id}?submitter=${encodeURIComponent(walletState.walletAddress || 'anonymous')}`, {
+        ...data,
+        submitterName: walletState.connectedUser?.name || 'anonymous'
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
@@ -361,8 +367,13 @@ export default function Policies() {
         description: "Changes require approval before taking effect." 
       });
     },
-    onError: () => {
-      toast({ title: "Failed to update policy", variant: "destructive" });
+    onError: (error: Error) => {
+      const message = error.message || "Failed to update policy";
+      toast({ 
+        title: message.includes("not authorized") ? "Not Authorized" : "Failed to update policy", 
+        description: message.includes("not authorized") ? message : undefined,
+        variant: "destructive" 
+      });
     },
   });
 
@@ -382,7 +393,8 @@ export default function Policies() {
   const requestDeletionMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest('POST', `/api/policies/${id}/request-deletion`, {
-        submitter: walletState.walletAddress || 'anonymous'
+        submitter: walletState.walletAddress || 'anonymous',
+        submitterName: walletState.connectedUser?.name || 'anonymous'
       });
     },
     onSuccess: () => {
@@ -393,8 +405,13 @@ export default function Policies() {
         description: "This deletion requires approval before taking effect." 
       });
     },
-    onError: () => {
-      toast({ title: "Failed to submit deletion request", variant: "destructive" });
+    onError: (error: Error) => {
+      const message = error.message || "Failed to submit deletion request";
+      toast({ 
+        title: message.includes("not authorized") ? "Not Authorized" : "Failed to submit deletion request", 
+        description: message.includes("not authorized") ? message : undefined,
+        variant: "destructive" 
+      });
     },
   });
 
@@ -425,15 +442,21 @@ export default function Policies() {
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest('POST', `/api/policies/${id}/approve-change`, { 
-        approver: walletState.walletAddress || 'anonymous' 
+        approver: walletState.connectedUser?.name || 'anonymous' 
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+      setViewingPendingPolicyId(null);
       toast({ title: "Policy change approved" });
     },
-    onError: () => {
-      toast({ title: "Failed to approve policy change", variant: "destructive" });
+    onError: (error: Error) => {
+      const message = error.message || "Failed to approve policy change";
+      toast({ 
+        title: message.includes("not authorized") ? "Not Authorized" : "Failed to approve policy change", 
+        description: message.includes("not authorized") ? message : undefined,
+        variant: "destructive" 
+      });
     },
   });
 
@@ -542,7 +565,7 @@ export default function Policies() {
                           onToggle={() => toggleMutation.mutate(policy.id)}
                           onEdit={() => setEditingPolicy(policy)}
                           onApprove={() => approveMutation.mutate(policy.id)}
-                          onShowPending={setViewingPendingPolicy}
+                          onShowPending={(policy) => setViewingPendingPolicyId(policy.id)}
                           isToggling={toggleMutation.isPending}
                         />
                       ))}
@@ -619,7 +642,7 @@ export default function Policies() {
           </div>
         </DialogContent>
       </Dialog>
-      <Dialog open={!!viewingPendingPolicy} onOpenChange={(open) => !open && setViewingPendingPolicy(null)}>
+      <Dialog open={!!viewingPendingPolicy} onOpenChange={(open) => !open && setViewingPendingPolicyId(null)}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[24px] p-0 gap-0 hide-scrollbar">
           <DialogHeader className="p-6 pb-4 border-b border-border sticky top-0 bg-background z-10">
             <DialogTitle className="text-xl font-bold">Pending Changes Review</DialogTitle>
@@ -633,6 +656,13 @@ export default function Policies() {
                   const isPendingDeletion = pending.__delete === true;
                   
                   if (isPendingDeletion) {
+                    const currentApprovals = viewingPendingPolicy.changeApprovers?.length || 0;
+                    const requiredApprovals = viewingPendingPolicy.changeApprovalsRequired || 1;
+                    const initiatorName = viewingPendingPolicy.changeInitiator || 'Unknown';
+                    const isUserInitiator = viewingPendingPolicy.changeInitiator === walletState.walletAddress;
+                    const canApprove = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '') && !isUserInitiator;
+                    const hasUserApproved = viewingPendingPolicy.changeApprovers?.includes(walletState.connectedUser?.name || '');
+                    
                     return (
                       <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
                         <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-red-600 dark:text-red-400">
@@ -642,71 +672,154 @@ export default function Policies() {
                         <p className="text-sm text-foreground/70">
                           This policy is scheduled for deletion. Once approved, the policy will be permanently removed.
                         </p>
-                        <div className="mt-4 pt-4 border-t border-red-500/20">
+                        <div className="mt-4 pt-4 border-t border-red-500/20 space-y-4">
                           <div className="space-y-1">
                             <span className="text-[14px] font-medium text-[#8a8a8a]">Policy name</span>
-                            <div className="text-sm text-[#171717] font-medium">{viewingPendingPolicy.name}</div>
+                            <div className="text-sm text-[#171717] dark:text-foreground font-medium">{viewingPendingPolicy.name}</div>
                           </div>
+                          <div className="space-y-1">
+                            <span className="text-[14px] font-medium text-[#8a8a8a]">Requested by</span>
+                            <div className="text-sm text-[#171717] dark:text-foreground font-medium">{addressToName(initiatorName)}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[14px] font-medium text-[#8a8a8a]">Approval status</span>
+                            <div className="text-sm text-[#171717] dark:text-foreground font-medium">
+                              {currentApprovals} of {requiredApprovals} approvals received
+                            </div>
+                            {viewingPendingPolicy.changeApprovers && viewingPendingPolicy.changeApprovers.length > 0 && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                Approved by: {viewingPendingPolicy.changeApprovers.join(', ')}
+                              </div>
+                            )}
+                          </div>
+                          {canApprove && !hasUserApproved && (
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => {
+                                approveMutation.mutate(viewingPendingPolicy.id);
+                              }}
+                              disabled={approveMutation.isPending}
+                              data-testid="button-approve-deletion"
+                            >
+                              {approveMutation.isPending ? 'Approving...' : 'Approve Deletion'}
+                            </Button>
+                          )}
+                          {isUserInitiator && (
+                            <Badge variant="secondary" className="text-xs">You initiated this change</Badge>
+                          )}
+                          {hasUserApproved && !isUserInitiator && (
+                            <Badge variant="outline" className="text-xs">You have approved this change</Badge>
+                          )}
                         </div>
                       </div>
                     );
                   }
                   
+                  const currentApprovals = viewingPendingPolicy.changeApprovers?.length || 0;
+                  const requiredApprovals = viewingPendingPolicy.changeApprovalsRequired || 1;
+                  const initiatorName = viewingPendingPolicy.changeInitiator || 'Unknown';
+                  const isUserInitiator = viewingPendingPolicy.changeInitiator === walletState.walletAddress;
+                  const canApprove = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '') && !isUserInitiator;
+                  const hasUserApproved = viewingPendingPolicy.changeApprovers?.includes(walletState.connectedUser?.name || '');
+                  
                   return (
-                    <div className="p-4 rounded-xl bg-muted/30 border border-border">
-                      <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                        <ShieldEllipsis className="w-4 h-4 text-amber-500" />
-                        Proposed Comparison
-                      </h4>
-                      <div className="space-y-4">
-                        {(() => {
-                          const fields = [
-                            { key: 'name', label: 'Policy name' },
-                            { key: 'description', label: 'Description' },
-                            { key: 'action', label: 'Action' },
-                            { key: 'conditionLogic', label: 'Logic' },
-                            { key: 'initiatorType', label: 'Initiator type' },
-                            { key: 'amountCondition', label: 'Amount condition' },
-                            { key: 'approvers', label: 'Approvers' },
-                            { key: 'changeApproversList', label: 'Policy change approvers' },
-                          ];
+                    <>
+                      <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <ShieldEllipsis className="w-4 h-4 text-amber-500" />
+                          Proposed Comparison
+                        </h4>
+                        <div className="space-y-4">
+                          {(() => {
+                            const fields = [
+                              { key: 'name', label: 'Policy name' },
+                              { key: 'description', label: 'Description' },
+                              { key: 'action', label: 'Action' },
+                              { key: 'conditionLogic', label: 'Logic' },
+                              { key: 'initiatorType', label: 'Initiator type' },
+                              { key: 'amountCondition', label: 'Amount condition' },
+                              { key: 'approvers', label: 'Approvers' },
+                              { key: 'changeApproversList', label: 'Policy change approvers' },
+                            ];
 
-                          return fields.map(({ key, label }) => {
-                            const currentVal = (viewingPendingPolicy as any)[key];
-                            const pendingVal = pending[key];
-                            const isChanged = pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
-                            
-                            const displayVal = (val: any) => {
-                              if (val === undefined || val === null) return 'Not set';
-                              if (Array.isArray(val)) return val.length > 0 ? val.join(', ') : 'None';
-                              return String(val);
-                            };
+                            return fields.map(({ key, label }) => {
+                              const currentVal = (viewingPendingPolicy as any)[key];
+                              const pendingVal = pending[key];
+                              const isChanged = pendingVal !== undefined && JSON.stringify(currentVal) !== JSON.stringify(pendingVal);
+                              
+                              const displayVal = (val: any) => {
+                                if (val === undefined || val === null) return 'Not set';
+                                if (Array.isArray(val)) return val.length > 0 ? val.join(', ') : 'None';
+                                return String(val);
+                              };
 
-                            return (
-                              <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
-                                <div className="space-y-1">
-                                  <span className="text-[14px] font-medium text-[#8a8a8a]">{label}</span>
-                                  <div className="text-sm text-[#171717]">{displayVal(currentVal)}</div>
-                                </div>
-                                <div className="space-y-1">
-                                  <span className="text-[14px] font-medium text-[#8a8a8a]">Proposed change</span>
-                                  <div className={cn(
-                                    "text-sm font-medium",
-                                    isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
-                                  )}>
-                                    {isChanged ? displayVal(pendingVal) : "-"}
+                              return (
+                                <div key={key} className="grid grid-cols-2 gap-4 pb-3 border-b border-border/50 last:border-0">
+                                  <div className="space-y-1">
+                                    <span className="text-[14px] font-medium text-[#8a8a8a]">{label}</span>
+                                    <div className="text-sm text-[#171717] dark:text-foreground">{displayVal(currentVal)}</div>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <span className="text-[14px] font-medium text-[#8a8a8a]">Proposed change</span>
+                                    <div className={cn(
+                                      "text-sm font-medium",
+                                      isChanged ? "text-amber-600 dark:text-amber-400" : "text-foreground/70"
+                                    )}>
+                                      {isChanged ? displayVal(pendingVal) : "-"}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            );
-                          });
-                        })()}
+                              );
+                            });
+                          })()}
+                        </div>
                       </div>
-                    </div>
+                      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                          Approval Status
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="space-y-1">
+                            <span className="text-[14px] font-medium text-[#8a8a8a]">Requested by</span>
+                            <div className="text-sm text-[#171717] dark:text-foreground font-medium">{addressToName(initiatorName)}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[14px] font-medium text-[#8a8a8a]">Progress</span>
+                            <div className="text-sm text-[#171717] dark:text-foreground font-medium">
+                              {currentApprovals} of {requiredApprovals} approvals received
+                            </div>
+                            {viewingPendingPolicy.changeApprovers && viewingPendingPolicy.changeApprovers.length > 0 && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                Approved by: {viewingPendingPolicy.changeApprovers.join(', ')}
+                              </div>
+                            )}
+                          </div>
+                          {canApprove && !hasUserApproved && (
+                            <Button 
+                              size="sm"
+                              onClick={() => {
+                                approveMutation.mutate(viewingPendingPolicy.id);
+                              }}
+                              disabled={approveMutation.isPending}
+                              data-testid="button-approve-change"
+                            >
+                              {approveMutation.isPending ? 'Approving...' : 'Approve Change'}
+                            </Button>
+                          )}
+                          {isUserInitiator && (
+                            <Badge variant="secondary" className="text-xs">You initiated this change</Badge>
+                          )}
+                          {hasUserApproved && !isUserInitiator && (
+                            <Badge variant="outline" className="text-xs">You have approved this change</Badge>
+                          )}
+                        </div>
+                      </div>
+                    </>
                   );
                 })()}
                 <div className="flex justify-end">
-                  <Button variant="outline" onClick={() => setViewingPendingPolicy(null)}>
+                  <Button variant="outline" onClick={() => setViewingPendingPolicyId(null)}>
                     Close Review
                   </Button>
                 </div>

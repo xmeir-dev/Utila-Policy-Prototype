@@ -109,9 +109,15 @@ export default function Home() {
       queryClient.invalidateQueries({ queryKey: ["/api/policies/pending"] });
       queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
       toast({ title: "Policy change approved" });
+      setSelectedPolicy(null);
     },
-    onError: () => {
-      toast({ title: "Failed to approve policy change", variant: "destructive" });
+    onError: (error: Error) => {
+      const message = error.message || "Failed to approve policy change";
+      toast({ 
+        title: message.includes("not authorized") ? "Not Authorized" : "Failed to approve policy change", 
+        description: message.includes("not authorized") ? message : undefined,
+        variant: "destructive" 
+      });
     },
   });
 

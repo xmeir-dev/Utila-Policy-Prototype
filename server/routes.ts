@@ -18,6 +18,19 @@ import { z } from "zod";
 import { insertTransactionSchema } from "@shared/schema";
 import { openai } from "./replit_integrations/audio/client";
 
+// Maps wallet addresses to user names - must match client-side WALLET_USERS
+const ADDRESS_TO_NAME: Record<string, string> = {
+  "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1": "Meir",
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": "Ishai",
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7": "Omer",
+  "0x6B175474E89094C44Da98b954EesecdB6F8e5389": "Lena",
+  "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045": "Sam",
+};
+
+function addressToUserName(address: string): string {
+  return ADDRESS_TO_NAME[address] || address;
+}
+
 /**
  * Registers all API routes on the Express app.
  * Returns the HTTP server for chaining with middleware setup.
@@ -274,6 +287,15 @@ Return JSON: {
       
       const input = api.policies.update.input.parse(req.body);
       const submitter = req.query.submitter as string || 'anonymous';
+      const submitterName = req.body.submitterName as string || addressToUserName(submitter);
+      
+      // Check if user is authorized to modify this policy
+      const canModify = await storage.canUserModifyPolicy(id, submitterName);
+      if (!canModify) {
+        return res.status(403).json({ 
+          message: "You are not authorized to modify this policy. Only designated approvers can make changes." 
+        });
+      }
       
       if (input.action) {
         const validActions = ['allow', 'deny', 'require_approval'];
@@ -329,6 +351,16 @@ Return JSON: {
         return res.status(400).json({ message: "Invalid policy ID" });
       }
       const submitter = req.body.submitter || 'anonymous';
+      const submitterName = req.body.submitterName as string || addressToUserName(submitter);
+      
+      // Check if user is authorized to modify this policy
+      const canModify = await storage.canUserModifyPolicy(id, submitterName);
+      if (!canModify) {
+        return res.status(403).json({ 
+          message: "You are not authorized to delete this policy. Only designated approvers can make changes." 
+        });
+      }
+      
       const policy = await storage.submitPolicyDeletion(id, submitter);
       if (!policy) {
         return res.status(404).json({ message: "Policy not found" });
@@ -408,6 +440,15 @@ Return JSON: {
         return res.status(400).json({ message: "Invalid policy ID" });
       }
       const input = api.policies.approveChange.input.parse(req.body);
+      
+      // Check if user is authorized to approve this policy change
+      const canApprove = await storage.canUserModifyPolicy(id, input.approver);
+      if (!canApprove) {
+        return res.status(403).json({ 
+          message: "You are not authorized to approve this policy change. Only designated approvers can approve changes." 
+        });
+      }
+      
       const policy = await storage.approvePolicyChange(id, input.approver);
       if (!policy) {
         return res.status(404).json({ message: "Policy not found or not pending approval" });

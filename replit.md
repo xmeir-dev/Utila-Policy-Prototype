@@ -102,3 +102,25 @@ When a policy is edited or deleted, the changes don't take effect immediately. I
 - Users cannot approve/review policy changes they initiated themselves
 - If the current user's wallet address matches the policy's `changeInitiator`, they see a "Pending" badge instead of a "Review" button
 - Address-to-name mapping in `Home.tsx` and `Policies.tsx` uses `ADDRESS_TO_NAME` constant to display friendly names
+
+**Authorization System:**
+- Each policy has its own governance settings: `changeApproversList` (who can modify) and `changeApprovalsRequired` (how many approvals needed)
+- Only users in `changeApproversList` can request changes or approve them
+- The backend checks authorization in `server/routes.ts` and returns 403 for unauthorized users
+- The frontend shows "Not Authorized" toast when an unauthorized user tries to modify a policy
+
+**Pending Changes Review Modal (Policies page):**
+- Shows initiator name ("Requested by: <name>")
+- Shows approval progress ("X of Y approvals received")
+- Shows who has already approved ("Approved by: <names>")
+- Authorized users who haven't approved see an "Approve" button
+- Initiators see "You initiated this change" badge
+- Users who already approved see "You have approved this change" badge
+- Modal derives data from fresh React Query cache to ensure updated counts after approval
+
+**Wallet Address to Name Mapping:**
+- Meir: 0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1
+- Ishai: 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+- Omer: 0xdAC17F958D2ee523a2206206994597C13D831ec7
+- Lena: 0x6B175474E89094C44Da98b954EesecdB6F8e5389
+- Sam: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
