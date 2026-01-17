@@ -612,7 +612,7 @@ export default function Policies() {
                             setPrefilledAiPrompt(suggestion.prompt);
                             setShowAddModal(true);
                           }}
-                          className="text-left px-4 py-3 rounded-lg border border-border hover-elevate active-elevate-2 transition-colors"
+                          className="px-4 py-3 rounded-lg border border-border hover-elevate active-elevate-2 transition-colors text-center text-[14px]"
                           data-testid={`suggestion-${index}`}
                         >
                           <span className="text-sm text-foreground">{suggestion.label}</span>
