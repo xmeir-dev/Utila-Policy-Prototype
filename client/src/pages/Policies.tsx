@@ -115,7 +115,7 @@ const getStatusBadge = (status: string | null) => {
   switch (status) {
     case 'draft':
       return (
-        <Badge variant="outline" className="h-5 px-1.5 text-[10px] gap-1">
+        <Badge variant="outline" className="h-5 px-1.5 text-[10px] gap-1 no-default-hover-elevate">
           Draft
         </Badge>
       );
@@ -233,7 +233,7 @@ function SortablePolicyItem({
           </span>
           <Badge 
             variant="outline" 
-            className={`h-5 px-1.5 text-[14px] font-normal no-default-hover-elevate no-default-active-elevate ${
+            className={`h-5 px-1.5 text-[14px] font-normal no-default-hover-elevate ${
               policy.action === 'allow' 
                 ? 'text-green-600 border-green-600/30 bg-green-500/10' 
                 : policy.action === 'deny' 
@@ -244,7 +244,7 @@ function SortablePolicyItem({
             {policy.action === 'allow' ? 'Auto-allowed' : policy.action === 'deny' ? 'Auto-denied' : 'Requires approval'}
           </Badge>
           {!policy.isActive && (
-            <Badge variant="secondary" className="h-5 px-1.5 text-[11px] no-default-hover-elevate no-default-active-elevate">
+            <Badge variant="secondary" className="h-5 px-1.5 text-[11px] no-default-hover-elevate">
               Disabled
             </Badge>
           )}

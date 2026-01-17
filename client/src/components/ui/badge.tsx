@@ -5,18 +5,17 @@ import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
   // Whitespace-nowrap: Badges should never wrap.
-  "whitespace-nowrap inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" +
-  " hover-elevate " ,
+  "whitespace-nowrap inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow-xs",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
+          "border-transparent bg-primary text-primary-foreground shadow-xs hover-elevate",
+        secondary: "border-transparent bg-secondary text-secondary-foreground hover-elevate",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow-xs",
+          "border-transparent bg-destructive text-destructive-foreground shadow-xs hover-elevate",
 
-        outline: " border [border-color:var(--badge-outline)] shadow-xs",
+        outline: " border [border-color:var(--badge-outline)] shadow-xs hover-elevate",
       },
     },
     defaultVariants: {
