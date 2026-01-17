@@ -507,6 +507,85 @@ Return JSON: {
   });
 
   /**
+   * Analyzes policies for potential risks using AI.
+   * Checks for conflicts, overly permissive rules, coverage gaps,
+   * risky priority ordering, and exploitable conditions.
+   */
+  app.post('/api/policies/analyze-risks', async (req, res) => {
+    try {
+      const { policies } = req.body;
+      
+      if (!Array.isArray(policies)) {
+        return res.status(400).json({ message: "Policies array is required" });
+      }
+
+      const policySummaries = policies.map((p: any, index: number) => ({
+        priority: index + 1,
+        name: p.name,
+        action: p.action,
+        isActive: p.isActive,
+        initiatorType: p.initiatorType,
+        initiatorValues: p.initiatorValues,
+        sourceWalletType: p.sourceWalletType,
+        sourceWallets: p.sourceWallets,
+        destinationType: p.destinationType,
+        destinationValues: p.destinationValues,
+        amountCondition: p.amountCondition,
+        amountMin: p.amountMin,
+        amountMax: p.amountMax,
+        assetType: p.assetType,
+        assetValues: p.assetValues,
+        approvers: p.approvers,
+        quorumRequired: p.quorumRequired,
+      }));
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are a security expert analyzing crypto wallet transaction policies for potential risks.
+            
+Analyze the provided policies and their priority order for:
+1. Policy Conflicts - Rules that contradict each other or create ambiguity
+2. Overly Permissive Rules - Policies that are too broad (e.g., allowing all transfers without limits)
+3. Coverage Gaps - Scenarios not covered by any policy (remember: default is deny if no policy matches)
+4. Risky Priority Ordering - Higher priority rules that could bypass important security checks
+5. Exploitable Conditions - Conditions that could be exploited (e.g., amount just under threshold)
+
+Return a JSON object with this structure:
+{
+  "overallRiskLevel": "low" | "medium" | "high",
+  "summary": "Brief overall assessment",
+  "findings": [
+    {
+      "category": "conflicts" | "permissive" | "gaps" | "priority" | "exploitable",
+      "severity": "low" | "medium" | "high",
+      "title": "Brief title",
+      "description": "Detailed explanation",
+      "affectedPolicies": ["Policy Name 1", "Policy Name 2"],
+      "recommendation": "Suggested fix"
+    }
+  ]
+}`
+          },
+          {
+            role: "user",
+            content: `Analyze these policies (ordered by priority, 1 = highest priority):\n\n${JSON.stringify(policySummaries, null, 2)}`
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || "{}");
+      res.status(200).json(result);
+    } catch (err) {
+      console.error("Policy risk analysis error:", err);
+      res.status(500).json({ message: "Failed to analyze policy risks" });
+    }
+  });
+
+  /**
    * Creates a new transaction record.
    * Status depends on policy simulation - 'pending' requires approval, 'completed' is immediate.
    */

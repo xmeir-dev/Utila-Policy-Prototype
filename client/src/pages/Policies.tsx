@@ -15,7 +15,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, ShieldEllipsis,
-  Trash2, Scale, GripVertical, Settings, TestTubeDiagonal, ChevronRight
+  Trash2, Scale, GripVertical, Settings, TestTubeDiagonal, ChevronRight,
+  AlertTriangle, CheckCircle, AlertCircle, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -321,6 +322,21 @@ const POLICY_SUGGESTIONS = [
   { label: "Block USDT transfers to external wallets", prompt: "I want to block USDT transfers to external wallets" },
 ];
 
+interface RiskFinding {
+  category: 'conflicts' | 'permissive' | 'gaps' | 'priority' | 'exploitable';
+  severity: 'low' | 'medium' | 'high';
+  title: string;
+  description: string;
+  affectedPolicies: string[];
+  recommendation: string;
+}
+
+interface RiskAnalysisResult {
+  overallRiskLevel: 'low' | 'medium' | 'high';
+  summary: string;
+  findings: RiskFinding[];
+}
+
 export default function Policies() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -329,6 +345,7 @@ export default function Policies() {
   const [showSimulator, setShowSimulator] = useState(false);
   const [viewingPendingPolicyId, setViewingPendingPolicyId] = useState<number | null>(null);
   const [prefilledAiPrompt, setPrefilledAiPrompt] = useState<string | undefined>(undefined);
+  const [riskAnalysisResult, setRiskAnalysisResult] = useState<RiskAnalysisResult | null>(null);
   const { toast } = useToast();
 
   const sensors = useSensors(
@@ -516,6 +533,19 @@ export default function Policies() {
     },
   });
 
+  const riskAnalysisMutation = useMutation({
+    mutationFn: async (policiesToAnalyze: Policy[]) => {
+      const response = await apiRequest('POST', '/api/policies/analyze-risks', { policies: policiesToAnalyze });
+      return await response.json() as RiskAnalysisResult;
+    },
+    onSuccess: (data) => {
+      setRiskAnalysisResult(data);
+    },
+    onError: () => {
+      toast({ title: "Failed to analyze risks", variant: "destructive" });
+    },
+  });
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
@@ -659,6 +689,104 @@ export default function Policies() {
                       ))}
                     </SortableContext>
                   </DndContext>
+                </Card>
+              )}
+
+              {policies.length > 0 && (
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="ghost"
+                    onClick={() => riskAnalysisMutation.mutate(policies)}
+                    disabled={riskAnalysisMutation.isPending}
+                    className="gap-2"
+                    data-testid="button-check-risks"
+                  >
+                    {riskAnalysisMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="w-4 h-4" />
+                        Check for Risks
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {riskAnalysisResult && (
+                <Card className="mt-4 p-4 border-2" data-testid="risk-analysis-results">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      {riskAnalysisResult.overallRiskLevel === 'low' ? (
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      ) : riskAnalysisResult.overallRiskLevel === 'medium' ? (
+                        <AlertCircle className="w-5 h-5 text-amber-500" />
+                      ) : (
+                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                      )}
+                      <span className="font-semibold text-foreground">
+                        Risk Assessment: {riskAnalysisResult.overallRiskLevel.charAt(0).toUpperCase() + riskAnalysisResult.overallRiskLevel.slice(1)}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRiskAnalysisResult(null)}
+                      data-testid="button-dismiss-risks"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground mb-4">{riskAnalysisResult.summary}</p>
+                  
+                  {riskAnalysisResult.findings.length === 0 ? (
+                    <div className="text-center py-4 text-sm text-muted-foreground">
+                      No specific risks identified
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {riskAnalysisResult.findings.map((finding, index) => (
+                        <div 
+                          key={index} 
+                          className={cn(
+                            "p-3 rounded-lg border",
+                            finding.severity === 'high' ? 'bg-red-500/10 border-red-500/30' :
+                            finding.severity === 'medium' ? 'bg-amber-500/10 border-amber-500/30' :
+                            'bg-muted/50 border-border'
+                          )}
+                          data-testid={`risk-finding-${index}`}
+                        >
+                          <div className="flex items-start gap-2 mb-2">
+                            <Badge 
+                              variant="outline" 
+                              className={cn(
+                                "text-xs shrink-0",
+                                finding.severity === 'high' ? 'text-red-600 border-red-600/30' :
+                                finding.severity === 'medium' ? 'text-amber-600 border-amber-600/30' :
+                                'text-muted-foreground'
+                              )}
+                            >
+                              {finding.severity}
+                            </Badge>
+                            <span className="font-medium text-sm text-foreground">{finding.title}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{finding.description}</p>
+                          {finding.affectedPolicies.length > 0 && (
+                            <p className="text-xs text-muted-foreground mb-2">
+                              Affected: {finding.affectedPolicies.join(', ')}
+                            </p>
+                          )}
+                          <p className="text-sm text-foreground/80">
+                            <span className="font-medium">Recommendation:</span> {finding.recommendation}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Card>
               )}
           </div>
