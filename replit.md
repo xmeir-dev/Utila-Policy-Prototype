@@ -97,3 +97,8 @@ When a policy is edited or deleted, the changes don't take effect immediately. I
 - Policies with pending edits show amber "Changes pending" badge
 - Policies with pending deletion show red "Deletion pending" badge
 - Both badges expand on hover to reveal a chevron and are clickable to view details
+
+**Self-Approval Prevention:**
+- Users cannot approve/review policy changes they initiated themselves
+- If the current user's wallet address matches the policy's `changeInitiator`, they see a "Pending" badge instead of a "Review" button
+- Address-to-name mapping in `Home.tsx` and `Policies.tsx` uses `ADDRESS_TO_NAME` constant to display friendly names

@@ -54,6 +54,31 @@ const formatAmount = (amountStr: string) => {
   return `${formattedNum}${symbol ? ` ${symbol}` : ""}`;
 };
 
+// Address to name mapping - must match use-wallet.ts WALLET_USERS
+const ADDRESS_TO_NAME: Record<string, string> = {
+  "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1": "Meir",
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": "Ishai",
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7": "Omer",
+  "0x6B175474E89094C44Da98b954EesecdB6F8e5389": "Lena",
+  "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045": "Sam",
+};
+
+// Maps wallet addresses to user names - returns "Unknown" for unrecognized addresses
+const addressToName = (address: string | null | undefined): string => {
+  if (!address || address === "anonymous") return "Unknown";
+  return ADDRESS_TO_NAME[address] || "Unknown";
+};
+
+// Checks if the current user is the initiator of a policy change
+const isUserInitiator = (changeInitiator: string | null | undefined, currentUserAddress: string | undefined): boolean => {
+  // If no initiator recorded or current user not logged in, can't determine - allow review
+  if (!changeInitiator || !currentUserAddress) return false;
+  // If anonymous initiator, we can't determine who did it
+  if (changeInitiator === "anonymous") return false;
+  // Direct address comparison
+  return changeInitiator === currentUserAddress;
+};
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -332,6 +357,8 @@ export default function Home() {
                           } catch {
                             pendingChanges = {};
                           }
+                          const initiatorName = addressToName(policy.changeInitiator);
+                          const isPolicyInitiator = isUserInitiator(policy.changeInitiator, walletState.walletAddress);
                           return (
                             <div key={`policy-${policy.id}`} className="p-4 rounded-[14px] bg-card/50 px-2 py-3" data-testid={`pending-policy-${policy.id}`}>
                               <div className="flex items-center justify-between mb-2">
@@ -340,15 +367,19 @@ export default function Home() {
                                   <span className="text-[12px] text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1} approvals</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <Button 
-                                    size="sm" 
-                                    className="h-6 px-3 text-xs"
-                                    onClick={() => setSelectedPolicy(policy)}
-                                    disabled={approvePolicyMutation.isPending}
-                                    data-testid={`button-review-policy-${policy.id}`}
-                                  >
-                                    Review
-                                  </Button>
+                                  {isPolicyInitiator ? (
+                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 text-[10px] h-5 px-1.5 font-normal">Pending</Badge>
+                                  ) : (
+                                    <Button 
+                                      size="sm" 
+                                      className="h-6 px-3 text-xs"
+                                      onClick={() => setSelectedPolicy(policy)}
+                                      disabled={approvePolicyMutation.isPending}
+                                      data-testid={`button-review-policy-${policy.id}`}
+                                    >
+                                      Review
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
                               <p className="mb-3 text-[14px] text-[#8a8a8a]">
@@ -356,14 +387,7 @@ export default function Home() {
                               </p>
                               <div className="text-[10px] text-muted-foreground">
                                 <span className="text-[14px] text-[#8a8a8a]">
-                                  Requested by <span className="text-foreground font-medium">{(() => {
-                                    if (policy.changeInitiator === "anonymous") return "Meir";
-                                    if (policy.changeInitiator?.startsWith("0x")) {
-                                      if (policy.changeInitiator === "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1") return "Omer";
-                                      return "Ishai";
-                                    }
-                                    return policy.changeInitiator || "Unknown";
-                                  })()}</span> on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {policy.updatedAt ? new Date(policy.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}
+                                  Requested by <span className="text-foreground font-medium">{initiatorName}</span> on {policy.updatedAt ? new Date(policy.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {policy.updatedAt ? new Date(policy.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() : new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}
                                 </span>
                               </div>
                             </div>
@@ -444,14 +468,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border/50">
                     <div>
                       <div className="text-[10px] font-medium mb-1 uppercase tracking-wider text-muted-foreground">Initiated By</div>
-                      <div className="text-sm font-medium">{(() => {
-                        if (selectedPolicy.changeInitiator === "anonymous") return "Meir";
-                        if (selectedPolicy.changeInitiator?.startsWith("0x")) {
-                          if (selectedPolicy.changeInitiator === "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1") return "Omer";
-                          return "Ishai";
-                        }
-                        return selectedPolicy.changeInitiator || "Unknown";
-                      })()}</div>
+                      <div className="text-sm font-medium">{addressToName(selectedPolicy.changeInitiator)}</div>
                     </div>
                     <div>
                       <div className="text-[10px] font-medium mb-1 uppercase tracking-wider text-muted-foreground">Status</div>

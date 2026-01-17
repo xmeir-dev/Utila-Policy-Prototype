@@ -52,6 +52,21 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// Address to name mapping - must match use-wallet.ts WALLET_USERS
+const ADDRESS_TO_NAME: Record<string, string> = {
+  "0xc333b115a72a3519b48E9B4f9D1bBD4a34C248b1": "Meir",
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": "Ishai",
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7": "Omer",
+  "0x6B175474E89094C44Da98b954EesecdB6F8e5389": "Lena",
+  "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045": "Sam",
+};
+
+// Maps wallet addresses to user names - returns "Unknown" for unrecognized addresses
+const addressToName = (address: string | null | undefined): string => {
+  if (!address || address === "anonymous") return "Unknown";
+  return ADDRESS_TO_NAME[address] || "Unknown";
+};
+
 // Helper functions for policy action display
 const getActionIcon = (action: string) => {
   switch (action) {
@@ -267,8 +282,8 @@ function SortablePolicyItem({
             <TooltipContent className="max-w-[280px]">
               <p>
                 {isPendingDeletion 
-                  ? `This deletion was requested by ${policy.changeInitiator || 'a team member'}, and requires ${Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval${((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be completed.`
-                  : `This change was initiated by ${policy.changeInitiator || 'a team member'}, and requires ${Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval${((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be approved. For now the old rules apply.`
+                  ? `This deletion was requested by ${addressToName(policy.changeInitiator)}, and requires ${Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval${((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be completed.`
+                  : `This change was initiated by ${addressToName(policy.changeInitiator)}, and requires ${Math.max(0, (policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0))} more approval${((policy.changeApprovalsRequired || 1) - (policy.changeApprovers?.length || 0)) !== 1 ? 's' : ''} to be approved. For now the old rules apply.`
                 }
               </p>
             </TooltipContent>
