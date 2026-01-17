@@ -596,15 +596,6 @@ export default function Policies() {
                   <Plus className="w-4 h-4" />
                   Add Policy
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowSimulator(true)}
-                  className="gap-2 rounded-lg"
-                  data-testid="button-simulate-transaction"
-                >
-                  <TestTubeDiagonal className="w-4 h-4" />
-                  Simulate a Transaction
-                </Button>
               </div>
             )}
             {isLoading ? (
@@ -693,7 +684,7 @@ export default function Policies() {
               )}
 
               {policies.length > 0 && (
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center gap-3 mt-4">
                   <Button
                     variant="ghost"
                     onClick={() => riskAnalysisMutation.mutate(policies)}
@@ -708,10 +699,19 @@ export default function Policies() {
                       </>
                     ) : (
                       <>
-                        <AlertTriangle className="w-4 h-4" />
+                        <Shield className="w-4 h-4" />
                         Check for Risks
                       </>
                     )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowSimulator(true)}
+                    className="gap-2"
+                    data-testid="button-simulate-transaction-footer"
+                  >
+                    <TestTubeDiagonal className="w-4 h-4" />
+                    Simulate a Transaction
                   </Button>
                 </div>
               )}
