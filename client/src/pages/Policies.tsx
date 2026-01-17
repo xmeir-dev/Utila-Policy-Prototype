@@ -548,7 +548,15 @@ export default function Policies() {
 
           <div className="space-y-4">
             {policies.length > 0 && (
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowSimulator(true)}
+                  className="gap-2 rounded-lg"
+                  data-testid="button-simulate-transaction"
+                >
+                  Simulate a Transaction
+                </Button>
                 <Button
                   onClick={() => setShowAddModal(true)}
                   className="gap-2 rounded-lg"
@@ -621,19 +629,6 @@ export default function Policies() {
                   </DndContext>
                 </Card>
               )}
-          </div>
-
-          <div className="flex justify-center pt-4">
-            {policies.length > 0 && (
-              <Button
-                variant="secondary"
-                onClick={() => setShowSimulator(true)}
-                className="gap-2 rounded-lg"
-                data-testid="button-simulate-transaction"
-              >
-                Simulate a Transaction
-              </Button>
-            )}
           </div>
         </motion.div>
       </main>
