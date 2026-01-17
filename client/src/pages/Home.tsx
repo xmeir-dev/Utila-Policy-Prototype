@@ -220,7 +220,7 @@ export default function Home() {
                 Hi <span className="font-bold">{walletState.connectedUser?.name}</span>, welcome to your Waystar Royco workspace
               </h2>
 
-              <div className="grid grid-cols-4 gap-4 mb-12 w-full">
+              <div className="grid grid-cols-3 gap-4 mb-12 w-full">
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-primary text-primary-foreground cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
@@ -244,14 +244,6 @@ export default function Home() {
                 >
                   <History className="w-8 h-8 text-primary" />
                   <span className="font-semibold text-center">Activity</span>
-                </div>
-                <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
-                  onClick={() => setLocation("/wallets")}
-                  data-testid="button-wallets"
-                >
-                  <Wallet className="w-8 h-8 text-primary" />
-                  <span className="font-semibold text-center">Wallets</span>
                 </div>
               </div>
 
