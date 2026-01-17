@@ -573,10 +573,7 @@ export default function Policies() {
               ) : policies.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-12">
                   <Scale className="w-16 h-16 text-muted-foreground/30" />
-                  <p className="text-sm text-muted-foreground text-center max-w-[320px]">
-                    Without an active policy, all outgoing transfers are automatically denied. 
-                    Set up your first policy to start moving funds.
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center max-w-[320px]">Without an active policy, all outgoing transfers are automatically denied.</p>
                   <Button 
                     className="mt-2 gap-2 rounded-lg" 
                     onClick={() => setShowAddModal(true)}
