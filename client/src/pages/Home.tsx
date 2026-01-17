@@ -372,7 +372,45 @@ export default function Home() {
                               <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium">Policy change</span>
-                                  <span className="text-[12px] text-muted-foreground">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1} approvals</span>
+                                  <Tooltip delayDuration={200}>
+                                    <TooltipTrigger asChild>
+                                      <span className="text-[12px] text-muted-foreground cursor-help">{(policy.changeApprovers?.length || 0)}/{policy.changeApprovalsRequired || 1} approvals</span>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="p-2 min-w-[200px]">
+                                      <div className="space-y-2">
+                                        {policy.changeApprovers && policy.changeApprovers.length > 0 && (
+                                          <div>
+                                            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Approved by</p>
+                                            <ul className="text-xs space-y-1">
+                                              {policy.changeApprovers.map((name, i) => (
+                                                <li key={i} className="flex justify-between items-center">
+                                                  <span>{name}</span>
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        )}
+                                        {(() => {
+                                          const approvedSet = new Set(policy.changeApprovers || []);
+                                          const allowedButNotApproved = (policy.changeApproversList || []).filter(name => !approvedSet.has(name));
+                                          
+                                          if (allowedButNotApproved.length > 0) {
+                                            return (
+                                              <div>
+                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Pending from</p>
+                                                <ul className="text-xs space-y-1">
+                                                  {allowedButNotApproved.map((name, i) => (
+                                                    <li key={i} className="text-muted-foreground/70">{name}</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            );
+                                          }
+                                          return null;
+                                        })()}
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isPolicyInitiator ? (
@@ -426,7 +464,48 @@ export default function Home() {
                               <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium">Transfer of {formatAmount(tx.amount)}</span>
-                                  <span className="text-[12px] text-muted-foreground">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1} approvals</span>
+                                  <Tooltip delayDuration={200}>
+                                    <TooltipTrigger asChild>
+                                      <span className="text-[12px] text-muted-foreground cursor-help">{(tx.approvals?.length || 0)}/{tx.quorumRequired || 1} approvals</span>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="p-2 min-w-[200px]">
+                                      <div className="space-y-2">
+                                        {tx.approvals && tx.approvals.length > 0 && (
+                                          <div>
+                                            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Approved by</p>
+                                            <ul className="text-xs space-y-1">
+                                              {tx.approvals.map((name: string, i: number) => (
+                                                <li key={i}>{name}</li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        )}
+                                        {(() => {
+                                          // For transfers, the quorum can be satisfied by any authorized user.
+                                          // We don't have a specific "allowedButNotApproved" list for a specific transaction
+                                          // unless we look at the policy that triggered it. 
+                                          // However, based on the context of the app, any user who can approve can be listed.
+                                          const approvedSet = new Set(tx.approvals || []);
+                                          const allAuthorizedNames = ["Meir", "Ishai", "Omer", "Lena", "Sam"];
+                                          const pendingNames = allAuthorizedNames.filter(name => !approvedSet.has(name));
+
+                                          if (pendingNames.length > 0) {
+                                            return (
+                                              <div>
+                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Others authorized</p>
+                                                <ul className="text-xs space-y-1">
+                                                  {pendingNames.map((name, i) => (
+                                                    <li key={i} className="text-muted-foreground/70">{name}</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            );
+                                          }
+                                          return null;
+                                        })()}
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isInitiator ? (
