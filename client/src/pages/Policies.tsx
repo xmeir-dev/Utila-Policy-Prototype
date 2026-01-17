@@ -542,7 +542,6 @@ export default function Policies() {
             </Button>
             <div className="flex-1">
               <h2 className="font-bold font-display text-foreground text-[24px]">Policies</h2>
-              <p className="text-sm mt-1 text-[#8a8a8a]">Set transfer approval rules for Waystar Royco</p>
             </div>
           </div>
 
