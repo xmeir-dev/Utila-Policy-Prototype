@@ -33,8 +33,9 @@ export interface IStorage {
   getPendingPolicyChanges(userName: string): Promise<Policy[]>;
   createPolicy(policy: InsertPolicy): Promise<Policy>;
   updatePolicy(id: number, policy: Partial<InsertPolicy>): Promise<Policy | undefined>;
-  submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string): Promise<Policy | undefined>;
-  submitPolicyDeletion(id: number, submitter: string): Promise<Policy | undefined>;
+  submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string, submitterName?: string): Promise<Policy | undefined | { error: string }>;
+  submitPolicyDeletion(id: number, submitter: string, submitterName?: string): Promise<Policy | undefined | { error: string }>;
+  cancelPolicyChange(id: number): Promise<Policy | undefined>;
   deletePolicy(id: number): Promise<boolean>;
   togglePolicy(id: number): Promise<Policy | undefined>;
   reorderPolicies(orderedIds: number[]): Promise<Policy[]>;
@@ -127,8 +128,11 @@ export class DatabaseStorage implements IStorage {
    * Queues a policy modification for approval.
    * The original policy remains active until the change is fully approved.
    * Uses approval settings from existing policies to determine quorum requirements.
+   * 
+   * VALIDATION: Ensures the quorum can be reached after excluding the submitter
+   * from the list of approvers (since submitters cannot approve their own changes).
    */
-  async submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string): Promise<Policy | undefined> {
+  async submitPolicyChange(id: number, changes: Partial<InsertPolicy>, submitter: string, submitterName?: string): Promise<Policy | undefined | { error: string }> {
     const policy = await this.getPolicy(id);
     if (!policy) return undefined;
 
@@ -136,6 +140,33 @@ export class DatabaseStorage implements IStorage {
     // These are set when the policy is created and define who can modify the policy
     const approversList = policy.changeApproversList || [];
     const quorumRequired = policy.changeApprovalsRequired || 1;
+
+    // CRITICAL FIX: Validate that quorum is achievable after excluding the submitter
+    // The submitter cannot approve their own change, so we need at least quorumRequired
+    // other approvers available
+    if (approversList.length > 0) {
+      const effectiveName = submitterName || submitter;
+      
+      // Safety check: If the resolved name looks like a wallet address (starts with "0x"),
+      // but the approvers list contains human names, we can't reliably identify the submitter
+      // to exclude them from the quorum calculation. Fail safe by blocking the submission.
+      const nameIsWalletAddress = effectiveName.startsWith('0x');
+      const approversAreNames = approversList.every(name => !name.startsWith('0x'));
+      
+      if (nameIsWalletAddress && approversAreNames) {
+        return { 
+          error: `Cannot submit change: Unable to verify your identity against the approvers list. Please contact an administrator to ensure your wallet address is properly registered.`
+        };
+      }
+      
+      const eligibleApprovers = approversList.filter(name => name !== effectiveName);
+      
+      if (eligibleApprovers.length < quorumRequired) {
+        return { 
+          error: `Cannot submit change: This policy requires ${quorumRequired} approval(s), but only ${eligibleApprovers.length} eligible approver(s) remain after excluding you as the submitter. Either reduce the required approvals or have another authorized user submit this change.`
+        };
+      }
+    }
 
     const [updated] = await db
       .update(policies)
@@ -155,10 +186,40 @@ export class DatabaseStorage implements IStorage {
    * Queues a policy for deletion with approval workflow.
    * Uses __delete flag in pendingChanges to indicate deletion intent.
    * Prevents accidental or unauthorized removal of security policies.
+   * 
+   * VALIDATION: Ensures the quorum can be reached after excluding the submitter.
    */
-  async submitPolicyDeletion(id: number, submitter: string): Promise<Policy | undefined> {
+  async submitPolicyDeletion(id: number, submitter: string, submitterName?: string): Promise<Policy | undefined | { error: string }> {
     const policy = await this.getPolicy(id);
     if (!policy) return undefined;
+
+    const approversList = policy.changeApproversList || [];
+    const quorumRequired = policy.changeApprovalsRequired || 1;
+
+    // CRITICAL FIX: Validate that quorum is achievable after excluding the submitter
+    if (approversList.length > 0) {
+      const effectiveName = submitterName || submitter;
+      
+      // Safety check: If the resolved name looks like a wallet address (starts with "0x"),
+      // but the approvers list contains human names, we can't reliably identify the submitter
+      // to exclude them from the quorum calculation. Fail safe by blocking the submission.
+      const nameIsWalletAddress = effectiveName.startsWith('0x');
+      const approversAreNames = approversList.every(name => !name.startsWith('0x'));
+      
+      if (nameIsWalletAddress && approversAreNames) {
+        return { 
+          error: `Cannot submit deletion request: Unable to verify your identity against the approvers list. Please contact an administrator to ensure your wallet address is properly registered.`
+        };
+      }
+      
+      const eligibleApprovers = approversList.filter(name => name !== effectiveName);
+      
+      if (eligibleApprovers.length < quorumRequired) {
+        return { 
+          error: `Cannot submit deletion request: This policy requires ${quorumRequired} approval(s), but only ${eligibleApprovers.length} eligible approver(s) remain after excluding you as the submitter. Either reduce the required approvals or have another authorized user submit this request.`
+        };
+      }
+    }
 
     // Use the policy's own governance settings - no need to override them
     const [updated] = await db
@@ -168,6 +229,28 @@ export class DatabaseStorage implements IStorage {
         pendingChanges: JSON.stringify({ __delete: true }),
         changeApprovers: [],
         changeInitiator: submitter,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(policies.id, id))
+      .returning();
+    return updated;
+  }
+
+  /**
+   * Cancels a pending policy change, returning the policy to active status.
+   * Can be used by authorized approvers to unstick policies with impossible quorum.
+   */
+  async cancelPolicyChange(id: number): Promise<Policy | undefined> {
+    const policy = await this.getPolicy(id);
+    if (!policy || policy.status !== 'pending_approval') return undefined;
+
+    const [updated] = await db
+      .update(policies)
+      .set({
+        status: 'active',
+        pendingChanges: null,
+        changeApprovers: null,
+        changeInitiator: null,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(policies.id, id))

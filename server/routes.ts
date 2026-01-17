@@ -308,9 +308,13 @@ Return JSON: {
       }
       
       // Changes require multi-party approval before taking effect
-      const policy = await storage.submitPolicyChange(id, input, submitter);
+      const policy = await storage.submitPolicyChange(id, input, submitter, submitterName);
       if (!policy) {
         return res.status(404).json({ message: "Policy not found" });
+      }
+      // Check if validation failed (impossible quorum scenario)
+      if ('error' in policy) {
+        return res.status(400).json({ message: policy.error });
       }
       res.status(200).json(policy);
     } catch (err) {
@@ -361,13 +365,48 @@ Return JSON: {
         });
       }
       
-      const policy = await storage.submitPolicyDeletion(id, submitter);
+      const policy = await storage.submitPolicyDeletion(id, submitter, submitterName);
       if (!policy) {
         return res.status(404).json({ message: "Policy not found" });
+      }
+      // Check if validation failed (impossible quorum scenario)
+      if ('error' in policy) {
+        return res.status(400).json({ message: policy.error });
       }
       res.status(200).json(policy);
     } catch (err) {
       res.status(500).json({ message: "Failed to submit deletion request" });
+    }
+  });
+
+  /**
+   * Cancels a pending policy change, returning the policy to active status.
+   * Used to unstick policies where approval quorum became impossible.
+   */
+  app.post('/api/policies/:id/cancel-change', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid policy ID" });
+      }
+      
+      const cancelerName = req.body.cancelerName as string;
+      
+      // Check if user is authorized to cancel (must be an approver)
+      const canModify = await storage.canUserModifyPolicy(id, cancelerName);
+      if (!canModify) {
+        return res.status(403).json({ 
+          message: "You are not authorized to cancel this change. Only designated approvers can cancel pending changes." 
+        });
+      }
+      
+      const policy = await storage.cancelPolicyChange(id);
+      if (!policy) {
+        return res.status(404).json({ message: "Policy not found or not pending approval" });
+      }
+      res.status(200).json(policy);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to cancel policy change" });
     }
   });
 

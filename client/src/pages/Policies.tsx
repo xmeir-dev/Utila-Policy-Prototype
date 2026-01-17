@@ -460,6 +460,27 @@ export default function Policies() {
     },
   });
 
+  const cancelChangeMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('POST', `/api/policies/${id}/cancel-change`, { 
+        cancelerName: walletState.connectedUser?.name || 'anonymous' 
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.policies.list.path] });
+      setViewingPendingPolicyId(null);
+      toast({ title: "Pending change cancelled" });
+    },
+    onError: (error: Error) => {
+      const message = error.message || "Failed to cancel change";
+      toast({ 
+        title: message.includes("not authorized") ? "Not Authorized" : "Failed to cancel change", 
+        description: message.includes("not authorized") ? message : undefined,
+        variant: "destructive" 
+      });
+    },
+  });
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
@@ -662,6 +683,12 @@ export default function Policies() {
                     const isUserInitiator = viewingPendingPolicy.changeInitiator === walletState.walletAddress;
                     const canApprove = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '') && !isUserInitiator;
                     const hasUserApproved = viewingPendingPolicy.changeApprovers?.includes(walletState.connectedUser?.name || '');
+                    const canCancel = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '');
+                    
+                    const approversList = viewingPendingPolicy.changeApproversList || [];
+                    const initiatorAsName = addressToName(initiatorName);
+                    const eligibleApprovers = approversList.filter((name: string) => name !== initiatorAsName);
+                    const isQuorumImpossible = eligibleApprovers.length < requiredApprovals;
                     
                     return (
                       <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
@@ -692,19 +719,41 @@ export default function Policies() {
                               </div>
                             )}
                           </div>
-                          {canApprove && !hasUserApproved && (
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => {
-                                approveMutation.mutate(viewingPendingPolicy.id);
-                              }}
-                              disabled={approveMutation.isPending}
-                              data-testid="button-approve-deletion"
-                            >
-                              {approveMutation.isPending ? 'Approving...' : 'Approve Deletion'}
-                            </Button>
+                          {isQuorumImpossible && (
+                            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                              <p className="text-sm text-destructive font-medium">
+                                This change cannot be approved: {requiredApprovals} approval(s) required, but only {eligibleApprovers.length} eligible approver(s) available after excluding the submitter.
+                              </p>
+                            </div>
                           )}
+                          <div className="flex gap-2 flex-wrap">
+                            {canApprove && !hasUserApproved && !isQuorumImpossible && (
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => {
+                                  approveMutation.mutate(viewingPendingPolicy.id);
+                                }}
+                                disabled={approveMutation.isPending}
+                                data-testid="button-approve-deletion"
+                              >
+                                {approveMutation.isPending ? 'Approving...' : 'Approve Deletion'}
+                              </Button>
+                            )}
+                            {canCancel && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  cancelChangeMutation.mutate(viewingPendingPolicy.id);
+                                }}
+                                disabled={cancelChangeMutation.isPending}
+                                data-testid="button-cancel-deletion"
+                              >
+                                {cancelChangeMutation.isPending ? 'Cancelling...' : 'Cancel Request'}
+                              </Button>
+                            )}
+                          </div>
                           {isUserInitiator && (
                             <Badge variant="secondary" className="text-xs">You initiated this change</Badge>
                           )}
@@ -722,6 +771,12 @@ export default function Policies() {
                   const isUserInitiator = viewingPendingPolicy.changeInitiator === walletState.walletAddress;
                   const canApprove = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '') && !isUserInitiator;
                   const hasUserApproved = viewingPendingPolicy.changeApprovers?.includes(walletState.connectedUser?.name || '');
+                  const canCancel = viewingPendingPolicy.changeApproversList?.includes(walletState.connectedUser?.name || '');
+                  
+                  const approversList = viewingPendingPolicy.changeApproversList || [];
+                  const initiatorAsName = addressToName(initiatorName);
+                  const eligibleApprovers = approversList.filter((name: string) => name !== initiatorAsName);
+                  const isQuorumImpossible = eligibleApprovers.length < requiredApprovals;
                   
                   return (
                     <>
@@ -795,18 +850,40 @@ export default function Policies() {
                               </div>
                             )}
                           </div>
-                          {canApprove && !hasUserApproved && (
-                            <Button 
-                              size="sm"
-                              onClick={() => {
-                                approveMutation.mutate(viewingPendingPolicy.id);
-                              }}
-                              disabled={approveMutation.isPending}
-                              data-testid="button-approve-change"
-                            >
-                              {approveMutation.isPending ? 'Approving...' : 'Approve Change'}
-                            </Button>
+                          {isQuorumImpossible && (
+                            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                              <p className="text-sm text-destructive font-medium">
+                                This change cannot be approved: {requiredApprovals} approval(s) required, but only {eligibleApprovers.length} eligible approver(s) available after excluding the submitter.
+                              </p>
+                            </div>
                           )}
+                          <div className="flex gap-2 flex-wrap">
+                            {canApprove && !hasUserApproved && !isQuorumImpossible && (
+                              <Button 
+                                size="sm"
+                                onClick={() => {
+                                  approveMutation.mutate(viewingPendingPolicy.id);
+                                }}
+                                disabled={approveMutation.isPending}
+                                data-testid="button-approve-change"
+                              >
+                                {approveMutation.isPending ? 'Approving...' : 'Approve Change'}
+                              </Button>
+                            )}
+                            {canCancel && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  cancelChangeMutation.mutate(viewingPendingPolicy.id);
+                                }}
+                                disabled={cancelChangeMutation.isPending}
+                                data-testid="button-cancel-change"
+                              >
+                                {cancelChangeMutation.isPending ? 'Cancelling...' : 'Cancel Request'}
+                              </Button>
+                            )}
+                          </div>
                           {isUserInitiator && (
                             <Badge variant="secondary" className="text-xs">You initiated this change</Badge>
                           )}
