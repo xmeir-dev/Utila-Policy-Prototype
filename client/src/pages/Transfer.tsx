@@ -430,7 +430,8 @@ export default function Transfer() {
         quorumRequired: simulationResult.matchedPolicy?.quorumRequired || 1,
         fromWallet: sourceWalletName,
         toAddress: recipients[0]?.address || "",
-        toLabel: recipients[0]?.label || ""
+        toLabel: recipients[0]?.label || "",
+        authorizedApprovers: simulationResult.matchedPolicy?.approvers || []
       });
 
       queryClient.invalidateQueries({ queryKey: ["/api/transactions/pending"] });

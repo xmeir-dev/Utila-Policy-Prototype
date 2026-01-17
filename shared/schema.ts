@@ -80,6 +80,9 @@ export const transactions = pgTable("transactions", {
   toAddress: text("to_address"),
   // Human-readable label for destination (e.g., "Bank of America")
   toLabel: text("to_label"),
+  // Array of authorized approver names from the matched policy
+  // Used to check if initiator's approval should auto-count
+  authorizedApprovers: text("authorized_approvers").array(),
   // ISO timestamp when transaction was created
   createdAt: text("created_at").default("now()"),
 });
