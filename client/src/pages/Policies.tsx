@@ -555,9 +555,12 @@ export default function Policies() {
           <div className="space-y-4">
             {policies.length > 0 && (
               <div className="flex justify-center gap-3">
-                <Button
-                  onClick={() => setShowAddModal(true)}
-                  className="gap-2 rounded-lg"
+                <Button 
+                  className="mt-2 gap-2 rounded-lg" 
+                  onClick={() => {
+                    setPrefilledAiPrompt(undefined);
+                    setShowAddModal(true);
+                  }}
                   data-testid="button-add-policy-header"
                 >
                   <Plus className="w-4 h-4" />
