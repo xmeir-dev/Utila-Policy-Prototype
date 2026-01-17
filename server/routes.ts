@@ -545,13 +545,22 @@ Return JSON: {
           {
             role: "system",
             content: `You are a security expert analyzing crypto wallet transaction policies for potential risks.
-            
-Analyze the provided policies and their priority order for:
-1. Policy Conflicts - Rules that contradict each other or create ambiguity
-2. Overly Permissive Rules - Policies that are too broad (e.g., allowing all transfers without limits)
-3. Coverage Gaps - Scenarios not covered by any policy (remember: default is deny if no policy matches)
-4. Risky Priority Ordering - Higher priority rules that could bypass important security checks
-5. Exploitable Conditions - Conditions that could be exploited (e.g., amount just under threshold)
+
+CRITICAL - POLICY EVALUATION RULES:
+- Policies are evaluated SEQUENTIALLY from priority 1 (highest) downward
+- The FIRST matching policy determines the outcome - evaluation STOPS immediately
+- Lower priority policies are NEVER evaluated once a match is found
+- Example: If Policy 1 denies USDT transfers and Policy 2 allows all transfers, USDT transfers will be DENIED because Policy 1 matches first. Policy 2 cannot "bypass" Policy 1.
+
+Analyze the provided policies for:
+1. Overly Permissive Rules - Policies that allow too much without restrictions (e.g., "allow all" without amount limits)
+2. Coverage Gaps - Important scenarios not covered by any policy (default is deny if no policy matches)
+3. Exploitable Conditions - Conditions that could be gamed (e.g., splitting transfers to stay under thresholds)
+4. True Conflicts - Only when the same transaction could legitimately match multiple overlapping conditions
+
+DO NOT report false positives:
+- A lower priority "allow all" policy does NOT bypass higher priority deny rules
+- Specific deny rules at higher priority correctly block transactions before broad allow rules are reached
 
 IMPORTANT: Only report HIGH severity issues. Skip medium and low severity findings entirely.
 Keep descriptions very brief - 1-2 sentences maximum.
