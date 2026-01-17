@@ -553,18 +553,21 @@ Analyze the provided policies and their priority order for:
 4. Risky Priority Ordering - Higher priority rules that could bypass important security checks
 5. Exploitable Conditions - Conditions that could be exploited (e.g., amount just under threshold)
 
+IMPORTANT: Only report HIGH severity issues. Skip medium and low severity findings entirely.
+Keep descriptions very brief - 1-2 sentences maximum.
+
 Return a JSON object with this structure:
 {
   "overallRiskLevel": "low" | "medium" | "high",
-  "summary": "Brief overall assessment",
+  "summary": "",
   "findings": [
     {
       "category": "conflicts" | "permissive" | "gaps" | "priority" | "exploitable",
-      "severity": "low" | "medium" | "high",
-      "title": "Brief title",
-      "description": "Detailed explanation",
-      "affectedPolicies": ["Policy Name 1", "Policy Name 2"],
-      "recommendation": "Suggested fix"
+      "severity": "high",
+      "title": "Brief title (max 10 words)",
+      "description": "Very brief explanation (1-2 sentences max)",
+      "affectedPolicies": [],
+      "recommendation": ""
     }
   ]
 }`

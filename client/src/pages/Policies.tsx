@@ -716,79 +716,55 @@ export default function Policies() {
                 </div>
               )}
 
-              {riskAnalysisResult && (
-                <Card className="mt-4 p-4 border-2" data-testid="risk-analysis-results">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      {riskAnalysisResult.overallRiskLevel === 'low' ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : riskAnalysisResult.overallRiskLevel === 'medium' ? (
-                        <AlertCircle className="w-5 h-5 text-amber-500" />
-                      ) : (
-                        <AlertTriangle className="w-5 h-5 text-red-500" />
-                      )}
-                      <span className="font-semibold text-foreground">
-                        Risk Assessment: {riskAnalysisResult.overallRiskLevel.charAt(0).toUpperCase() + riskAnalysisResult.overallRiskLevel.slice(1)}
-                      </span>
+              {riskAnalysisResult && (() => {
+                const highRiskFindings = riskAnalysisResult.findings.filter(f => f.severity === 'high');
+                return (
+                  <Card className="mt-4 p-4 border-2" data-testid="risk-analysis-results">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        {highRiskFindings.length > 0 ? (
+                          <AlertTriangle className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        )}
+                        <span className="font-semibold text-foreground">
+                          {highRiskFindings.length > 0 
+                            ? `You have ${highRiskFindings.length} potential issue${highRiskFindings.length !== 1 ? 's' : ''}`
+                            : 'No issues found'
+                          }
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setRiskAnalysisResult(null)}
+                        data-testid="button-dismiss-risks"
+                      >
+                        Dismiss
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setRiskAnalysisResult(null)}
-                      data-testid="button-dismiss-risks"
-                    >
-                      Dismiss
-                    </Button>
-                  </div>
-                  
-                  <p className="text-sm text-muted-foreground mb-4">{riskAnalysisResult.summary}</p>
-                  
-                  {riskAnalysisResult.findings.length === 0 ? (
-                    <div className="text-center py-4 text-sm text-muted-foreground">
-                      No specific risks identified
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {riskAnalysisResult.findings.map((finding, index) => (
-                        <div 
-                          key={index} 
-                          className={cn(
-                            "p-3 rounded-lg border",
-                            finding.severity === 'high' ? 'bg-red-500/10 border-red-500/30' :
-                            finding.severity === 'medium' ? 'bg-amber-500/10 border-amber-500/30' :
-                            'bg-muted/50 border-border'
-                          )}
-                          data-testid={`risk-finding-${index}`}
-                        >
-                          <div className="flex items-start gap-2 mb-2">
-                            <Badge 
-                              variant="outline" 
-                              className={cn(
-                                "text-xs shrink-0",
-                                finding.severity === 'high' ? 'text-red-600 border-red-600/30' :
-                                finding.severity === 'medium' ? 'text-amber-600 border-amber-600/30' :
-                                'text-muted-foreground'
-                              )}
-                            >
-                              {finding.severity}
-                            </Badge>
+                    
+                    {highRiskFindings.length === 0 ? (
+                      <div className="text-center py-4 text-sm text-muted-foreground">
+                        No high priority issues identified
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {highRiskFindings.map((finding, index) => (
+                          <div 
+                            key={index} 
+                            className="p-3 rounded-lg border bg-red-500/10 border-red-500/30"
+                            data-testid={`risk-finding-${index}`}
+                          >
                             <span className="font-medium text-sm text-foreground">{finding.title}</span>
+                            <p className="text-sm text-muted-foreground mt-1">{finding.description}</p>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">{finding.description}</p>
-                          {finding.affectedPolicies.length > 0 && (
-                            <p className="text-xs text-muted-foreground mb-2">
-                              Affected: {finding.affectedPolicies.join(', ')}
-                            </p>
-                          )}
-                          <p className="text-sm text-foreground/80">
-                            <span className="font-medium">Recommendation:</span> {finding.recommendation}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              )}
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                );
+              })()}
           </div>
         </motion.div>
       </main>
