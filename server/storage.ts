@@ -87,6 +87,16 @@ export class DatabaseStorage implements IStorage {
       ...tx,
       createdAt: new Date().toISOString(),
     }).returning();
+
+    // If the transaction requires approval and the initiator is an authorized approver, 
+    // count their initiation as the first approval.
+    if (transaction.status === 'pending' && transaction.quorumRequired && transaction.quorumRequired > 0) {
+      const [policy] = await db.select().from(policies).where(eq(policies.id, transaction.policyId!));
+      if (policy && policy.approvers?.includes(transaction.initiatorName || '')) {
+        return await this.approveTransaction(transaction.id, transaction.initiatorName!) || transaction;
+      }
+    }
+
     return transaction;
   }
 
