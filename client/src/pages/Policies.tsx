@@ -602,7 +602,7 @@ export default function Policies() {
                     Add Your First Policy
                   </Button>
                   <div className="mt-4 space-y-2 w-full max-w-[380px]">
-                    <p className="text-xs text-muted-foreground text-center">Or try one of these suggestions:</p>
+                    <p className="text-center text-[#ababab] text-[14px]">Or try a suggestion</p>
                     <div className="flex flex-col gap-2">
                       {POLICY_SUGGESTIONS.map((suggestion, index) => (
                         <button
