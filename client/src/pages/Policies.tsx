@@ -798,11 +798,6 @@ export default function Policies() {
                   <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
                       <span className="font-medium tracking-wide text-[14px] text-[#171717] dark:text-foreground">All policies</span>
-                      {isAdvancedMode && (
-                        <Badge variant="secondary" className="text-xs no-default-hover-elevate">
-                          Advanced Mode
-                        </Badge>
-                      )}
                     </div>
                     <div className="flex items-center gap-3">
                       <Tooltip delayDuration={200}>
