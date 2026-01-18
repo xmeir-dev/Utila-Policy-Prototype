@@ -595,11 +595,11 @@ export class DatabaseStorage implements IStorage {
         .where(eq(policies.id, id))
         .returning();
 
-      // Record edit in history
+      // Record change-approval in history (final approval that applied the changes)
       await this.createPolicyHistory({
         policyId: id,
         policyName: updated.name,
-        action: 'edit',
+        action: 'change-approval',
         performedBy: approver,
         changes: JSON.stringify(pendingChanges),
       });

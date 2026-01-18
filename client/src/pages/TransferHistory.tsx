@@ -309,6 +309,29 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
           </Badge>
         );
       case "change-approval":
+        if (parsedChanges) {
+          return (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 cursor-help">
+                  <Users className="w-3 h-3" />
+                  Change approval
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[300px] p-3">
+                <div className="text-xs space-y-1">
+                  <p className="font-medium mb-2">Changes applied:</p>
+                  {Object.entries(parsedChanges).map(([key, value]) => (
+                    <div key={key} className="flex justify-between gap-2">
+                      <span className="text-muted-foreground">{key}:</span>
+                      <span className="font-medium">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          );
+        }
         return (
           <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1">
             <Users className="w-3 h-3" />
