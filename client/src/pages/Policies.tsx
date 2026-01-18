@@ -453,12 +453,16 @@ export default function Policies() {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState(false);
+  const [advancedOrder, setAdvancedOrder] = useState<number[]>([]);
   const { toast } = useToast();
   
   const ADVANCED_MODE_PASSWORD = "utila";
   
   const handlePasswordSubmit = () => {
     if (passwordInput === ADVANCED_MODE_PASSWORD) {
+      // Initialize advanced order from current restrictive-sorted view
+      const sortedPolicies = sortPoliciesByActionPriority(policies);
+      setAdvancedOrder(sortedPolicies.map(p => p.id));
       setIsAdvancedMode(true);
       setShowPasswordDialog(false);
       setPasswordInput("");
@@ -483,8 +487,12 @@ export default function Policies() {
   // Derive the viewing policy from fresh query data to avoid stale state
   const viewingPendingPolicy = viewingPendingPolicyId ? policies.find(p => p.id === viewingPendingPolicyId) || null : null;
   
-  // In default mode, sort by action priority; in advanced mode, use server order (manual priority)
-  const displayedPolicies = isAdvancedMode ? policies : sortPoliciesByActionPriority(policies);
+  // In default mode, sort by action priority; in advanced mode, use the local advancedOrder
+  const displayedPolicies = isAdvancedMode 
+    ? advancedOrder
+        .map(id => policies.find(p => p.id === id))
+        .filter((p): p is Policy => p !== undefined)
+    : sortPoliciesByActionPriority(policies);
 
   const createMutation = useMutation({
     mutationFn: async (policy: InsertPolicy) => {
@@ -687,10 +695,11 @@ export default function Policies() {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
-      const oldIndex = policies.findIndex((p) => p.id === active.id);
-      const newIndex = policies.findIndex((p) => p.id === over.id);
-      const newOrder = arrayMove(policies, oldIndex, newIndex);
-      reorderMutation.mutate(newOrder.map(p => p.id));
+      const oldIndex = advancedOrder.indexOf(active.id as number);
+      const newIndex = advancedOrder.indexOf(over.id as number);
+      const newOrder = arrayMove(advancedOrder, oldIndex, newIndex);
+      setAdvancedOrder(newOrder);
+      reorderMutation.mutate(newOrder);
     }
   };
 
