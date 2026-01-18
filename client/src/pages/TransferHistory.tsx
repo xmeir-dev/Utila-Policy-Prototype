@@ -418,11 +418,11 @@ export default function TransferHistory() {
               <table className="w-full" data-testid="table-transactions">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Date & Time</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Initiator</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Amount</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">From</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">To</th>
-                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Date & Time</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Status</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Approvals</th>
                   </tr>
@@ -454,6 +454,12 @@ export default function TransferHistory() {
                           data-testid={`row-transaction-${tx.id}`}
                         >
                           <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="text-sm">{date}</span>
+                              <span className="text-xs text-[#8a8a8a]">{time}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
                             <span className="text-sm font-normal">{tx.initiatorName || "-"}</span>
                           </td>
                           <td className="px-6 py-4">
@@ -477,12 +483,6 @@ export default function TransferHistory() {
                               addresses={toAddresses} 
                               etherscanLogo={etherscanLogo} 
                             />
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex flex-col">
-                              <span className="text-sm">{date}</span>
-                              <span className="text-xs text-[#8a8a8a]">{time}</span>
-                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <StatusBadge status={tx.status} />
