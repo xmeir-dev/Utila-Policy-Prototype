@@ -266,6 +266,38 @@ const StatusBadge = ({ status }: { status: string }) => {
 const PolicyActionBadge = ({ action, changes }: { action: string; changes: string | null }) => {
   const parsedChanges = changes ? JSON.parse(changes) : null;
   
+  // Extract diff from new format or fall back to legacy format
+  const getDiff = () => {
+    if (!parsedChanges) return null;
+    if (parsedChanges.__diff) return parsedChanges.__diff;
+    // Legacy format - just show keys
+    return null;
+  };
+  
+  const diff = getDiff();
+  const hasDiff = diff && Object.keys(diff).length > 0;
+  
+  const renderChangesTooltip = (title: string) => (
+    <TooltipContent side="top" className="max-w-[350px] p-3">
+      {hasDiff ? (
+        <div className="text-xs space-y-1.5">
+          <p className="font-medium mb-2">{title}</p>
+          {Object.entries(diff).map(([key, value]: [string, any]) => (
+            <div key={key} className="text-left">
+              <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+              <span className="text-muted-foreground"> changed from </span>
+              <span className="text-red-500 line-through">{value.from}</span>
+              <span className="text-muted-foreground"> to </span>
+              <span className="text-emerald-600 font-medium">{value.to}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs">No change details available</p>
+      )}
+    </TooltipContent>
+  );
+  
   const getBadgeContent = () => {
     switch (action) {
       case "creation":
@@ -276,32 +308,26 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
           </Badge>
         );
       case "edit":
+        if (hasDiff) {
+          return (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <span className="inline-flex">
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help">
+                    <Clock className="w-3 h-3" />
+                    Edit
+                  </Badge>
+                </span>
+              </TooltipTrigger>
+              {renderChangesTooltip("Changes made:")}
+            </Tooltip>
+          );
+        }
         return (
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <span className="inline-flex">
-                <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help">
-                  <Clock className="w-3 h-3" />
-                  Edit
-                </Badge>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-[300px] p-3">
-              {parsedChanges ? (
-                <div className="text-xs space-y-1">
-                  <p className="font-medium mb-2">Changes made:</p>
-                  {Object.entries(parsedChanges).map(([key, value]) => (
-                    <div key={key} className="flex justify-between gap-2">
-                      <span className="text-muted-foreground">{key}:</span>
-                      <span className="font-medium">{String(value)}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs">No change details available</p>
-              )}
-            </TooltipContent>
-          </Tooltip>
+          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1">
+            <Clock className="w-3 h-3" />
+            Edit
+          </Badge>
         );
       case "deletion":
         return (
@@ -311,7 +337,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
           </Badge>
         );
       case "change-approval":
-        if (parsedChanges) {
+        if (hasDiff) {
           return (
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
@@ -322,17 +348,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
                   </Badge>
                 </span>
               </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[300px] p-3">
-                <div className="text-xs space-y-1">
-                  <p className="font-medium mb-2">Changes applied:</p>
-                  {Object.entries(parsedChanges).map(([key, value]) => (
-                    <div key={key} className="flex justify-between gap-2">
-                      <span className="text-muted-foreground">{key}:</span>
-                      <span className="font-medium">{String(value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </TooltipContent>
+              {renderChangesTooltip("Changes applied:")}
             </Tooltip>
           );
         }

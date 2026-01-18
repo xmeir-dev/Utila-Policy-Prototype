@@ -137,6 +137,40 @@ export class DatabaseStorage implements IStorage {
   }
 
   /**
+   * Computes a human-readable diff between old policy and new changes.
+   * Returns an object with field names as keys and {from, to} as values.
+   */
+  private computePolicyDiff(oldPolicy: Policy, newChanges: Partial<InsertPolicy>): Record<string, { from: string; to: string }> {
+    const diff: Record<string, { from: string; to: string }> = {};
+    
+    // Fields to track for changes (user-facing fields only)
+    const trackableFields = [
+      'name', 'description', 'action', 'isActive', 'priority', 'conditionLogic',
+      'initiatorType', 'initiatorValues', 'sourceWalletType', 'sourceWallets',
+      'destinationType', 'destinationValues', 'amountCondition', 'amountMin', 'amountMax',
+      'assetType', 'assetValues', 'approvers', 'quorumRequired',
+      'changeApproversList', 'changeApprovalsRequired'
+    ];
+
+    for (const field of trackableFields) {
+      if (field in newChanges) {
+        const oldValue = (oldPolicy as any)[field];
+        const newValue = (newChanges as any)[field];
+        
+        // Convert to string for comparison
+        const oldStr = Array.isArray(oldValue) ? oldValue.join(', ') || '(none)' : String(oldValue ?? '(none)');
+        const newStr = Array.isArray(newValue) ? newValue.join(', ') || '(none)' : String(newValue ?? '(none)');
+        
+        if (oldStr !== newStr) {
+          diff[field] = { from: oldStr, to: newStr };
+        }
+      }
+    }
+    
+    return diff;
+  }
+
+  /**
    * Queues a policy modification for approval.
    * If the submitter is in the approvers list, their submission counts as 1 approval.
    * If this meets the quorum, changes are applied immediately (auto-approved).
@@ -150,6 +184,9 @@ export class DatabaseStorage implements IStorage {
     const approversList = policy.changeApproversList || [];
     const quorumRequired = policy.changeApprovalsRequired || 1;
     const effectiveName = submitterName || submitter;
+
+    // Compute the diff for history tracking
+    const policyDiff = this.computePolicyDiff(policy, changes);
 
     // Safety check: If the resolved name looks like a wallet address (starts with "0x"),
     // but the approvers list contains human names, we can't reliably identify the submitter.
@@ -184,13 +221,13 @@ export class DatabaseStorage implements IStorage {
         .where(eq(policies.id, id))
         .returning();
 
-      // Record edit in history (auto-approved)
+      // Record edit in history (auto-approved) with diff
       await this.createPolicyHistory({
         policyId: id,
         policyName: updated.name,
         action: 'edit',
         performedBy: effectiveName,
-        changes: JSON.stringify(changes),
+        changes: JSON.stringify({ __diff: policyDiff, __raw: changes }),
       });
 
       return updated;
@@ -207,11 +244,12 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Queue the change with submitter's approval pre-counted
+    // Store both the raw changes and the computed diff
     const [updated] = await db
       .update(policies)
       .set({
         status: 'pending_approval',
-        pendingChanges: JSON.stringify(changes),
+        pendingChanges: JSON.stringify({ __raw: changes, __diff: policyDiff }),
         changeApprovers: initialApprovals,
         changeInitiator: submitter,
         updatedAt: new Date().toISOString(),
@@ -563,10 +601,10 @@ export class DatabaseStorage implements IStorage {
 
     if (newApprovals.length >= requiredApprovals) {
       // Quorum reached - apply the pending changes
-      const pendingChanges = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
+      const pendingData = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
       
       // Handle deletion vs. modification
-      if (pendingChanges.__delete === true) {
+      if (pendingData.__delete === true) {
         await db.delete(policies).where(eq(policies.id, id));
         
         // Record deletion in history
@@ -581,11 +619,15 @@ export class DatabaseStorage implements IStorage {
         return { ...policy, status: 'deleted' } as Policy;
       }
       
+      // Extract raw changes and diff from pending data
+      const rawChanges = pendingData.__raw || pendingData;
+      const policyDiff = pendingData.__diff || null;
+      
       // Apply modifications and reset approval tracking
       const [updated] = await db
         .update(policies)
         .set({
-          ...pendingChanges,
+          ...rawChanges,
           status: 'active',
           pendingChanges: null,
           changeApprovers: null,
@@ -601,7 +643,7 @@ export class DatabaseStorage implements IStorage {
         policyName: updated.name,
         action: 'change-approval',
         performedBy: approver,
-        changes: JSON.stringify(pendingChanges),
+        changes: JSON.stringify({ __diff: policyDiff, __raw: rawChanges }),
       });
 
       return updated;
