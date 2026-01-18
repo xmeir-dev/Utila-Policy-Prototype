@@ -16,8 +16,9 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, ShieldEllipsis,
   Trash2, Scale, GripVertical, Settings, TestTubeDiagonal, ChevronRight,
-  AlertTriangle, CheckCircle, AlertCircle, Loader2
+  AlertTriangle, CheckCircle, AlertCircle, Loader2, Lock
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -161,7 +162,7 @@ function getConditionSummary(policy: Policy): string[] {
   return conditions;
 }
 
-interface SortablePolicyItemProps {
+interface PolicyItemProps {
   policy: Policy;
   index: number;
   totalPolicies: number;
@@ -173,56 +174,40 @@ interface SortablePolicyItemProps {
 }
 
 /**
- * Individual policy row in the sortable list.
- * Integrates with dnd-kit for drag-and-drop reordering.
- * Shows pending change/deletion status with interactive tooltips.
+ * Shared policy item content used by both sortable and static variants.
+ * Renders the policy row content without drag-and-drop functionality.
  */
-function SortablePolicyItem({ 
+function PolicyItemContent({ 
   policy, 
   index, 
   totalPolicies,
-  onToggle, 
   onEdit,
-  onApprove,
   onShowPending,
-  isToggling
-}: SortablePolicyItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: policy.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
+  showDragHandle = false,
+  dragHandleProps,
+}: PolicyItemProps & { 
+  showDragHandle?: boolean;
+  dragHandleProps?: {
+    attributes: Record<string, unknown>;
+    listeners: Record<string, unknown> | undefined;
   };
-
-  const ActionIcon = getActionIcon(policy.action);
-  const conditions = getConditionSummary(policy);
+}) {
   const isPendingApproval = policy.status === 'pending_approval';
   const pendingChanges = policy.pendingChanges ? JSON.parse(policy.pendingChanges) : {};
   const isPendingDeletion = isPendingApproval && pendingChanges.__delete === true;
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`flex items-start gap-3 px-4 py-4 ${index !== totalPolicies - 1 ? 'border-b border-border' : ''} ${isDragging ? 'bg-muted/50' : ''}`}
-      data-testid={`policy-item-${policy.id}`}
-    >
-      <button
-        className="mt-1 text-[#ababab] hover:text-foreground transition-colors"
-        {...attributes}
-        {...listeners}
-        data-testid={`drag-handle-${policy.id}`}
-      >
-        <GripVertical className="w-4 h-4" />
-      </button>
+    <>
+      {showDragHandle && dragHandleProps && (
+        <button
+          className="mt-1 text-[#ababab] hover:text-foreground transition-colors"
+          {...dragHandleProps.attributes}
+          {...dragHandleProps.listeners}
+          data-testid={`drag-handle-${policy.id}`}
+        >
+          <GripVertical className="w-4 h-4" />
+        </button>
+      )}
       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-medium text-muted-foreground shrink-0">
         {index + 1}
       </div>
@@ -311,7 +296,62 @@ function SortablePolicyItem({
             </TooltipContent>
           )}
         </Tooltip>
-        </div>
+      </div>
+    </>
+  );
+}
+
+/**
+ * Static policy item for default view (no drag-and-drop).
+ * Used when not in advanced mode.
+ */
+function StaticPolicyItem(props: PolicyItemProps) {
+  const { policy, index, totalPolicies } = props;
+  
+  return (
+    <div
+      className={`flex items-start gap-3 px-4 py-4 ${index !== totalPolicies - 1 ? 'border-b border-border' : ''}`}
+      data-testid={`policy-item-${policy.id}`}
+    >
+      <PolicyItemContent {...props} showDragHandle={false} />
+    </div>
+  );
+}
+
+/**
+ * Sortable policy item for advanced mode with drag-and-drop.
+ * Integrates with dnd-kit for reordering.
+ */
+function SortablePolicyItem(props: PolicyItemProps) {
+  const { policy, index, totalPolicies } = props;
+  
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: policy.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-start gap-3 px-4 py-4 ${index !== totalPolicies - 1 ? 'border-b border-border' : ''} ${isDragging ? 'bg-muted/50' : ''}`}
+      data-testid={`policy-item-${policy.id}`}
+    >
+      <PolicyItemContent 
+        {...props} 
+        showDragHandle={true} 
+        dragHandleProps={{ attributes, listeners }}
+      />
     </div>
   );
 }
@@ -373,6 +413,31 @@ interface RiskAnalysisResult {
   findings: RiskFinding[];
 }
 
+/**
+ * Sorts policies by action priority (deny > require_approval > allow) with newest as tie-breaker.
+ * This is the default sorting logic used when not in advanced mode.
+ */
+function sortPoliciesByActionPriority(policies: Policy[]): Policy[] {
+  const actionPriority: Record<string, number> = {
+    'deny': 0,
+    'require_approval': 1,
+    'allow': 2,
+    'approve': 2, // Legacy support
+  };
+  
+  return [...policies].sort((a, b) => {
+    const priorityA = actionPriority[a.action] ?? 3;
+    const priorityB = actionPriority[b.action] ?? 3;
+    
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+    
+    // Tie-breaker: newest (higher id) wins - shown first
+    return b.id - a.id;
+  });
+}
+
 export default function Policies() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -382,7 +447,25 @@ export default function Policies() {
   const [viewingPendingPolicyId, setViewingPendingPolicyId] = useState<number | null>(null);
   const [prefilledAiPrompt, setPrefilledAiPrompt] = useState<string | undefined>(undefined);
   const [riskAnalysisResult, setRiskAnalysisResult] = useState<RiskAnalysisResult | null>(null);
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const { toast } = useToast();
+  
+  const ADVANCED_MODE_PASSWORD = "utila";
+  
+  const handlePasswordSubmit = () => {
+    if (passwordInput === ADVANCED_MODE_PASSWORD) {
+      setIsAdvancedMode(true);
+      setShowPasswordDialog(false);
+      setPasswordInput("");
+      setPasswordError(false);
+      toast({ title: "Advanced mode enabled", description: "You can now manually reorder policies." });
+    } else {
+      setPasswordError(true);
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -397,6 +480,9 @@ export default function Policies() {
 
   // Derive the viewing policy from fresh query data to avoid stale state
   const viewingPendingPolicy = viewingPendingPolicyId ? policies.find(p => p.id === viewingPendingPolicyId) || null : null;
+  
+  // In default mode, sort by action priority; in advanced mode, use server order (manual priority)
+  const displayedPolicies = isAdvancedMode ? policies : sortPoliciesByActionPriority(policies);
 
   const createMutation = useMutation({
     mutationFn: async (policy: InsertPolicy) => {
@@ -697,29 +783,79 @@ export default function Policies() {
                 </Card>
               ) : (
                 <Card className="overflow-hidden">
-                  <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
+                  <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium tracking-wide text-[14px] text-[#171717]">All policies</span>
+                      <span className="font-medium tracking-wide text-[14px] text-[#171717] dark:text-foreground">All policies</span>
+                      {isAdvancedMode && (
+                        <Badge variant="secondary" className="text-xs no-default-hover-elevate">
+                          Advanced Mode
+                        </Badge>
+                      )}
                     </div>
-                    <span className="text-[14px] text-[#ababab]">
-                      Drag to reorder. Higher policies take priority
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[14px] text-[#ababab]">
+                        {isAdvancedMode 
+                          ? "Drag to reorder. Higher policies take priority" 
+                          : "Sorted by: Denied, then Approval, then Allowed"
+                        }
+                      </span>
+                      {isAdvancedMode ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => setIsAdvancedMode(false)}
+                          data-testid="button-exit-advanced-mode"
+                        >
+                          Exit Advanced
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => setShowPasswordDialog(true)}
+                          data-testid="button-enter-advanced-mode"
+                        >
+                          <Lock className="w-3 h-3" />
+                          Advanced
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={policies.map(p => p.id)}
-                      strategy={verticalListSortingStrategy}
+                  {isAdvancedMode ? (
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
                     >
-                      {policies.map((policy, index) => (
-                        <SortablePolicyItem
+                      <SortableContext
+                        items={displayedPolicies.map(p => p.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {displayedPolicies.map((policy, index) => (
+                          <SortablePolicyItem
+                            key={policy.id}
+                            policy={policy}
+                            index={index}
+                            totalPolicies={displayedPolicies.length}
+                            onToggle={() => toggleMutation.mutate(policy.id)}
+                            onEdit={() => setEditingPolicy(policy)}
+                            onApprove={() => approveMutation.mutate(policy.id)}
+                            onShowPending={(policy) => setViewingPendingPolicyId(policy.id)}
+                            isToggling={toggleMutation.isPending}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  ) : (
+                    <div>
+                      {displayedPolicies.map((policy, index) => (
+                        <StaticPolicyItem
                           key={policy.id}
                           policy={policy}
                           index={index}
-                          totalPolicies={policies.length}
+                          totalPolicies={displayedPolicies.length}
                           onToggle={() => toggleMutation.mutate(policy.id)}
                           onEdit={() => setEditingPolicy(policy)}
                           onApprove={() => approveMutation.mutate(policy.id)}
@@ -727,8 +863,8 @@ export default function Policies() {
                           isToggling={toggleMutation.isPending}
                         />
                       ))}
-                    </SortableContext>
-                  </DndContext>
+                    </div>
+                  )}
                 </Card>
               )}
 
@@ -1119,6 +1255,67 @@ export default function Policies() {
                 </div>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showPasswordDialog} onOpenChange={(open) => {
+        setShowPasswordDialog(open);
+        if (!open) {
+          setPasswordInput("");
+          setPasswordError(false);
+        }
+      }}>
+        <DialogContent className="sm:max-w-[400px] rounded-[24px] p-0 gap-0">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              Advanced Mode
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Enter password to access manual policy reordering.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6 space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Enter password"
+                value={passwordInput}
+                onChange={(e) => {
+                  setPasswordInput(e.target.value);
+                  setPasswordError(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handlePasswordSubmit();
+                  }
+                }}
+                className={passwordError ? "border-red-500" : ""}
+                data-testid="input-advanced-password"
+              />
+              {passwordError && (
+                <p className="text-sm text-red-500">Incorrect password</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPasswordDialog(false);
+                  setPasswordInput("");
+                  setPasswordError(false);
+                }}
+                data-testid="button-cancel-password"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handlePasswordSubmit}
+                data-testid="button-submit-password"
+              >
+                Unlock
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
