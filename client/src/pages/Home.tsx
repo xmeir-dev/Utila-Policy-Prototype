@@ -27,7 +27,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { ReviewDialog, ValueDiff } from "@/components/ReviewDialog";
+import { ReviewDialog, ValueDiff, hasValueChanged } from "@/components/ReviewDialog";
 import { useToast } from "@/hooks/use-toast";
 import type { Policy } from "@shared/schema";
 import { Trash2, AlertCircle } from "lucide-react";
@@ -598,29 +598,74 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5 mb-2">
-                      {isDelete ? "Policy to be Deleted" : "Proposed Changes"}
-                    </h4>
-                    
-                    <ValueDiff label="Policy Name" oldVal={selectedPolicy.name} newVal={pendingChanges.name} isDelete={isDelete} />
-                    <ValueDiff label="Description" oldVal={selectedPolicy.description} newVal={pendingChanges.description} isDelete={isDelete} />
-                    <ValueDiff label="Action" oldVal={selectedPolicy.action} newVal={pendingChanges.action} isDelete={isDelete} />
-                    <ValueDiff label="Condition Logic" oldVal={selectedPolicy.conditionLogic} newVal={pendingChanges.conditionLogic} isDelete={isDelete} />
-                    <ValueDiff label="Initiator Type" oldVal={selectedPolicy.initiatorType} newVal={pendingChanges.initiatorType} isDelete={isDelete} />
-                    <ValueDiff label="Initiators" oldVal={selectedPolicy.initiatorValues} newVal={pendingChanges.initiatorValues} isDelete={isDelete} />
-                    <ValueDiff label="Asset Type" oldVal={selectedPolicy.assetType} newVal={pendingChanges.assetType} isDelete={isDelete} />
-                    <ValueDiff label="Assets" oldVal={selectedPolicy.assetValues} newVal={pendingChanges.assetValues} isDelete={isDelete} />
-                    <ValueDiff label="Amount Condition" oldVal={selectedPolicy.amountCondition} newVal={pendingChanges.amountCondition} isDelete={isDelete} />
-                    <ValueDiff label="Min Amount" oldVal={selectedPolicy.amountMin} newVal={pendingChanges.amountMin} isDelete={isDelete} />
-                    <ValueDiff label="Max Amount" oldVal={selectedPolicy.amountMax} newVal={pendingChanges.amountMax} isDelete={isDelete} />
-                    <ValueDiff label="Approvers" oldVal={selectedPolicy.approvers} newVal={pendingChanges.approvers} isDelete={isDelete} />
-                    <ValueDiff label="Quorum Required" oldVal={selectedPolicy.quorumRequired} newVal={pendingChanges.quorumRequired} isDelete={isDelete} />
+                  {isDelete ? (
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5 mb-2">
+                        Policy to be Deleted
+                      </h4>
+                      <ValueDiff label="Policy Name" oldVal={selectedPolicy.name} newVal={pendingChanges.name} isDelete={true} />
+                      <ValueDiff label="Description" oldVal={selectedPolicy.description} newVal={pendingChanges.description} isDelete={true} />
+                      <ValueDiff label="Action" oldVal={selectedPolicy.action} newVal={pendingChanges.action} isDelete={true} />
+                    </div>
+                  ) : (
+                    <>
+                      {/* Changed Items Section */}
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5 mb-2">
+                          Changes
+                        </h4>
+                        
+                        <ValueDiff label="Policy Name" oldVal={selectedPolicy.name} newVal={pendingChanges.__raw?.name ?? pendingChanges.name} />
+                        <ValueDiff label="Description" oldVal={selectedPolicy.description} newVal={pendingChanges.__raw?.description ?? pendingChanges.description} />
+                        <ValueDiff label="Action" oldVal={selectedPolicy.action} newVal={pendingChanges.__raw?.action ?? pendingChanges.action} />
+                        <ValueDiff label="Condition Logic" oldVal={selectedPolicy.conditionLogic} newVal={pendingChanges.__raw?.conditionLogic ?? pendingChanges.conditionLogic} />
+                        <ValueDiff label="Initiator Type" oldVal={selectedPolicy.initiatorType} newVal={pendingChanges.__raw?.initiatorType ?? pendingChanges.initiatorType} />
+                        <ValueDiff label="Initiators" oldVal={selectedPolicy.initiatorValues} newVal={pendingChanges.__raw?.initiatorValues ?? pendingChanges.initiatorValues} />
+                        <ValueDiff label="Asset Type" oldVal={selectedPolicy.assetType} newVal={pendingChanges.__raw?.assetType ?? pendingChanges.assetType} />
+                        <ValueDiff label="Assets" oldVal={selectedPolicy.assetValues} newVal={pendingChanges.__raw?.assetValues ?? pendingChanges.assetValues} />
+                        <ValueDiff label="Amount Condition" oldVal={selectedPolicy.amountCondition} newVal={pendingChanges.__raw?.amountCondition ?? pendingChanges.amountCondition} />
+                        <ValueDiff label="Min Amount" oldVal={selectedPolicy.amountMin} newVal={pendingChanges.__raw?.amountMin ?? pendingChanges.amountMin} />
+                        <ValueDiff label="Max Amount" oldVal={selectedPolicy.amountMax} newVal={pendingChanges.__raw?.amountMax ?? pendingChanges.amountMax} />
+                        <ValueDiff label="Approvers" oldVal={selectedPolicy.approvers} newVal={pendingChanges.__raw?.approvers ?? pendingChanges.approvers} />
+                        <ValueDiff label="Quorum Required" oldVal={selectedPolicy.quorumRequired} newVal={pendingChanges.__raw?.quorumRequired ?? pendingChanges.quorumRequired} />
 
-                    {!isDelete && Object.keys(pendingChanges).length === 0 && (
-                      <div className="text-sm text-muted-foreground italic py-2">No configuration changes detected.</div>
-                    )}
-                  </div>
+                        {Object.keys(pendingChanges.__raw || pendingChanges).filter(k => !k.startsWith('__')).length === 0 && (
+                          <div className="text-sm text-muted-foreground italic py-2">No configuration changes detected.</div>
+                        )}
+                      </div>
+
+                      {/* Unchanged Conditions Section */}
+                      {(() => {
+                        const rawChanges = pendingChanges.__raw || pendingChanges;
+                        const unchangedFields = [
+                          { label: "Policy Name", oldVal: selectedPolicy.name, newVal: rawChanges.name },
+                          { label: "Description", oldVal: selectedPolicy.description, newVal: rawChanges.description },
+                          { label: "Action", oldVal: selectedPolicy.action, newVal: rawChanges.action },
+                          { label: "Condition Logic", oldVal: selectedPolicy.conditionLogic, newVal: rawChanges.conditionLogic },
+                          { label: "Initiator Type", oldVal: selectedPolicy.initiatorType, newVal: rawChanges.initiatorType },
+                          { label: "Initiators", oldVal: selectedPolicy.initiatorValues, newVal: rawChanges.initiatorValues },
+                          { label: "Asset Type", oldVal: selectedPolicy.assetType, newVal: rawChanges.assetType },
+                          { label: "Assets", oldVal: selectedPolicy.assetValues, newVal: rawChanges.assetValues },
+                          { label: "Amount Condition", oldVal: selectedPolicy.amountCondition, newVal: rawChanges.amountCondition },
+                          { label: "Min Amount", oldVal: selectedPolicy.amountMin, newVal: rawChanges.amountMin },
+                          { label: "Max Amount", oldVal: selectedPolicy.amountMax, newVal: rawChanges.amountMax },
+                        ].filter(f => !hasValueChanged(f.oldVal, f.newVal));
+
+                        if (unchangedFields.length === 0) return null;
+
+                        return (
+                          <div className="space-y-1 mt-4 pt-4 border-t border-border/50">
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-2">
+                              Unchanged Conditions
+                            </h4>
+                            {unchangedFields.map((f) => (
+                              <ValueDiff key={f.label} label={f.label} oldVal={f.oldVal} newVal={f.newVal} showUnchanged={true} />
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </>
+                  )}
                 </div>
               );
             })()

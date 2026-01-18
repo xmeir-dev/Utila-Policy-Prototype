@@ -33,7 +33,7 @@ interface ReviewDialogProps {
  * Shows the change as "oldValue → newValue" for clarity.
  * Returns null if values are unchanged to reduce visual noise.
  */
-function ValueDiff({ label, oldVal, newVal, isDelete = false }: { label: string, oldVal?: any, newVal?: any, isDelete?: boolean }) {
+function ValueDiff({ label, oldVal, newVal, isDelete = false, showUnchanged = false }: { label: string, oldVal?: any, newVal?: any, isDelete?: boolean, showUnchanged?: boolean }) {
   // Normalize values for consistent comparison and display
   const formatVal = (v: any) => {
     if (Array.isArray(v)) return v.join(", ");
@@ -43,26 +43,51 @@ function ValueDiff({ label, oldVal, newVal, isDelete = false }: { label: string,
 
   const oldFormatted = formatVal(oldVal);
   const newFormatted = formatVal(newVal);
+  const hasChanged = oldFormatted !== newFormatted;
 
-  // Skip rendering if nothing changed (reduces clutter in review)
-  if (oldFormatted === newFormatted && !isDelete) return null;
+  // Skip rendering if nothing changed (unless showUnchanged is true)
+  if (!hasChanged && !isDelete && !showUnchanged) return null;
+
+  // For unchanged items, show simple display
+  if (!hasChanged && showUnchanged) {
+    return (
+      <div className="py-1.5 border-b border-border/30 last:border-0">
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-muted-foreground">{label}</span>
+          <span className="text-foreground">{oldFormatted}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-2 border-b border-border/50 last:border-0">
-      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
-      <div className="flex items-center gap-2 text-sm">
+      <div className="text-xs text-muted-foreground mb-1">{label} changed</div>
+      <div className="flex items-center gap-2 text-sm flex-wrap">
         {isDelete ? (
-          <span className="line-through text-muted-foreground">{oldFormatted}</span>
+          <span className="line-through text-red-500">{oldFormatted}</span>
         ) : (
           <>
-            <span className="text-muted-foreground line-through">{oldFormatted}</span>
-            <ArrowRight className="w-3 h-3 text-muted-foreground" />
-            <span className="font-medium text-foreground">{newFormatted}</span>
+            <span className="text-red-500 line-through">{oldFormatted}</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+            <span className="font-medium text-green-600">{newFormatted}</span>
           </>
         )}
       </div>
     </div>
   );
+}
+
+/**
+ * Helper to check if a value has changed
+ */
+function hasValueChanged(oldVal: any, newVal: any): boolean {
+  const formatVal = (v: any) => {
+    if (Array.isArray(v)) return v.join(", ");
+    if (v === null || v === undefined) return "None";
+    return String(v);
+  };
+  return formatVal(oldVal) !== formatVal(newVal);
 }
 
 /**
@@ -114,4 +139,4 @@ export function ReviewDialog({
   );
 }
 
-export { ValueDiff };
+export { ValueDiff, hasValueChanged };
