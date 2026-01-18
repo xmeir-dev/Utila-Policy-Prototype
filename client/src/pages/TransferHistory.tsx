@@ -501,6 +501,7 @@ export default function TransferHistory() {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Date & Time</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Initiator</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Policy</th>
                     <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Action</th>
                   </tr>
@@ -508,13 +509,13 @@ export default function TransferHistory() {
                 <tbody>
                   {isPolicyHistoryLoading ? (
                     <tr>
-                      <td colSpan={3} className="px-6 py-12 text-center text-muted-foreground">
+                      <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
                         Loading policy history...
                       </td>
                     </tr>
                   ) : policyHistoryData.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="px-6 py-12 text-center text-[#ababab]">No policy changes yet</td>
+                      <td colSpan={4} className="px-6 py-12 text-center text-[#ababab]">No policy changes yet</td>
                     </tr>
                   ) : (
                     policyHistoryData.map((entry) => {
@@ -531,6 +532,9 @@ export default function TransferHistory() {
                               <span className="text-sm">{date}</span>
                               <span className="text-xs text-[#8a8a8a]">{time}</span>
                             </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-normal">{entry.performedBy || "-"}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-sm font-normal">{entry.policyName}</span>
