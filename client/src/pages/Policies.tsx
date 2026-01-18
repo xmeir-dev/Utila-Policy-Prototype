@@ -794,14 +794,40 @@ export default function Policies() {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
-                          <div className="flex items-center gap-2 cursor-help">
-                            <span className="text-[14px] text-[#ababab]">
-                              {isAdvancedMode ? "Drag to reorder. Higher policies take priority" : "Restrictive"}
-                            </span>
-                            {!isAdvancedMode && <Info className="w-3.5 h-3.5 text-[#ababab]" />}
+                          <div className="flex items-center rounded-md border border-border bg-muted/50 p-0.5">
+                            <button
+                              onClick={() => setIsAdvancedMode(false)}
+                              className={cn(
+                                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-colors",
+                                !isAdvancedMode 
+                                  ? "bg-background text-foreground shadow-sm" 
+                                  : "text-muted-foreground hover:text-foreground"
+                              )}
+                              data-testid="button-restrictive-mode"
+                            >
+                              Restrictive
+                              {!isAdvancedMode && <Info className="w-3 h-3" />}
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (!isAdvancedMode) {
+                                  setShowPasswordDialog(true);
+                                }
+                              }}
+                              className={cn(
+                                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-colors",
+                                isAdvancedMode 
+                                  ? "bg-background text-foreground shadow-sm" 
+                                  : "text-muted-foreground hover:text-foreground"
+                              )}
+                              data-testid="button-advanced-mode"
+                            >
+                              {!isAdvancedMode && <Lock className="w-3 h-3" />}
+                              Advanced
+                            </button>
                           </div>
                         </TooltipTrigger>
                         {!isAdvancedMode && (
@@ -810,28 +836,6 @@ export default function Policies() {
                           </TooltipContent>
                         )}
                       </Tooltip>
-                      {isAdvancedMode ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs gap-1"
-                          onClick={() => setIsAdvancedMode(false)}
-                          data-testid="button-exit-advanced-mode"
-                        >
-                          Restrictive
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs gap-1"
-                          onClick={() => setShowPasswordDialog(true)}
-                          data-testid="button-enter-advanced-mode"
-                        >
-                          <Lock className="w-3 h-3" />
-                          Advanced
-                        </Button>
-                      )}
                     </div>
                   </div>
                   {isAdvancedMode ? (
