@@ -416,15 +416,52 @@ interface RiskAnalysisResult {
 }
 
 /**
+ * DUAL-MODE POLICY SORTING SYSTEM
+ * ================================
+ * 
+ * The Policies page supports two display modes:
+ * 
+ * 1. RESTRICTIVE MODE (default)
+ *    - Policies are automatically sorted by action priority for maximum security
+ *    - Sorting order: deny (0) > require_approval (1) > allow (2)
+ *    - Within the same action type, older policies (lower ID) appear first
+ *    - This ensures the most restrictive policies are always evaluated first
+ *    - Users cannot manually reorder policies in this mode
+ * 
+ * 2. ADVANCED MODE (password-protected)
+ *    - Requires password "utila" to access
+ *    - Enables manual drag-and-drop reordering of policies
+ *    - When entering advanced mode, the current restrictive order is preserved
+ *    - Custom order persists when switching between modes
+ *    - Switching back to restrictive mode shows a confirmation dialog
+ *      warning that the custom order will be reset
+ * 
+ * Key state variables:
+ * - isAdvancedMode: Boolean toggle between the two modes
+ * - advancedOrder: Array of policy IDs representing the manual order
+ * - showPasswordDialog: Controls the password entry dialog
+ * - showRestrictiveConfirmDialog: Controls the "switch back" confirmation
+ */
+
+/**
  * Sorts policies by action priority (deny > require_approval > allow) with oldest as tie-breaker.
  * This is the "Restrictive" sorting logic used when not in advanced mode.
+ * 
+ * Priority values:
+ * - deny: 0 (highest priority - shown first)
+ * - require_approval: 1 (medium priority)
+ * - allow/approve: 2 (lowest priority - shown last)
+ * 
+ * Tie-breaker: When two policies have the same action type, the older policy
+ * (with lower ID) is shown first, assuming older policies were created with
+ * more consideration and should take precedence.
  */
 function sortPoliciesByActionPriority(policies: Policy[]): Policy[] {
   const actionPriority: Record<string, number> = {
     'deny': 0,
     'require_approval': 1,
     'allow': 2,
-    'approve': 2, // Legacy support
+    'approve': 2, // Legacy support for old action name
   };
   
   return [...policies].sort((a, b) => {
@@ -449,19 +486,27 @@ export default function Policies() {
   const [viewingPendingPolicyId, setViewingPendingPolicyId] = useState<number | null>(null);
   const [prefilledAiPrompt, setPrefilledAiPrompt] = useState<string | undefined>(undefined);
   const [riskAnalysisResult, setRiskAnalysisResult] = useState<RiskAnalysisResult | null>(null);
-  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-  const [passwordInput, setPasswordInput] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
-  const [advancedOrder, setAdvancedOrder] = useState<number[]>([]);
-  const [showRestrictiveConfirmDialog, setShowRestrictiveConfirmDialog] = useState(false);
+  // === DUAL-MODE SORTING STATE ===
+  // See sortPoliciesByActionPriority() for full documentation
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);           // Toggle between restrictive/advanced modes
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);   // Password dialog for entering advanced mode
+  const [passwordInput, setPasswordInput] = useState("");                // Current password input value
+  const [passwordError, setPasswordError] = useState(false);             // Whether password was incorrect
+  const [advancedOrder, setAdvancedOrder] = useState<number[]>([]);      // Manual policy order (array of policy IDs)
+  const [showRestrictiveConfirmDialog, setShowRestrictiveConfirmDialog] = useState(false); // Confirm switching back to restrictive
   const { toast } = useToast();
   
+  // Password required to unlock advanced mode (manual reordering)
   const ADVANCED_MODE_PASSWORD = "utila";
   
+  /**
+   * Handles password submission for advanced mode.
+   * On success: captures current restrictive order into advancedOrder state,
+   * ensuring visual continuity when switching modes.
+   */
   const handlePasswordSubmit = () => {
     if (passwordInput === ADVANCED_MODE_PASSWORD) {
-      // Initialize advanced order from current restrictive-sorted view
+      // Capture current restrictive-sorted order so switching modes doesn't reshuffle
       const sortedPolicies = sortPoliciesByActionPriority(policies);
       setAdvancedOrder(sortedPolicies.map(p => p.id));
       setIsAdvancedMode(true);
@@ -488,7 +533,13 @@ export default function Policies() {
   // Derive the viewing policy from fresh query data to avoid stale state
   const viewingPendingPolicy = viewingPendingPolicyId ? policies.find(p => p.id === viewingPendingPolicyId) || null : null;
   
-  // In default mode, sort by action priority; in advanced mode, use the local advancedOrder
+  /**
+   * DISPLAYED POLICIES - determined by current mode:
+   * - Restrictive mode: Auto-sorted by action priority (deny > require_approval > allow)
+   * - Advanced mode: Uses advancedOrder array to maintain custom order
+   * 
+   * The filter ensures we only show policies that still exist (handles deletions)
+   */
   const displayedPolicies = isAdvancedMode 
     ? advancedOrder
         .map(id => policies.find(p => p.id === id))
@@ -692,6 +743,11 @@ export default function Policies() {
     },
   });
 
+  /**
+   * ADVANCED MODE: Drag-and-drop handler for manual policy reordering.
+   * Updates the local advancedOrder state and persists to server.
+   * Only active when isAdvancedMode is true.
+   */
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
