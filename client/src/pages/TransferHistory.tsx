@@ -279,10 +279,12 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
         return (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help">
-                <Clock className="w-3 h-3" />
-                Edit
-              </Badge>
+              <span className="inline-flex">
+                <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help">
+                  <Clock className="w-3 h-3" />
+                  Edit
+                </Badge>
+              </span>
             </TooltipTrigger>
             <TooltipContent side="top" className="max-w-[300px] p-3">
               {parsedChanges ? (
@@ -313,10 +315,12 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
           return (
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
-                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 cursor-help">
-                  <Users className="w-3 h-3" />
-                  Change approval
-                </Badge>
+                <span className="inline-flex">
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 cursor-help">
+                    <Users className="w-3 h-3" />
+                    Change approval
+                  </Badge>
+                </span>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-[300px] p-3">
                 <div className="text-xs space-y-1">
