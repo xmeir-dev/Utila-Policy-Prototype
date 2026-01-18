@@ -302,7 +302,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
     switch (action) {
       case "creation":
         return (
-          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-200 gap-1 no-default-hover-elevate">
+          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-200 gap-1 no-default-hover-elevate text-sm font-normal">
             <CheckCircle2 className="w-3 h-3" />
             Creation
           </Badge>
@@ -313,7 +313,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <span className="inline-flex">
-                  <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help no-default-hover-elevate">
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help no-default-hover-elevate text-sm font-normal">
                     <Clock className="w-3 h-3" />
                     Edit
                   </Badge>
@@ -324,14 +324,14 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
           );
         }
         return (
-          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 no-default-hover-elevate">
+          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 no-default-hover-elevate text-sm font-normal">
             <Clock className="w-3 h-3" />
             Edit
           </Badge>
         );
       case "deletion":
         return (
-          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-200 gap-1 no-default-hover-elevate">
+          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-200 gap-1 no-default-hover-elevate text-sm font-normal">
             <XCircle className="w-3 h-3" />
             Deletion
           </Badge>
@@ -342,7 +342,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <span className="inline-flex">
-                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 cursor-help no-default-hover-elevate">
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 cursor-help no-default-hover-elevate text-sm font-normal">
                     <Users className="w-3 h-3" />
                     Change approval
                   </Badge>
@@ -353,7 +353,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
           );
         }
         return (
-          <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 no-default-hover-elevate">
+          <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1 no-default-hover-elevate text-sm font-normal">
             <Users className="w-3 h-3" />
             Change approval
           </Badge>
