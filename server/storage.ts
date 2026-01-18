@@ -256,6 +256,16 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(policies.id, id))
       .returning();
+
+    // Record edit in history (pending approval) with diff
+    await this.createPolicyHistory({
+      policyId: id,
+      policyName: updated.name,
+      action: 'edit',
+      performedBy: effectiveName,
+      changes: JSON.stringify({ __diff: policyDiff, __raw: changes }),
+    });
+
     return updated;
   }
 
