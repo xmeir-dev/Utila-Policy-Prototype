@@ -294,7 +294,7 @@ export default function TransferHistory() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h2 className="font-bold font-display text-foreground text-[24px]">Transfer history</h2>
+            <h2 className="font-bold font-display text-foreground text-[24px]">Activity</h2>
           </div>
 
           <div className="border border-border rounded-[24px] bg-card overflow-hidden">
