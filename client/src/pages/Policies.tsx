@@ -797,11 +797,11 @@ export default function Policies() {
                     <div className="flex items-center gap-3">
                       <Tooltip delayDuration={200}>
                         <TooltipTrigger asChild>
-                          <div className="flex items-center rounded-md border border-border bg-muted/50 p-0.5">
+                          <div className="flex items-center rounded-full border border-border bg-muted/50 p-0.5">
                             <button
                               onClick={() => setIsAdvancedMode(false)}
                               className={cn(
-                                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-colors",
+                                "flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full transition-colors",
                                 !isAdvancedMode 
                                   ? "bg-background text-foreground shadow-sm" 
                                   : "text-muted-foreground hover:text-foreground"
@@ -818,7 +818,7 @@ export default function Policies() {
                                 }
                               }}
                               className={cn(
-                                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-colors",
+                                "flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full transition-colors",
                                 isAdvancedMode 
                                   ? "bg-background text-foreground shadow-sm" 
                                   : "text-muted-foreground hover:text-foreground"
