@@ -454,6 +454,7 @@ export default function Policies() {
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [advancedOrder, setAdvancedOrder] = useState<number[]>([]);
+  const [showRestrictiveConfirmDialog, setShowRestrictiveConfirmDialog] = useState(false);
   const { toast } = useToast();
   
   const ADVANCED_MODE_PASSWORD = "utila";
@@ -808,7 +809,11 @@ export default function Policies() {
                         <TooltipTrigger asChild>
                           <div className="flex items-center rounded-full border border-border bg-muted/50 p-0.5">
                             <button
-                              onClick={() => setIsAdvancedMode(false)}
+                              onClick={() => {
+                                if (isAdvancedMode) {
+                                  setShowRestrictiveConfirmDialog(true);
+                                }
+                              }}
                               className={cn(
                                 "flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full transition-colors",
                                 !isAdvancedMode 
@@ -1337,6 +1342,36 @@ export default function Policies() {
                 data-testid="button-submit-password"
               >
                 Unlock
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showRestrictiveConfirmDialog} onOpenChange={setShowRestrictiveConfirmDialog}>
+        <DialogContent className="sm:max-w-[400px] rounded-[24px] p-0 gap-0">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogTitle className="text-xl font-bold">Switch to Restrictive Mode?</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Your custom order will be reset to the automatic restrictive sorting (deny first, then requires-approval, then allow).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6 space-y-4">
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowRestrictiveConfirmDialog(false)}
+                data-testid="button-cancel-restrictive"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsAdvancedMode(false);
+                  setShowRestrictiveConfirmDialog(false);
+                }}
+                data-testid="button-confirm-restrictive"
+              >
+                Switch to Restrictive
               </Button>
             </div>
           </div>
