@@ -183,6 +183,16 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(policies.id, id))
         .returning();
+
+      // Record edit in history (auto-approved)
+      await this.createPolicyHistory({
+        policyId: id,
+        policyName: updated.name,
+        action: 'edit',
+        performedBy: effectiveName,
+        changes: JSON.stringify(changes),
+      });
+
       return updated;
     }
 
@@ -247,6 +257,16 @@ export class DatabaseStorage implements IStorage {
     // If submitter's approval already meets the quorum, delete immediately
     if (initialApprovalCount >= quorumRequired) {
       await db.delete(policies).where(eq(policies.id, id));
+
+      // Record deletion in history (auto-approved)
+      await this.createPolicyHistory({
+        policyId: id,
+        policyName: policy.name,
+        action: 'deletion',
+        performedBy: effectiveName,
+        changes: null,
+      });
+
       return { ...policy, status: 'deleted' } as Policy;
     }
 
@@ -323,6 +343,16 @@ export class DatabaseStorage implements IStorage {
       ...policy,
       priority: maxPriority + 1,
     }).returning();
+
+    // Record policy creation in history
+    await this.createPolicyHistory({
+      policyId: newPolicy.id,
+      policyName: newPolicy.name,
+      action: 'creation',
+      performedBy: policy.changeInitiator || null,
+      changes: null,
+    });
+
     return newPolicy;
   }
 
@@ -538,6 +568,16 @@ export class DatabaseStorage implements IStorage {
       // Handle deletion vs. modification
       if (pendingChanges.__delete === true) {
         await db.delete(policies).where(eq(policies.id, id));
+        
+        // Record deletion in history
+        await this.createPolicyHistory({
+          policyId: id,
+          policyName: policy.name,
+          action: 'deletion',
+          performedBy: approver,
+          changes: null,
+        });
+        
         return { ...policy, status: 'deleted' } as Policy;
       }
       
@@ -554,6 +594,16 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(policies.id, id))
         .returning();
+
+      // Record edit in history
+      await this.createPolicyHistory({
+        policyId: id,
+        policyName: updated.name,
+        action: 'edit',
+        performedBy: approver,
+        changes: JSON.stringify(pendingChanges),
+      });
+
       return updated;
     } else {
       // Quorum not yet reached - just record the approval
@@ -562,6 +612,16 @@ export class DatabaseStorage implements IStorage {
         .set({ changeApprovers: newApprovals })
         .where(eq(policies.id, id))
         .returning();
+
+      // Record change-approval in history
+      await this.createPolicyHistory({
+        policyId: id,
+        policyName: policy.name,
+        action: 'change-approval',
+        performedBy: approver,
+        changes: null,
+      });
+
       return updated;
     }
   }
