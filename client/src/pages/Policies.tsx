@@ -16,7 +16,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Shield, ShieldCheck, ShieldX, ShieldAlert, ShieldEllipsis,
   Trash2, Scale, GripVertical, Settings, TestTubeDiagonal, ChevronRight,
-  AlertTriangle, CheckCircle, AlertCircle, Loader2, Lock
+  AlertTriangle, CheckCircle, AlertCircle, Loader2, Lock, Info
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,9 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DraggableAttributes,
 } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import {
   arrayMove,
   SortableContext,
@@ -188,8 +190,8 @@ function PolicyItemContent({
 }: PolicyItemProps & { 
   showDragHandle?: boolean;
   dragHandleProps?: {
-    attributes: Record<string, unknown>;
-    listeners: Record<string, unknown> | undefined;
+    attributes: DraggableAttributes;
+    listeners: SyntheticListenerMap | undefined;
   };
 }) {
   const isPendingApproval = policy.status === 'pending_approval';
@@ -414,8 +416,8 @@ interface RiskAnalysisResult {
 }
 
 /**
- * Sorts policies by action priority (deny > require_approval > allow) with newest as tie-breaker.
- * This is the default sorting logic used when not in advanced mode.
+ * Sorts policies by action priority (deny > require_approval > allow) with oldest as tie-breaker.
+ * This is the "Restrictive" sorting logic used when not in advanced mode.
  */
 function sortPoliciesByActionPriority(policies: Policy[]): Policy[] {
   const actionPriority: Record<string, number> = {
@@ -433,8 +435,8 @@ function sortPoliciesByActionPriority(policies: Policy[]): Policy[] {
       return priorityA - priorityB;
     }
     
-    // Tie-breaker: newest (higher id) wins - shown first
-    return b.id - a.id;
+    // Tie-breaker: oldest (lower id) wins - shown first
+    return a.id - b.id;
   });
 }
 
@@ -793,12 +795,21 @@ export default function Policies() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[14px] text-[#ababab]">
-                        {isAdvancedMode 
-                          ? "Drag to reorder. Higher policies take priority" 
-                          : "Sorted by: Denied, then Approval, then Allowed"
-                        }
-                      </span>
+                      <Tooltip delayDuration={200}>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-2 cursor-help">
+                            <span className="text-[14px] text-[#ababab]">
+                              {isAdvancedMode ? "Drag to reorder. Higher policies take priority" : "Restrictive"}
+                            </span>
+                            {!isAdvancedMode && <Info className="w-3.5 h-3.5 text-[#ababab]" />}
+                          </div>
+                        </TooltipTrigger>
+                        {!isAdvancedMode && (
+                          <TooltipContent className="max-w-[320px]">
+                            <p>Restrictive sorting assumes auto-deny policies take precedence over requires-approval policies, which take precedence over auto-approve policies. Tiebreakers are decided by policy age, older policies take priority. Switch to Advanced to sort policies manually.</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
                       {isAdvancedMode ? (
                         <Button
                           variant="ghost"
@@ -807,7 +818,7 @@ export default function Policies() {
                           onClick={() => setIsAdvancedMode(false)}
                           data-testid="button-exit-advanced-mode"
                         >
-                          Exit Advanced
+                          Restrictive
                         </Button>
                       ) : (
                         <Button
