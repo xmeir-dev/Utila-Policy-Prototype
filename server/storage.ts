@@ -11,7 +11,7 @@
  * - Transaction simulation against policy rules
  */
 
-import { users, transactions, policies, type User, type InsertUser, type Transaction, type InsertTransaction, type Policy, type InsertPolicy, type SimulateTransactionRequest } from "@shared/schema";
+import { users, transactions, policies, policyHistory, type User, type InsertUser, type Transaction, type InsertTransaction, type Policy, type InsertPolicy, type PolicyHistory, type InsertPolicyHistory, type SimulateTransactionRequest } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, asc, desc } from "drizzle-orm";
 
@@ -42,6 +42,8 @@ export interface IStorage {
   simulateTransaction(request: SimulateTransactionRequest): Promise<{ matchedPolicy: Policy | null; action: string; reason: string }>;
   approvePolicyChange(id: number, approver: string): Promise<Policy | undefined>;
   approveTransaction(id: number, approver: string): Promise<Transaction | undefined>;
+  getPolicyHistory(): Promise<PolicyHistory[]>;
+  createPolicyHistory(entry: InsertPolicyHistory): Promise<PolicyHistory>;
 }
 
 /**
@@ -609,6 +611,21 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return updated;
     }
+  }
+
+  async getPolicyHistory(): Promise<PolicyHistory[]> {
+    return await db
+      .select()
+      .from(policyHistory)
+      .orderBy(desc(policyHistory.id));
+  }
+
+  async createPolicyHistory(entry: InsertPolicyHistory): Promise<PolicyHistory> {
+    const [record] = await db.insert(policyHistory).values({
+      ...entry,
+      createdAt: new Date().toISOString(),
+    }).returning();
+    return record;
   }
 }
 

@@ -303,3 +303,30 @@ export type SimulateTransactionRequest = z.infer<typeof simulateTransactionSchem
  */
 export type TransactionsListResponse = Transaction[];
 export type PoliciesListResponse = Policy[];
+
+/**
+ * POLICY HISTORY TABLE
+ * 
+ * Tracks all changes made to policies for audit and compliance purposes.
+ * Records creation, edits, deletions, and approval changes.
+ */
+export const policyHistory = pgTable("policy_history", {
+  id: serial("id").primaryKey(),
+  // Reference to the policy (may be null if policy was deleted)
+  policyId: integer("policy_id"),
+  // Name of the policy at the time of action
+  policyName: text("policy_name").notNull(),
+  // Type of action: 'creation', 'edit', 'deletion', 'change-approval'
+  action: text("action").notNull(),
+  // Who performed the action
+  performedBy: text("performed_by"),
+  // JSON string of changes made (for edits - shows before/after)
+  changes: text("changes"),
+  // ISO timestamp when action occurred
+  createdAt: text("created_at").default("now()"),
+});
+
+export const insertPolicyHistorySchema = createInsertSchema(policyHistory).omit({ id: true, createdAt: true });
+
+export type PolicyHistory = typeof policyHistory.$inferSelect;
+export type InsertPolicyHistory = z.infer<typeof insertPolicyHistorySchema>;

@@ -641,5 +641,15 @@ Return a JSON object with this structure:
     }
   });
 
+  // Returns all policy history entries for the activity view
+  app.get("/api/policy-history", async (req, res) => {
+    try {
+      const history = await storage.getPolicyHistory();
+      res.status(200).json(history);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch policy history" });
+    }
+  });
+
   return httpServer;
 }

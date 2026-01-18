@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import type { Transaction } from "@shared/schema";
+import type { Transaction, PolicyHistory } from "@shared/schema";
 
 const truncateAddress = (address: string): string => {
   if (!address) return "-";
@@ -263,6 +263,66 @@ const StatusBadge = ({ status }: { status: string }) => {
   }
 };
 
+const PolicyActionBadge = ({ action, changes }: { action: string; changes: string | null }) => {
+  const parsedChanges = changes ? JSON.parse(changes) : null;
+  
+  const getBadgeContent = () => {
+    switch (action) {
+      case "creation":
+        return (
+          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-200 gap-1">
+            <CheckCircle2 className="w-3 h-3" />
+            Creation
+          </Badge>
+        );
+      case "edit":
+        return (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1 cursor-help">
+                <Clock className="w-3 h-3" />
+                Edit
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[300px] p-3">
+              {parsedChanges ? (
+                <div className="text-xs space-y-1">
+                  <p className="font-medium mb-2">Changes made:</p>
+                  {Object.entries(parsedChanges).map(([key, value]) => (
+                    <div key={key} className="flex justify-between gap-2">
+                      <span className="text-muted-foreground">{key}:</span>
+                      <span className="font-medium">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs">No change details available</p>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        );
+      case "deletion":
+        return (
+          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-200 gap-1">
+            <XCircle className="w-3 h-3" />
+            Deletion
+          </Badge>
+        );
+      case "change-approval":
+        return (
+          <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1">
+            <Users className="w-3 h-3" />
+            Approval
+          </Badge>
+        );
+      default:
+        return <Badge variant="outline">{action}</Badge>;
+    }
+  };
+
+  return getBadgeContent();
+};
+
 export default function TransferHistory() {
   const [, setLocation] = useLocation();
   const walletState = useWallet();
@@ -272,6 +332,15 @@ export default function TransferHistory() {
     queryFn: async () => {
       const res = await fetch("/api/transactions");
       if (!res.ok) throw new Error("Failed to fetch transactions");
+      return res.json();
+    },
+  });
+
+  const { data: policyHistoryData = [], isLoading: isPolicyHistoryLoading } = useQuery<PolicyHistory[]>({
+    queryKey: ["/api/policy-history"],
+    queryFn: async () => {
+      const res = await fetch("/api/policy-history");
+      if (!res.ok) throw new Error("Failed to fetch policy history");
       return res.json();
     },
   });
@@ -412,6 +481,62 @@ export default function TransferHistory() {
                             ) : (
                               <span className="text-sm text-muted-foreground">-</span>
                             )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3 className="text-[#171717] text-[18px] font-medium mt-8" data-testid="text-policy-history-label">
+            Policy history
+          </h3>
+
+          <div className="border border-border rounded-[24px] bg-card overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full" data-testid="table-policy-history">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Date & Time</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Policy</th>
+                    <th className="text-left px-6 py-4 text-[14px] font-medium text-[#8a8a8a]">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isPolicyHistoryLoading ? (
+                    <tr>
+                      <td colSpan={3} className="px-6 py-12 text-center text-muted-foreground">
+                        Loading policy history...
+                      </td>
+                    </tr>
+                  ) : policyHistoryData.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="px-6 py-12 text-center text-[#ababab]">No policy changes yet</td>
+                    </tr>
+                  ) : (
+                    policyHistoryData.map((entry) => {
+                      const { date, time } = formatDateTime(entry.createdAt);
+                      
+                      return (
+                        <tr 
+                          key={entry.id} 
+                          className="border-b border-border last:border-b-0"
+                          data-testid={`row-policy-history-${entry.id}`}
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="text-sm">{date}</span>
+                              <span className="text-xs text-[#8a8a8a]">{time}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-normal">{entry.policyName}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <PolicyActionBadge action={entry.action} changes={entry.changes} />
                           </td>
                         </tr>
                       );
