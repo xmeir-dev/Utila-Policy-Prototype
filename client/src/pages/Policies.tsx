@@ -809,7 +809,6 @@ export default function Policies() {
                               data-testid="button-restrictive-mode"
                             >
                               Restrictive
-                              {!isAdvancedMode && <Info className="w-3 h-3" />}
                             </button>
                             <button
                               onClick={() => {
