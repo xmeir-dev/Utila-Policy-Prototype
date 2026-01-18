@@ -297,6 +297,10 @@ export default function TransferHistory() {
             <h2 className="font-bold font-display text-foreground text-[24px]">Activity</h2>
           </div>
 
+          <h3 className="text-[#171717] text-[18px] font-medium" data-testid="text-transfer-history-label">
+            Transfer history
+          </h3>
+
           <div className="border border-border rounded-[24px] bg-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="table-transactions">
