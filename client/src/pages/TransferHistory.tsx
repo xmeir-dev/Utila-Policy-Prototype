@@ -312,7 +312,7 @@ const PolicyActionBadge = ({ action, changes }: { action: string; changes: strin
         return (
           <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1">
             <Users className="w-3 h-3" />
-            Approval
+            Change approval
           </Badge>
         );
       default:
