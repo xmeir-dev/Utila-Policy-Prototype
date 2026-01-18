@@ -254,12 +254,12 @@ export default function Home() {
 
               <div className="grid grid-cols-3 gap-4 mb-12 w-full">
                 <div 
-                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-primary text-primary-foreground cursor-pointer hover-elevate active-elevate-2"
+                  className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
                   onClick={() => setLocation("/transfer")}
                   data-testid="button-transfer"
                 >
-                  <Send className="w-8 h-8 text-primary-foreground" />
-                  <span className="font-semibold text-center text-primary-foreground">Transfer</span>
+                  <Send className="w-8 h-8 text-primary" />
+                  <span className="font-semibold text-center">Transfer</span>
                 </div>
                 <div 
                   className="flex flex-col items-center justify-center gap-3 p-8 border border-border rounded-[24px] bg-card cursor-pointer hover-elevate active-elevate-2"
