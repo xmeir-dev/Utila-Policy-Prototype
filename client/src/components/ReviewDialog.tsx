@@ -31,7 +31,15 @@ interface ReviewDialogProps {
 /**
  * Displays a visual diff between old and new values.
  * Shows the change as "oldValue → newValue" for clarity.
- * Returns null if values are unchanged to reduce visual noise.
+ * 
+ * For changed values:
+ * - Old value shown in red with strikethrough
+ * - New value shown in green
+ * 
+ * For unchanged values (when showUnchanged=true):
+ * - Simple label: value display
+ * 
+ * Returns null if values are unchanged and showUnchanged is false.
  */
 function ValueDiff({ label, oldVal, newVal, isDelete = false, showUnchanged = false }: { label: string, oldVal?: any, newVal?: any, isDelete?: boolean, showUnchanged?: boolean }) {
   // Normalize values for consistent comparison and display
@@ -79,7 +87,8 @@ function ValueDiff({ label, oldVal, newVal, isDelete = false, showUnchanged = fa
 }
 
 /**
- * Helper to check if a value has changed
+ * Helper to check if a value has changed.
+ * Used to separate changed items from unchanged conditions in the review dialog.
  */
 function hasValueChanged(oldVal: any, newVal: any): boolean {
   const formatVal = (v: any) => {

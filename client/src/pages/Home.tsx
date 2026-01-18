@@ -609,7 +609,9 @@ export default function Home() {
                     </div>
                   ) : (
                     <>
-                      {/* Changed Items Section */}
+                      {/* Changed Items Section
+                          Shows only fields that have been modified.
+                          Format: "Field changed" with old value (red strikethrough) → new value (green) */}
                       <div className="space-y-1">
                         <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5 mb-2">
                           Changes
@@ -634,7 +636,9 @@ export default function Home() {
                         )}
                       </div>
 
-                      {/* Unchanged Conditions Section */}
+                      {/* Unchanged Conditions Section
+                          Shows policy fields that remain the same for context.
+                          Displayed in simple "Label: Value" format below the changes. */}
                       {(() => {
                         const rawChanges = pendingChanges.__raw || pendingChanges;
                         const unchangedFields = [

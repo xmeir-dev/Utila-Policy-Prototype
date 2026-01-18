@@ -413,6 +413,9 @@ export default function TransferHistory() {
             Transfer history
           </h3>
 
+          {/* Transfer History Table
+              Column order: Date (first), Initiator, Amount, From, To, Status, Approvals
+              Date column shows date on first line and time below in smaller text */}
           <div className="border border-border rounded-[24px] bg-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="table-transactions">
@@ -538,6 +541,11 @@ export default function TransferHistory() {
             Policy history
           </h3>
 
+          {/* Policy History Table
+              Column order: Date (first), Initiator, Policy, Action
+              Action badges: Creation (green), Edit (blue), Deletion (red), Change approval (orange)
+              Edit and Change approval badges show tooltips with diff format:
+              "Field changed from X to Y" with old value in red strikethrough and new value in green */}
           <div className="border border-border rounded-[24px] bg-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="table-policy-history">

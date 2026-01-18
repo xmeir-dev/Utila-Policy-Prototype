@@ -257,7 +257,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(policies.id, id))
       .returning();
 
-    // Record edit in history (pending approval) with diff
+    // Record edit in history immediately when queued for approval.
+    // This ensures both the "edit" action (from submitter) and subsequent
+    // "change-approval" action (from approver) appear in policy history.
+    // The diff is stored with __diff for before/after display in tooltips.
     await this.createPolicyHistory({
       policyId: id,
       policyName: updated.name,
